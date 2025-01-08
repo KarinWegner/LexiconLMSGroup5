@@ -16,5 +16,8 @@ namespace Domain.Models.Entities
 
         //Foreign key
         public int CourseId { get; set; }
+
+        //Navigation Property
+        public Course Course { get; set; }
     }
 }
