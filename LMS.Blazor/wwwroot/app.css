@@ -63,20 +63,54 @@ a, .btn-link {
     color: #fff;
 }
 
+/*********** Primary buttons *******/
 .btn-primary {
+    background-color: #7ebeea;
+    border-color: #7ebeea;
+}
+
+    .btn-primary:hover {
+        border-color: #40a5eb !important;
+        background: #40a5eb !important;
+    }
+
+.btn-outline-primary {
+    border: 1px solid #7ebeea;
+    color: #7ebeea;
+}
+
+    .btn-outline-primary:hover {
+        color: #fff;
+        background-color: #40a5eb;
+        border: 1px solid #40a5eb;
+    }
+
+/*********** Secondary buttons *******/
+.btn-secondary {
     background-color: #ec8f6a;
     border-color: #ec8f6a;
 }
 
-.btn-primary:hover {
-     border-color: #e66d3d !important;
-     background: #e66d3d !important;
+    .btn-secondary:hover {
+        border-color: #e66d3d !important;
+        background: #e66d3d !important;
+    }
+
+.btn-outline-secondary {
+    border: 1px solid #ec8f6a;
+    color: #ec8f6a;
+}
+
+.btn-outline-secondary:hover {
+        color: #fff;
+        background-color: #e66d3d;
+        border: 1px solid #e66d3d;
 }
 
 
 .btn-success {
-     border-color: #8bbabb;
-     background: #8bbabb;
+    border-color: #8bbabb;
+    background: #8bbabb;
 }
 
 .btn-success:hover {
@@ -168,4 +202,8 @@ h1:focus {
 
 .logo{
     width: 40px;
+}
+
+.custom-min-vh-80 {
+    min-height: 80vh;
 }
