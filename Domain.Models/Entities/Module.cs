@@ -18,6 +18,6 @@ namespace Domain.Models.Entities
         public int CourseId { get; set; }
 
         //Navigation Property
-        public Course Course { get; set; }
+        
     }
 }
