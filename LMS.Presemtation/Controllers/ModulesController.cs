@@ -85,8 +85,15 @@ namespace LMS.Presemtation.Controllers
         {
             if ((moduleDto == null)) return NotFound("No module to add was found.");
             if (!CourseExists(courseId)) return NotFound("Course could not be found.");
-            Module module = _mapper.Map<Module>(moduleDto);
+
             Course course = await _context.Courses.FirstOrDefaultAsync(c => c.CourseId == courseId);
+
+            if (moduleDto.StartDate < course.StartDate || moduleDto.EndDate > course.EndDate) return BadRequest("Module startdate is not within the course timeframe.");
+            if (moduleDto.EndDate < moduleDto.StartDate) return BadRequest("The module cannot end before it starts.");
+           
+            //ToDo: Add check for overlapping start/end dates
+
+            Module module = _mapper.Map<Module>(moduleDto);
             course.Modules.Add(module);
             await _context.SaveChangesAsync();
 

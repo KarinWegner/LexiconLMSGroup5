@@ -9,6 +9,7 @@ using Domain.Models.Entities;
 using LMS.Infrastructure.Data;
 using AutoMapper;
 using LMS.Shared.DTOs.CourseDTOs;
+using LMS.Shared.DTOs.ModuleDTOs;
 
 namespace LMS.Presemtation.Controllers
 {
@@ -84,7 +85,9 @@ namespace LMS.Presemtation.Controllers
         [HttpPost]
         public async Task<ActionResult<Course>> PostCourse(CourseCreateDTO courseDto)
         {
-            if (courseDto == null) return BadRequest();
+            if (courseDto == null) return NotFound("No course to add could be found.");
+            if(courseDto.EndDate<courseDto.StartDate) return BadRequest("The course cannot end before the start date.");
+
             var courseToAdd = _mapper.Map<Course>(courseDto);
             _context.Courses.Add(courseToAdd);
             await _context.SaveChangesAsync();
