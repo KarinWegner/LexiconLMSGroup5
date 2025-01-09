@@ -1,17 +1,14 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Domain.Models.Entities
+namespace Domain.Models.Entities;
+
+//ApplicationUser is shared between Blazor and API
+public class ApplicationUser : IdentityUser
 {
-    public class ApplicationUser : IdentityUser
-    {
-        public string Name { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
-        public ICollection<Course> Enrollments { get; set; }
-        
-    }
+    public string? RefreshToken { get; set; }
+    public DateTime RefreshTokenExpireTime { get; set; }
+
+    public string Name { get; set; } = string.Empty;
+
+    public ICollection<Course> Enrollments { get; set; }
 }
