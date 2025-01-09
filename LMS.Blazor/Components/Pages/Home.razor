@@ -2,32 +2,20 @@
 
 <PageTitle>Home</PageTitle>
 
-<h1>LMS starter template</h1>
-
-<p>You can use this template as a starter template or build from one from scratch!</p>
-
-<div class="row flex">
-    <div class="col-md-3">
-        <button type="button" class="btn mb-2 mb-md-0 btn-primary btn-block">
-            Primary
-        </button>
+<div class="container-fluid custom-min-vh-80  d-flex align-items-center justify-content-center">
+    <div class="row w-100">
+      
+        <div class="col-md-6 d-flex flex-column justify-content-center order-2 order-md-1 gap-3" data-aos="zoom-out">
+            <h2>Welcome to <span>Lexicon LMS</span></h2>
+            <p>Please log in to proceed, or sign up to create a new account.</p>
+            <div class="d-flex gap-2">
+                <NavLink href="account/login" class="btn btn-secondary">Login</NavLink>
+                <NavLink class="btn btn-outline-secondary" href="Account/Register">Register</NavLink>
+            </div>
+        </div>
+        <div class="col-md-6 d-flex justify-content-center align-items-center order-1 order-md-2">
+            <img src="/assets/learning-management-system.png" class="img-fluid" alt="Learning Managment System" />
+        </div>
     </div>
 
-    <div class="col-md-3">
-        <button type="button" class="btn mb-2 mb-md-0 btn-info btn-block">
-            Info
-        </button>
-    </div>
-
-    <div class="col-md-3">
-        <button type="button" class="btn mb-2 mb-md-0 btn-success btn-block">
-            Success
-        </button>
-    </div>
-
-    <div class="col-md-3">
-        <button type="button" class="btn mb-2 mb-md-0 btn-danger btn-block">
-            Danger
-        </button>
-    </div>
 </div>

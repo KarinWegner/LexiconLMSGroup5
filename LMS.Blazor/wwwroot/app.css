@@ -150,6 +150,9 @@ a, .btn-link {
 }
 
 /******** Custom text color *******/
+.text-primary {
+    color: #7ebeea !important;
+}
 .text-danger, .validation-message {
     color: #b96b9f !important;
 }
