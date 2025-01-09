@@ -1,7 +1,6 @@
-﻿using Domain.Models.Entities;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 
-namespace LMS.Shared.User;
+namespace Domain.Models.Entities;
 
 //ApplicationUser is shared between Blazor and API
 public class ApplicationUser : IdentityUser
@@ -10,6 +9,6 @@ public class ApplicationUser : IdentityUser
     public DateTime RefreshTokenExpireTime { get; set; }
 
     public string Name { get; set; } = string.Empty;
-    public string Email { get; set; } = string.Empty;
+    
     public ICollection<Course> Enrollments { get; set; }
 }

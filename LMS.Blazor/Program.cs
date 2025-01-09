@@ -1,9 +1,9 @@
+using LMS.Blazor;
 using LMS.Blazor.Client.Services;
 using LMS.Blazor.Components;
 using LMS.Blazor.Components.Account;
 using LMS.Blazor.Data;
 using LMS.Blazor.Services;
-using LMS.Shared.User;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

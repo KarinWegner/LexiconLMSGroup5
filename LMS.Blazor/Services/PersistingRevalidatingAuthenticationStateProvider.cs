@@ -7,7 +7,6 @@ using System.Diagnostics;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Components.Web;
 using LMS.Blazor.Client.Models;
-using LMS.Shared.User;
 
 namespace LMS.Blazor.Services;
 
@@ -94,7 +93,7 @@ internal sealed class PersistingRevalidatingAuthenticationStateProvider : Revali
                 state.PersistAsJson(nameof(UserInfo), new UserInfo
                 {
                     UserId = userId,
-                    Email = email,
+                    Email = email
                 });
             }
         }
