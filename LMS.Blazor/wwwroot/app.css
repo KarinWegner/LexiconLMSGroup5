@@ -1,4 +1,19 @@
 
+:root {
+    --primary-color: #7ebeea;
+    --primary-hover-color: #40a5eb;
+    --secondary-color: #ec8f6a;
+    --secondary-hover-color: #e66d3d;
+    --success-color: #8bbabb;
+    --success-hover-color: #6ba7a8;
+    --info-color: #e2c275;
+    --info-hover-color: #d9af4b;
+    --danger-color: #b96b9f;
+    --danger-hover-color: #a44d87;
+    --focus-shadow-color: #258cfb;
+}
+
+/******** Fonts *******/
 .roboto-regular {
     font-family: "Roboto", serif;
     font-weight: 400;
@@ -54,6 +69,7 @@ a, .btn-link {
 }
 
 /******** Customize buttons *******/
+
 .btn {
     border-radius: 5px;
     padding: 6px 16px !important;
@@ -64,110 +80,126 @@ a, .btn-link {
 }
 
 /*********** Primary buttons *******/
+
 .btn-primary {
-    background-color: #7ebeea;
-    border-color: #7ebeea;
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
 }
 
     .btn-primary:hover {
-        border-color: #40a5eb !important;
-        background: #40a5eb !important;
+        border-color: var(--primary-hover-color) !important;
+        background: var(--primary-hover-color) !important;
     }
 
 .btn-outline-primary {
-    border: 1px solid #7ebeea;
-    color: #7ebeea;
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
 }
 
     .btn-outline-primary:hover {
         color: #fff;
-        background-color: #40a5eb;
-        border: 1px solid #40a5eb;
+        background-color: var(--primary-hover-color);
+        border: 1px solid var(--primary-hover-color);
     }
 
 /*********** Secondary buttons *******/
+
 .btn-secondary {
-    background-color: #ec8f6a;
-    border-color: #ec8f6a;
+    background-color: var(--secondary-color);
+    border-color: var(--secondary-color);
 }
 
     .btn-secondary:hover {
-        border-color: #e66d3d !important;
-        background: #e66d3d !important;
+        border-color: var(--secondary-hover-color) !important;
+        background: var(--secondary-hover-color) !important;
     }
 
 .btn-outline-secondary {
-    border: 1px solid #ec8f6a;
-    color: #ec8f6a;
+    border: 1px solid var(--secondary-color);
+    color: var(--secondary-color);
 }
 
-.btn-outline-secondary:hover {
+    .btn-outline-secondary:hover {
         color: #fff;
-        background-color: #e66d3d;
-        border: 1px solid #e66d3d;
-}
+        background-color: var(--secondary-hover-color);
+        border: 1px solid var(--secondary-hover-color);
+    }
 
+/*********** Success buttons *******/
 
 .btn-success {
-    border-color: #8bbabb;
-    background: #8bbabb;
+    border-color: var(--success-color);
+    background: var(--success-color);
 }
 
-.btn-success:hover {
-      border-color: #6ba7a8 !important;
-      background: #6ba7a8 !important;
-}
+    .btn-success:hover {
+        border-color: var(--success-hover-color) !important;
+        background: var(--success-hover-color) !important;
+    }
+
+/*********** Info buttons *******/
 
 .btn-info {
-    background: #e2c275;
-    border-color: #e2c275;
+    background: var(--info-color);
+    border-color: var(--info-color);
 }
 
-.btn-info:hover {
-     border-color: #d9af4b !important;
-     background: #d9af4b !important;
-     color: #fff;
-}
+    .btn-info:hover {
+        border-color: var(--info-hover-color) !important;
+        background: var(--info-hover-color) !important;
+        color: #fff;
+    }
+
+/*********** Danger buttons *******/
 
 .btn-danger {
-    border-color: #b96b9f;
-    background: #b96b9f;
+    border-color: var(--danger-color);
+    background: var(--danger-color);
 }
 
-.btn-danger:hover {
-    border-color: #a44d87 !important;
-    background: #a44d87 !important;
-}
+    .btn-danger:hover {
+        border-color: var(--danger-hover-color) !important;
+        background: var(--danger-hover-color) !important;
+    }
 
+/******** Focus State *******/
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem var(--focus-shadow-color);
 }
 
 /******** Invalid input field color *******/
+
 .invalid {
-    outline: 1px solid #b96b9f !important;
+    outline: 1px solid var(--danger-color) !important;
 }
 
-/******** Custom text color *******/
+/******** Custom text colors *******/
+
 .text-primary {
-    color: #7ebeea !important;
+    color: var(--primary-color) !important;
 }
+
 .text-danger, .validation-message {
-    color: #b96b9f !important;
+    color: var(--danger-color) !important;
 }
 
 .text-success {
-    color: #8bbabb !important;
+    color: var(--success-color) !important;
 }
 
 .text-warning {
-    color: #b96b9f !important;
+    color: var(--danger-color) !important;
 }
 
 .text-info {
-    color: #ec8f6a !important;
+    color: var(--secondary-color) !important;
 }
+
 
 .content {
     padding-top: 1.1rem;
