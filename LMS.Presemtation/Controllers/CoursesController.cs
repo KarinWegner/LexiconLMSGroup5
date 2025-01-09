@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Domain.Models.Entities;
 using LMS.Infrastructure.Data;
+using LMS.Shared.DTOs;
+using AutoMapper;
 
 namespace LMS.Presemtation.Controllers
 {
@@ -15,17 +17,21 @@ namespace LMS.Presemtation.Controllers
     public class CoursesController : ControllerBase
     {
         private readonly LmsContext _context;
+        private readonly IMapper _mapper;
 
-        public CoursesController(LmsContext context)
+        public CoursesController(LmsContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         // GET: api/Courses
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Course>>> GetCourses()
+        public async Task<ActionResult<IEnumerable<CourseDTO>>> GetCourses()
         {
-            return await _context.Courses.ToListAsync();
+            var courses =  await _context.Courses.ToListAsync();
+            var courseDTOs = _mapper.Map<IEnumerable<CourseDTO>>(courses);
+            return Ok(courseDTOs);
         }
 
         // GET: api/Courses/5
@@ -76,12 +82,14 @@ namespace LMS.Presemtation.Controllers
         // POST: api/Courses
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Course>> PostCourse(Course course)
+        public async Task<ActionResult<Course>> PostCourse(CourseCreateDTO courseDto)
         {
-            _context.Courses.Add(course);
+            if (courseDto == null) return BadRequest();
+            var courseToAdd = _mapper.Map<Course>(courseDto);
+            _context.Courses.Add(courseToAdd);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetCourse", new { id = course.CourseId }, course);
+            return CreatedAtAction("GetCourse", new { id = courseToAdd.CourseId }, courseToAdd);
         }
 
         // DELETE: api/Courses/5
