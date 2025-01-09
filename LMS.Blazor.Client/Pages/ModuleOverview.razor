@@ -1,5 +1,5 @@
-﻿<h3>ModuleOverview</h3>
+﻿@attribute [Route($"/{RoutingVariables.CourseOverview}/{RoutingVariables.Modules}/{RoutingVariables.WithIntId}")]
 
-@code {
+<h3>Module Overview</h3>
 
-}
+<CourseEntryList ListEntries="@Entries"></CourseEntryList>

@@ -1,10 +1,11 @@
-﻿using LMS.Shared.DTOs;
+﻿using LMS.Blazor.Client.Models.Enums;
+using LMS.Shared.DTOs;
 
 namespace LMS.Blazor.Client.Models
 {
-    public class CourseEntryModel
+    public class CourseEntryModel(ECourseEntryType entryType, IEnumerable<CourseEntryDto> courseEntries)
     {
-
-        public IEnumerable<CourseEntryDto> CourseEntries { get; set; }
+        public ECourseEntryType CourseEntryType { get; set; } = entryType;
+        public IEnumerable<CourseEntryDto> CourseEntries { get; set; } = courseEntries;
     }
 }

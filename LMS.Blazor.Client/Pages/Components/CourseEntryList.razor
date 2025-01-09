@@ -1,5 +1,10 @@
-﻿<h3>CourseEntryList</h3>
+﻿<div>
+    <ul class="list-group" id="taskGroup">
+        @foreach (var e in ListEntries.CourseEntries)
+        {
 
-@code {
+            <CourseEntryObject Model="e" CourseEntryType="ListEntries.CourseEntryType"></CourseEntryObject>
+        }
+    </ul>
+</div>
 
-}
