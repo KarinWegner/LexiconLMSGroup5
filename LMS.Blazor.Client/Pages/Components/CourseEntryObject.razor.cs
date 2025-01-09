@@ -15,5 +15,7 @@ namespace LMS.Blazor.Client.Pages.Components
         public string ThisNavLink => CourseEntryType == ECourseEntryType.Module ?
             $"{RV.CourseOverview}/{RV.Modules}/{Model.Id}" : 
             $"{RV.CourseOverview}/{RV.Modules}/{Model.ParentId}/{Model.Id}";
+
+
     }
 }

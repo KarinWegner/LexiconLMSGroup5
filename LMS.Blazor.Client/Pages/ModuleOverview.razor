@@ -1,5 +1,19 @@
 ﻿@attribute [Route($"/{RoutingVariables.CourseOverview}/{RoutingVariables.Modules}/{RoutingVariables.WithIntId}")]
 
-<h3>Module Overview</h3>
+<h3>Module Overview - @ModuleName</h3>
 
-<CourseEntryList ListEntries="@Entries"></CourseEntryList>
+@if (UpcommingEntries.CourseEntries.Count() > 0)
+{
+    <div>
+        <h4 class="h4-marg"> Upcomming:</h4>
+        <CourseEntryList ListEntries="@UpcommingEntries"></CourseEntryList>
+    </div>
+}
+@if (ExpiredEntries.CourseEntries.Count() > 0)
+{
+    <div>
+        <h4 class="h4-marg"> Expired: </h4>
+        <CourseEntryList ListEntries="@ExpiredEntries"></CourseEntryList>
+    </div>
+
+}

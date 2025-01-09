@@ -2,7 +2,7 @@
 {
     public static class RoutingVariables
     {
-        //Route variables
+        //Student CourseOverview Route variables
         public const string CourseOverview = "CourseOverview", Modules = "Modules";
         //parameters getters
         public const string WithIntId = "{Id:int}";

@@ -9,7 +9,9 @@ namespace LMS.Blazor.Client.Services
         {
             return [ new CourseEntryDto(0,0, "C# Basics", "Learn how to code.", new DateTime(2024,09,03,9,0,0), new DateTime(2024,10,7,17,0,0)),
                 new CourseEntryDto(1,0,"Frontend", "Learn how to graphic design passion etc etc", new DateTime(2024,10,10,9,0,0), new DateTime(2024,10,28,17,0,0)),
-            new CourseEntryDto(2,0,"Asp.net", "Learn how to asp", new DateTime(2024,10,28,9,0,0), new DateTime(2025,1,7,17,0,0))];
+            new CourseEntryDto(2,0,"Asp.net", "Learn how to asp", new DateTime(2024,10,28,9,0,0), new DateTime(2025,1,7,17,0,0)),
+            new CourseEntryDto(3,0,"The future", "Learn how to time travel", new DateTime(2025,10,28,9,0,0), new DateTime(2026,1,7,17,0,0)),
+            new CourseEntryDto(4,0,"Curveball", "Learn how to time travel", new DateTime(2025,10,28,9,0,0), new DateTime(2025,5,7,17,0,0))];
         }
 
         public static IEnumerable<CourseEntryDto> GetActivities()
