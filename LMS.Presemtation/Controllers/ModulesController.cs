@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Domain.Models.Entities;
 using LMS.Infrastructure.Data;
+using AutoMapper;
+using LMS.Shared.DTOs.ModuleDTOs;
+using Bogus;
 
 namespace LMS.Presemtation.Controllers
 {
@@ -15,10 +18,12 @@ namespace LMS.Presemtation.Controllers
     public class ModulesController : ControllerBase
     {
         private readonly LmsContext _context;
+        private readonly IMapper _mapper;
 
-        public ModulesController(LmsContext context)
+        public ModulesController(LmsContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         // GET: api/Modules
@@ -76,12 +81,18 @@ namespace LMS.Presemtation.Controllers
         // POST: api/Modules
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Module>> PostModule(Module @module)
+        public async Task<ActionResult<Module>> PostModule(ModuleCreateDTO moduleDto, int courseId)
         {
-            _context.Modules.Add(@module);
+            if ((moduleDto == null)) return NotFound("No module to add was found.");
+            if (!CourseExists(courseId)) return NotFound("Course could not be found.");
+            Module module = _mapper.Map<Module>(moduleDto);
+            Course course = await _context.Courses.FirstOrDefaultAsync(c => c.CourseId == courseId);
+            course.Modules.Add(module);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetModule", new { id = @module.ModuleId }, @module);
+            var createdModuleToReturn = _mapper.Map<ModuleDTO>(module);
+
+            return CreatedAtAction("GetModule", new { courseId = courseId,id = module.ModuleId }, createdModuleToReturn);
         }
 
         // DELETE: api/Modules/5
@@ -103,6 +114,10 @@ namespace LMS.Presemtation.Controllers
         private bool ModuleExists(int id)
         {
             return _context.Modules.Any(e => e.ModuleId == id);
+        }
+        private bool CourseExists(int id) 
+        {
+            return _context.Courses.Any(c => c.CourseId == id);
         }
     }
 }
