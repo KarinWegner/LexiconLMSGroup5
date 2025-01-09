@@ -1,8 +1,11 @@
 @implements IDisposable
 @inject NavigationManager NavigationManager
-<div class="top-row ps-3 navbar navbar-dark"> 
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">LMS</a>
+        <div class="d-flex align-items-end justify-content-between gap-2">
+            <img src="assets/logo.png" alt="Logo" class="logo" />
+            <a class="navbar-brand" href="">LMS</a>
+        </div>
     </div>
 </div>
 
@@ -16,7 +19,7 @@
             </NavLink>
         </div>
         <AuthorizeView>
-             <NotAuthorized>
+            <NotAuthorized>
                 <div class="nav-item px-2">
                     <NavLink class="nav-link" href="Account/Register">
                         <span class="bi bi-person-nav-menu" aria-hidden="true"></span> Register
@@ -28,10 +31,10 @@
                     </NavLink>
                 </div>
             </NotAuthorized>
-            <Authorized> 
+            <Authorized>
                 <div class="nav-item px-2">
                     <NavLink class="nav-link" href="demoauth">
-                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> DemoAuth 
+                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> DemoAuth
                     </NavLink>
                 </div>
                 <div class="nav-item px-2">
@@ -39,16 +42,16 @@
                         <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span> @context.User.Identity?.Name
                     </NavLink>
                 </div>
-                    <div class="nav-item px-2">
+                <div class="nav-item px-2">
                     <form action="Account/Logout" method="post">
                         <AntiforgeryToken />
                         <input type="hidden" name="ReturnUrl" value="@currentUrl" />
                         <button type="submit" class="nav-link">
-                            <span class="bi bi-arrow-bar-left-nav-menu" aria-hidden="true"></span> Logout 
+                            <span class="bi bi-arrow-bar-left-nav-menu" aria-hidden="true"></span> Logout
                         </button>
                     </form>
                 </div>
-          </Authorized>
+            </Authorized>
         </AuthorizeView>
     </nav>
 </div>

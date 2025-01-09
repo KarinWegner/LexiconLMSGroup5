@@ -1,19 +1,135 @@
+
+.roboto-regular {
+    font-family: "Roboto", serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.roboto-medium {
+    font-family: "Roboto", serif;
+    font-weight: 500;
+    font-style: normal;
+}
+
+.roboto-bold {
+    font-family: "Roboto", serif;
+    font-weight: 700;
+    font-style: normal;
+}
+
+.roboto-regular-italic {
+    font-family: "Roboto", serif;
+    font-weight: 400;
+    font-style: italic;
+}
+
+.roboto-medium-italic {
+    font-family: "Roboto", serif;
+    font-weight: 500;
+    font-style: italic;
+}
+
+.roboto-bold-italic {
+    font-family: "Roboto", serif;
+    font-weight: 700;
+    font-style: italic;
+}
+
+
 html, body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: Roboto, sans-serif;
+    color: #41464b;
+}
+
+.nav-scrollable {
+    background: #1b2a47 !important;
+}
+
+.nav-link active {
+    font-weight: 500 !important;
 }
 
 a, .btn-link {
     color: #006bb7;
 }
 
-.btn-primary {
+/******** Customize buttons *******/
+.btn {
+    border-radius: 5px;
+    padding: 6px 16px !important;
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
     color: #fff;
-    background-color: #1b6ec2;
-    border-color: #1861ac;
 }
 
+.btn-primary {
+    background-color: #ec8f6a;
+    border-color: #ec8f6a;
+}
+
+.btn-primary:hover {
+     border-color: #e66d3d !important;
+     background: #e66d3d !important;
+}
+
+
+.btn-success {
+     border-color: #8bbabb;
+     background: #8bbabb;
+}
+
+.btn-success:hover {
+      border-color: #6ba7a8 !important;
+      background: #6ba7a8 !important;
+}
+
+.btn-info {
+    background: #e2c275;
+    border-color: #e2c275;
+}
+
+.btn-info:hover {
+     border-color: #d9af4b !important;
+     background: #d9af4b !important;
+     color: #fff;
+}
+
+.btn-danger {
+    border-color: #b96b9f;
+    background: #b96b9f;
+}
+
+.btn-danger:hover {
+    border-color: #a44d87 !important;
+    background: #a44d87 !important;
+}
+
+
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+/******** Invalid input field color *******/
+.invalid {
+    outline: 1px solid #b96b9f !important;
+}
+
+/******** Custom text color *******/
+.text-danger, .validation-message {
+    color: #b96b9f !important;
+}
+
+.text-success {
+    color: #8bbabb !important;
+}
+
+.text-warning {
+    color: #b96b9f !important;
+}
+
+.text-info {
+    color: #ec8f6a !important;
 }
 
 .content {
@@ -48,4 +164,8 @@ h1:focus {
 
 .darker-border-checkbox.form-check-input {
     border-color: #929292;
+}
+
+.logo{
+    width: 40px;
 }
