@@ -15,6 +15,9 @@ namespace Domain.Models.Entities
         public DateTime EndDate { get; set; }
 
         //Foreign key
+        public int CourseId { get; set; }
+
+        //Navigation Property
         public Course Course { get; set; }
     }
 }

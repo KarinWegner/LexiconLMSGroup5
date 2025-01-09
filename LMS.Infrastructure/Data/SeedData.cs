@@ -1,5 +1,5 @@
 ﻿using Bogus;
-using LMS.Shared.User;
+using Domain.Models.Entities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -56,6 +56,7 @@ public static class SeedData
         {
             e.Email = f.Person.Email;
             e.UserName = f.Person.Email;
+            e.Name = f.Person.FullName;
         });
 
         var users = faker.Generate(nrOfUsers);

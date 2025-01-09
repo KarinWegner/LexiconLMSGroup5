@@ -1,5 +1,5 @@
 ﻿using LMS.Blazor.Services;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http.Headers;
 using System.Security.Claims;
@@ -27,7 +27,7 @@ public class ProxyController : ControllerBase
     public async Task<IActionResult> Proxy() //ToDo send endpoint uri here!
     {
         string endpoint = "api/demoauth";
-        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value; //Usermanager can be used here!
 
         if (userId == null)
             return Unauthorized();
