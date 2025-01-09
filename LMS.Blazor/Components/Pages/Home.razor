@@ -4,18 +4,35 @@
 
 <div class="container-fluid custom-min-vh-80  d-flex align-items-center justify-content-center">
     <div class="row w-100">
-      
-        <div class="col-md-6 d-flex flex-column justify-content-center order-2 order-md-1 gap-3" data-aos="zoom-out">
-            <h2>Welcome to <span>Lexicon LMS</span></h2>
-            <p>Please log in to proceed, or sign up to create a new account.</p>
-            <div class="d-flex gap-2">
-                <NavLink href="account/login" class="btn btn-secondary">Login</NavLink>
-                <NavLink class="btn btn-outline-secondary" href="Account/Register">Register</NavLink>
+        @if (isAuthenticated)
+        {
+            <div class="col-md-6 d-flex flex-column justify-content-center align-items-center gap-3">
+                <h3>Hello, <span class="text-primary"> @userName </span></h3>
+                <h3>Welcome back!</h3>
             </div>
-        </div>
+        }
+        else
+        {
+            <div class="col-md-6 d-flex flex-column justify-content-center order-2 order-md-1 gap-3">
+                <h2>Welcome to <span>Lexicon LMS</span></h2>
+                <p>Please log in to proceed, or sign up to create a new account.</p>
+                <div class="d-flex gap-2">
+                    <NavLink href="account/login" class="btn btn-secondary">Login</NavLink>
+                    <NavLink class="btn btn-outline-secondary" href="Account/Register">Register</NavLink>
+                </div>
+            </div>
+        }
         <div class="col-md-6 d-flex justify-content-center align-items-center order-1 order-md-2">
             <img src="/assets/learning-management-system.png" class="img-fluid" alt="Learning Managment System" />
         </div>
     </div>
 
 </div>
+
+@code {
+
+    // todo Implement the authefication, get user name from Auth Provider
+    private bool isAuthenticated = false;
+    private string userName = "Anna";
+
+}
