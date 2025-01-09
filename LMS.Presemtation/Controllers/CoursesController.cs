@@ -7,8 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Domain.Models.Entities;
 using LMS.Infrastructure.Data;
-using LMS.Shared.DTOs;
 using AutoMapper;
+using LMS.Shared.DTOs.CourseDTOs;
 
 namespace LMS.Presemtation.Controllers
 {

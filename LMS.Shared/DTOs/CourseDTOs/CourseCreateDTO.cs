@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LMS.Shared.DTOs
+namespace LMS.Shared.DTOs.CourseDTOs
 {
     public record CourseCreateDTO
     {
@@ -19,10 +19,10 @@ namespace LMS.Shared.DTOs
         [Required(ErrorMessage = "The Course needs a start date")]
         [DataType(DataType.Date)]
         public DateTime StartDate { get; set; }
-        [Required(ErrorMessage="The Course needs an end date")]
+        [Required(ErrorMessage = "The Course needs an end date")]
         [DataType(DataType.Date)]
         public DateTime EndDate { get; set; }
 
-        
+
     }
 }
