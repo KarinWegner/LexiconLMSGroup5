@@ -165,3 +165,7 @@ h1:focus {
 .darker-border-checkbox.form-check-input {
     border-color: #929292;
 }
+
+.logo{
+    width: 40px;
+}
