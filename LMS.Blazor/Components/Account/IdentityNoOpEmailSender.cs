@@ -1,4 +1,5 @@
-﻿using LMS.Shared.User;
+﻿using Domain.Models.Entities;
+using LMS.Shared.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 

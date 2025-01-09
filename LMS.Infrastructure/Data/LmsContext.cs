@@ -1,6 +1,5 @@
 ﻿using Bogus;
 using Domain.Models.Entities;
-using LMS.Shared.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;

@@ -3,13 +3,9 @@ using Microsoft.AspNetCore.Identity;
 
 namespace LMS.Shared.User;
 
-//ApplicationUser is shared between Blazor and API
+//Only used with Usermanager
+//No navigationproperties or FK here!!!
 public class ApplicationUser : IdentityUser
 {
-    public string? RefreshToken { get; set; }
-    public DateTime RefreshTokenExpireTime { get; set; }
-
     public string Name { get; set; } = string.Empty;
-    public string Email { get; set; } = string.Empty;
-    public ICollection<Course> Enrollments { get; set; }
 }
