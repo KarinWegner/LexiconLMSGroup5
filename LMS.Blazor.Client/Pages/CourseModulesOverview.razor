@@ -1,6 +1,9 @@
-﻿@attribute [Route($"/{RoutingVariables.CourseOverview}/{RoutingVariables.Modules}")]
+﻿@attribute [Route(VBRoutes.Student.LinkToModules)]
 
 <h3>Course Modules</h3>
+
+<CourseNavbar ActiveNav="ECourseNav.Modules"></CourseNavbar>
+
 @if (UpcommingEntries.CourseEntries.Count() > 0)
 {
     <div>
