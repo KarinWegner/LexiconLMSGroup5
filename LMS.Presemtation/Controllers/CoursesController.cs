@@ -37,7 +37,7 @@ namespace LMS.Presemtation.Controllers
 
         // GET: api/Courses/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Course>> GetCourse(int id)
+        public async Task<ActionResult<CourseDTO>> GetCourse(int id)
         {
             var course = await _context.Courses.FindAsync(id);
 
@@ -45,8 +45,8 @@ namespace LMS.Presemtation.Controllers
             {
                 return NotFound();
             }
-
-            return course;
+            var courseDTO = _mapper.Map<CourseDTO>(course);
+            return Ok(courseDTO);
         }
 
         // PUT: api/Courses/5

@@ -28,23 +28,25 @@ namespace LMS.Presemtation.Controllers
 
         // GET: api/Modules
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Module>>> GetModules()
+        public async Task<ActionResult<IEnumerable<ModuleDTO>>> GetModules()
         {
-            return await _context.Modules.ToListAsync();
+            var modules = await _context.Modules.ToListAsync();
+            var modulesDTO = _mapper.Map<IEnumerable<Module>>(modules);
+            return Ok(modulesDTO);
         }
 
         // GET: api/Modules/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Module>> GetModule(int id)
+        public async Task<ActionResult<ModuleDTO>> GetModule(int id)
         {
-            var @module = await _context.Modules.FindAsync(id);
+            var module = await _context.Modules.FindAsync(id);
 
-            if (@module == null)
+            if (module == null)
             {
                 return NotFound();
             }
-
-            return @module;
+            var moduleDTO = _mapper.Map<ModuleDTO>(module);
+            return moduleDTO;
         }
 
         // PUT: api/Modules/5
@@ -88,7 +90,7 @@ namespace LMS.Presemtation.Controllers
 
             Course course = await _context.Courses.FirstOrDefaultAsync(c => c.CourseId == courseId);
 
-            if (moduleDto.StartDate < course.StartDate || moduleDto.EndDate > course.EndDate) return BadRequest("Module startdate is not within the course timeframe.");
+            if (moduleDto.StartDate < course.StartDate || moduleDto.EndDate > course.EndDate) return BadRequest("Modules start/end dates is not within the course timeframe.");
             if (moduleDto.EndDate < moduleDto.StartDate) return BadRequest("The module cannot end before it starts.");
            
             //ToDo: Add check for overlapping start/end dates
