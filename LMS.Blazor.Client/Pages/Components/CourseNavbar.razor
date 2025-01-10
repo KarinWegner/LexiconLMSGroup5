@@ -7,8 +7,8 @@
         </button>
         <div class="@navstate navbar-collapse row" id="navbarNavAltMarkup">
             <div class="navbar-nav @NavstateBg">
-                <NavLink class="nav-link disabled col-sm-auto" href="@LinkToOverview" aria-disabled="true">Course Information</NavLink>
-                <NavLink class="nav-link active col-sm-auto" aria-current="page" href="@LinkToModules">Modules</NavLink>
+                <NavLink class="@($"{onInfo} nav-link col-sm-auto")" href="@LinkToOverview" aria-disabled="true" ActiveClass="">Course Information</NavLink>
+                <NavLink class="nav-link col-sm-auto" href="@LinkToModules">Modules</NavLink>
                 <NavLink class="nav-link disabled col-sm-auto" href="@LinkToCourseParticipants" aria-disabled="true">Course Participants</NavLink>
                 <NavLink class="nav-link disabled col-sm-auto" href="@LinkToSchedule" aria-disabled="true">Schedule</NavLink>
                 <NavLink class="nav-link disabled col-sm-auto" href="@LinkToPlanning" aria-disabled="true">Planning</NavLink>

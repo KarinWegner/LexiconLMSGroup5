@@ -28,3 +28,7 @@
     outline: 2px solid black !important;
 }
 
+::deep .navbar-nav > .active{
+    background-color: white;
+    border-radius: 10px;
+}

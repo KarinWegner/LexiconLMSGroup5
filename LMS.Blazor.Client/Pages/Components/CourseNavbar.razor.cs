@@ -17,7 +17,14 @@ namespace LMS.Blazor.Client.Pages.Components
         public string LinkToPlanning => VBRoutes.Student.LinkToPlanning;
 
         private bool isOpen = true;
-        private string navstate = "collapse", NavstateBg = "bg-expanded", filler = "col";
+        private string navstate = "collapse", NavstateBg = "bg-expanded", filler = "col", onInfo ="";
+
+        protected override void OnInitialized()
+        {
+            base.OnInitialized();
+            if (ActiveNav == ECourseNav.Overview)
+                onInfo = "active";
+        }
 
         public void ToggleNavbar()
         {
@@ -36,6 +43,7 @@ namespace LMS.Blazor.Client.Pages.Components
             }
             
         }
+
 
     }
 }
