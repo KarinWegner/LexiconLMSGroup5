@@ -21,29 +21,35 @@ public class LmsContext : IdentityDbContext<ApplicationUser, IdentityRole, strin
     {
         builder.Entity<ActivityType>()
             .HasData(
-            new ActivityType("Lecture")
+            new ActivityType()
             {
-                Id = 1
+                Name="Lecture",
+                ActivityTypeId = 1
             },
-            new ActivityType("Essay")
+            new ActivityType()
             {
-                Id = 2
+                Name ="Essay",
+                ActivityTypeId = 2
             },
-            new ActivityType("Assignment")
+            new ActivityType()
             {
-                Id = 3
+                Name ="Assignment",
+                ActivityTypeId = 3
             },
-            new ActivityType("Discussion")
+            new ActivityType()
             {
-                Id = 4
+                Name ="Discussion",
+                ActivityTypeId = 4
             },
-            new ActivityType("Webinar")
+            new ActivityType()
             {
-                Id = 5
+                Name ="Webinar",
+                ActivityTypeId = 5
             },
-            new ActivityType("Other")
+            new ActivityType()
             {
-                Id = 6
+                Name ="Other",
+                ActivityTypeId = 6
             });
         base.OnModelCreating(builder);
     }

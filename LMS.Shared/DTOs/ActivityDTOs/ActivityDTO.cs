@@ -8,7 +8,7 @@ namespace LMS.Shared.DTOs.ActivityDTOs
 {
     public record ActivityDTO
     {
-        public int Id { get; init; }
+        public int ActivityId { get; init; }
         public string Name { get; init; } = string.Empty;
         public string Description { get; init; } = string.Empty;
         public DateTime StartDate { get; init; }

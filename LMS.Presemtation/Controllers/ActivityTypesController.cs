@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Domain.Models.Entities;
 using LMS.Infrastructure.Data;
+using LMS.Shared.DTOs.ActivityTypeDTOs;
+using AutoMapper;
 
 namespace LMS.Presemtation.Controllers
 {
@@ -15,22 +17,25 @@ namespace LMS.Presemtation.Controllers
     public class ActivityTypesController : ControllerBase
     {
         private readonly LmsContext _context;
-
-        public ActivityTypesController(LmsContext context)
+        private readonly IMapper _mapper;
+        public ActivityTypesController(LmsContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         // GET: api/ActivityTypes
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ActivityType>>> GetActivityTypes()
+        public async Task<ActionResult<IEnumerable<ActivityTypeDTO>>> GetActivityTypes()
         {
-            return await _context.ActivityTypes.ToListAsync();
+            var activityTypes = await _context.ActivityTypes.ToListAsync();
+            var activityTypeDtos = _mapper.Map<IEnumerable<ActivityTypeDTO>>(activityTypes);
+            return Ok(activityTypeDtos);
         }
 
         // GET: api/ActivityTypes/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<ActivityType>> GetActivityType(int id)
+        public async Task<ActionResult<ActivityTypeDTO>> GetActivityType(int id)
         {
             var activityType = await _context.ActivityTypes.FindAsync(id);
 
@@ -38,8 +43,9 @@ namespace LMS.Presemtation.Controllers
             {
                 return NotFound();
             }
+            var activityTypeDTO = _mapper.Map<ActivityTypeDTO>(activityType);
 
-            return activityType;
+            return Ok(activityTypeDTO);
         }
 
         // PUT: api/ActivityTypes/5
@@ -47,7 +53,7 @@ namespace LMS.Presemtation.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutActivityType(int id, ActivityType activityType)
         {
-            if (id != activityType.Id)
+            if (id != activityType.ActivityTypeId)
             {
                 return BadRequest();
             }
@@ -76,12 +82,16 @@ namespace LMS.Presemtation.Controllers
         // POST: api/ActivityTypes
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<ActivityType>> PostActivityType(ActivityType activityType)
+        public async Task<ActionResult<ActivityTypeDTO>> PostActivityType(ActivityTypeCreateDTO activityTypeDto)
         {
-            _context.ActivityTypes.Add(activityType);
+            if(!_context.ActivityTypes.Any(a=>a.Name == activityTypeDto.Name)) return BadRequest("Activity already exists");
+
+            ActivityType activityToAdd = _mapper.Map<ActivityType>(activityTypeDto);
+            _context.ActivityTypes.Add(activityToAdd);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetActivityType", new { id = activityType.Id }, activityType);
+            var dtoToReturn = _mapper.Map<ActivityTypeDTO>(activityToAdd);
+            return CreatedAtAction("GetActivityType", new { id = dtoToReturn.ActivityTypeId }, dtoToReturn);
         }
 
         // DELETE: api/ActivityTypes/5
@@ -102,7 +112,7 @@ namespace LMS.Presemtation.Controllers
 
         private bool ActivityTypeExists(int id)
         {
-            return _context.ActivityTypes.Any(e => e.Id == id);
+            return _context.ActivityTypes.Any(e => e.ActivityTypeId == id);
         }
     }
 }

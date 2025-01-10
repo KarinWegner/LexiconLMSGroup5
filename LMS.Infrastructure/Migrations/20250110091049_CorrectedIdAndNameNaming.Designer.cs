@@ -4,6 +4,7 @@ using LMS.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LMS.Infrastructure.Migrations
 {
     [DbContext(typeof(LmsContext))]
-    partial class LmsContextModelSnapshot : ModelSnapshot
+    [Migration("20250110091049_CorrectedIdAndNameNaming")]
+    partial class CorrectedIdAndNameNaming
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -45,6 +48,10 @@ namespace LMS.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ActivityId"));
 
+                    b.Property<string>("ActivityName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("ActivityTypeId")
                         .HasColumnType("int");
 
@@ -57,10 +64,6 @@ namespace LMS.Infrastructure.Migrations
 
                     b.Property<int>("ModuleId")
                         .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
@@ -82,7 +85,7 @@ namespace LMS.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ActivityTypeId"));
 
-                    b.Property<string>("Name")
+                    b.Property<string>("ActivityTypeName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -94,32 +97,32 @@ namespace LMS.Infrastructure.Migrations
                         new
                         {
                             ActivityTypeId = 1,
-                            Name = "Lecture"
+                            ActivityTypeName = "Lecture"
                         },
                         new
                         {
                             ActivityTypeId = 2,
-                            Name = "Essay"
+                            ActivityTypeName = "Essay"
                         },
                         new
                         {
                             ActivityTypeId = 3,
-                            Name = "Assignment"
+                            ActivityTypeName = "Assignment"
                         },
                         new
                         {
                             ActivityTypeId = 4,
-                            Name = "Discussion"
+                            ActivityTypeName = "Discussion"
                         },
                         new
                         {
                             ActivityTypeId = 5,
-                            Name = "Webinar"
+                            ActivityTypeName = "Webinar"
                         },
                         new
                         {
                             ActivityTypeId = 6,
-                            Name = "Other"
+                            ActivityTypeName = "Other"
                         });
                 });
 

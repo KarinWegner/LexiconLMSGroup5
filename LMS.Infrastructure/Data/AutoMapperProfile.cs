@@ -4,6 +4,7 @@ using Domain.Models.Entities;
 using LMS.Shared.DTOs.CourseDTOs;
 using LMS.Shared.DTOs.ModuleDTOs;
 using LMS.Shared.DTOs.ActivityDTOs;
+using LMS.Shared.DTOs.ActivityTypeDTOs;
 namespace LMS.Infrastructure.Data;
 
 public class AutoMapperProfile : Profile
@@ -20,6 +21,9 @@ public class AutoMapperProfile : Profile
 
         CreateMap<Activity, ActivityDTO>();
         CreateMap<ActivityCreateDTO, Activity>();
+
+        CreateMap<ActivityType, ActivityTypeDTO>();
+        CreateMap<ActivityTypeCreateDTO, ActivityType>();
 
         CreateMap<ApplicationUserDTO, ApplicationUser>();
 

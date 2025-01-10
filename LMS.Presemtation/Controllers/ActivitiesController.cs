@@ -55,7 +55,7 @@ namespace LMS.Presemtation.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutActivity(int id, Activity activity)
         {
-            if (id != activity.Id)
+            if (id != activity.ActivityId)
             {
                 return BadRequest();
             }
@@ -87,7 +87,7 @@ namespace LMS.Presemtation.Controllers
         public async Task<ActionResult<ActivityDTO>> PostActivity(ActivityCreateDTO activityDto, int courseId, int moduleId)
         {
             if(!_context.Courses.Any(c=> c.CourseId == courseId)) return NotFound("Course not found");
-            if (!_context.ActivityTypes.Any(a => a.Id == activityDto.ActivityTypeId)) return NotFound("ActivityType could not be found");
+            if (!_context.ActivityTypes.Any(a => a.ActivityTypeId == activityDto.ActivityTypeId)) return NotFound("ActivityType could not be found");
 
             var module = _context.Modules.FirstOrDefault(m=>m.ModuleId == moduleId);
 
@@ -104,7 +104,7 @@ namespace LMS.Presemtation.Controllers
 
             ActivityDTO createdActivityToReturn = _mapper.Map<ActivityDTO>(activityToAdd);
 
-            return CreatedAtAction("GetActivity", new {courseId = courseId, moduleId = moduleId, id = createdActivityToReturn.Id}, createdActivityToReturn);
+            return CreatedAtAction("GetActivity", new {courseId = courseId, moduleId = moduleId, id = createdActivityToReturn.ActivityId}, createdActivityToReturn);
         }
 
         // DELETE: api/Activities/5
@@ -126,7 +126,7 @@ namespace LMS.Presemtation.Controllers
 
         private bool ActivityExists(int id)
         {
-            return _context.Activities.Any(e => e.Id == id);
+            return _context.Activities.Any(e => e.ActivityId == id);
         }
     }
 }

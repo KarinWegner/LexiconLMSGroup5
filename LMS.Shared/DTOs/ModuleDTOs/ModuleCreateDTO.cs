@@ -11,7 +11,7 @@ namespace LMS.Shared.DTOs.ModuleDTOs
     {
         [Required(ErrorMessage ="A module name is required.")]
         [MaxLength(50, ErrorMessage ="Module name cannot exceed 50 characters.")]
-        public string? Name { get; init; }
+        public string? ModuleName { get; init; }
         [MaxLength(500, ErrorMessage ="Module description cannot exceed 500 characters.")]
         public string? Description { get; init; }
         public DateTime StartDate { get; init; }

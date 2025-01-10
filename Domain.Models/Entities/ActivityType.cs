@@ -8,11 +8,8 @@ namespace Domain.Models.Entities
 {
     public class ActivityType
     {
-        public int Id { get; set; }
+        public int ActivityTypeId { get; set; }
         public string Name { get; set; } = string.Empty;
-        public ActivityType(string name)
-        {
-            Name = name;
-        }
+        
     }
 }
