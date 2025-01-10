@@ -1,0 +1,37 @@
+﻿<li class="list-group-item">
+    <div class="row">
+        <NavLink class="nav-link " href="@ThisNavLink">
+            <div class="row">
+                <div class="col-sm-auto">
+                    <h4>@Model.Name</h4>
+                </div>
+                <div class="col"></div>
+                @if (CourseEntryType == ECourseEntryType.Activity)
+                {
+                    <div class="col-sm-auto align-right">@Model.ActivityType</div>
+                }
+            </div>
+            <div class="row">
+                <div class="col-sm-auto">
+                    <div class="col-1"></div>
+                    @Model.Description
+                </div>
+            </div>
+            <div class="row">
+                @if (CourseEntryType == ECourseEntryType.Activity)
+                {
+                    <div class="col-sm-auto">Start time: @Model.StartTime</div>
+
+                    <div class="col-sm-auto">End time: @Model.EndTime</div>
+                }
+                else
+                {
+                    <div class="col-sm-auto">Start date: @DateOnly.FromDateTime(Model.StartTime)</div>
+
+                    <div class="col-sm-auto">End date: @DateOnly.FromDateTime(Model.EndTime)</div>
+                }
+
+            </div>
+        </NavLink>
+    </div>
+</li>

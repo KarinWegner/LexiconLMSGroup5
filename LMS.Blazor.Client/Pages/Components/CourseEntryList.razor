@@ -1,0 +1,10 @@
+﻿<div>
+    <ul class="list-group" id="taskGroup">
+        @foreach (var e in ListEntries.CourseEntries)
+        {
+
+            <CourseEntryObject Model="e" CourseEntryType="ListEntries.CourseEntryType"></CourseEntryObject>
+        }
+    </ul>
+</div>
+
