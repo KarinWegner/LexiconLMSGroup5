@@ -10,6 +10,8 @@ using LMS.Infrastructure.Data;
 using LMS.Shared.DTOs.ActivityDTOs;
 using AutoMapper;
 using LMS.Shared.DTOs.ModuleDTOs;
+using Azure;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace LMS.Presemtation.Controllers
 {
@@ -31,7 +33,7 @@ namespace LMS.Presemtation.Controllers
         public async Task<ActionResult<IEnumerable<ActivityDTO>>> GetActivities()
         {
             IEnumerable<Activity> activities = await _context.Activities.ToListAsync();
-            var activitiesDto= _mapper.Map<IEnumerable<Activity>>(activities);
+            var activitiesDto = _mapper.Map<IEnumerable<Activity>>(activities);
             return Ok(activitiesDto);
         }
 
@@ -45,7 +47,7 @@ namespace LMS.Presemtation.Controllers
             {
                 return NotFound();
             }
-            var activityDTO =_mapper.Map<ActivityDTO>(activity);
+            var activityDTO = _mapper.Map<ActivityDTO>(activity);
 
             return Ok(activityDTO);
         }
@@ -53,32 +55,61 @@ namespace LMS.Presemtation.Controllers
         // PUT: api/Activities/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutActivity(int id, Activity activity)
+        public async Task<IActionResult> PutActivity(int id, ActivityUpdateDTO activityDto)
         {
-            if (id != activity.ActivityId)
+            if (id != activityDto.ActivityId)
             {
                 return BadRequest();
             }
 
-            _context.Entry(activity).State = EntityState.Modified;
+            var existingActivity = await _context.Activities.FirstOrDefaultAsync(a => a.ActivityId == id);
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ActivityExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            if (existingActivity == null) return NotFound("Activity not found");
+
+
+
+
+            _mapper.Map(activityDto, existingActivity);
+
+            await _context.SaveChangesAsync();
+            //try
+            //{
+            //}
+            //catch (DbUpdateConcurrencyException)
+            //{
+            //    if (!ActivityExists(id))
+            //    {
+            //        return NotFound();
+            //    }
+            //    else
+            //    {
+            //        throw;
+            //    }
+            //}
 
             return NoContent();
+        }
+
+        [HttpPatch("{id}")]
+        public async Task<ActionResult<ActivityDTO>> PatchActivity(int id, int moduleId, JsonPatchDocument<ActivityUpdateDTO> patchDocument)
+        {
+            if (!_context.Modules.Any(m => m.ModuleId == moduleId)) return NotFound("Module not found.");
+
+            var activityEntity = await _context.Activities.FirstOrDefaultAsync(a => a.ActivityId == id);
+            if (activityEntity == null) return NotFound("Activity not found");
+
+            var ActivityToPatch = _mapper.Map<ActivityUpdateDTO>(activityEntity);
+
+            patchDocument.ApplyTo(ActivityToPatch, ModelState);
+
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            if(!TryValidateModel(ActivityToPatch)) return BadRequest(ModelState);
+
+            _mapper.Map(ActivityToPatch, activityEntity);
+
+            await _context.SaveChangesAsync();
+
+            return Ok(_mapper.Map<ActivityDTO>(activityEntity));
         }
 
         // POST: api/Activities

@@ -10,6 +10,8 @@ using LMS.Infrastructure.Data;
 using AutoMapper;
 using LMS.Shared.DTOs.CourseDTOs;
 using LMS.Shared.DTOs.ModuleDTOs;
+using LMS.Shared.DTOs.ActivityDTOs;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace LMS.Presemtation.Controllers
 {
@@ -52,32 +54,47 @@ namespace LMS.Presemtation.Controllers
         // PUT: api/Courses/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutCourse(int id, Course course)
+        public async Task<IActionResult> PutCourse(int id, CourseUpdateDTO courseDto)
         {
-            if (id != course.CourseId)
+            if (id != courseDto.CourseId)
             {
                 return BadRequest();
             }
 
-            _context.Entry(course).State = EntityState.Modified;
+            
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!CourseExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            var existingCourse = await _context.Courses.FirstOrDefaultAsync(a => a.CourseId == id);
 
+            if (existingCourse == null) return NotFound("Course not found");
+
+
+
+
+            _mapper.Map(courseDto, existingCourse);
+
+            await _context.SaveChangesAsync();
             return NoContent();
+        }
+        [HttpPatch("{id}")]
+        public async Task<ActionResult<CourseDTO>> PatchCourse(int id, JsonPatchDocument<CourseUpdateDTO> patchDocument)
+        {
+           
+
+            var courseEntity = await _context.Courses.FirstOrDefaultAsync(a => a.CourseId == id);
+            if (courseEntity == null) return NotFound("Activity not found");
+
+            var courseToPatch = _mapper.Map<CourseUpdateDTO>(courseEntity);
+
+            patchDocument.ApplyTo(courseToPatch, ModelState);
+
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            if (!TryValidateModel(courseToPatch)) return BadRequest(ModelState);
+
+            _mapper.Map(courseToPatch, courseEntity);
+
+            await _context.SaveChangesAsync();
+
+            return Ok(_mapper.Map<CourseDTO>(courseEntity));
         }
 
         // POST: api/Courses

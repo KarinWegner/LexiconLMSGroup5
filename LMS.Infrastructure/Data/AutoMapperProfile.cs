@@ -15,14 +15,17 @@ public class AutoMapperProfile : Profile
 
         CreateMap<Course, CourseDTO>();
         CreateMap<CourseCreateDTO, Course>();
+        CreateMap<CourseUpdateDTO, Course>().ReverseMap();
 
         CreateMap<Module, ModuleDTO>();
         CreateMap<ModuleCreateDTO, Module>();
+        CreateMap<ModuleUpdateDTO, Module>().ReverseMap();
 
         CreateMap<Activity, ActivityDTO>();
         CreateMap<ActivityCreateDTO, Activity>();
+        CreateMap<ActivityUpdateDTO, Activity>().ReverseMap();
 
-        CreateMap<ActivityType, ActivityTypeDTO>();
+        CreateMap<ActivityType, ActivityTypeDTO>().ReverseMap();
         CreateMap<ActivityTypeCreateDTO, ActivityType>();
 
         CreateMap<ApplicationUserDTO, ApplicationUser>();

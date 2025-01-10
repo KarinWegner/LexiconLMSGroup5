@@ -9,6 +9,7 @@ using Domain.Models.Entities;
 using LMS.Infrastructure.Data;
 using LMS.Shared.DTOs.ActivityTypeDTOs;
 using AutoMapper;
+using LMS.Shared.DTOs.ActivityDTOs;
 
 namespace LMS.Presemtation.Controllers
 {
@@ -51,30 +52,26 @@ namespace LMS.Presemtation.Controllers
         // PUT: api/ActivityTypes/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutActivityType(int id, ActivityType activityType)
+        public async Task<IActionResult> PutActivityType(int id, ActivityTypeDTO activityType)
         {
             if (id != activityType.ActivityTypeId)
             {
                 return BadRequest();
             }
 
-            _context.Entry(activityType).State = EntityState.Modified;
+            if (activityType.ActivityTypeId != id) return BadRequest("Not allowed to change Activity type Id.");
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ActivityTypeExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            var existingActivityType = await _context.ActivityTypes.FirstOrDefaultAsync(a => a.ActivityTypeId == id);
+
+
+            if (existingActivityType == null) return NotFound("Activity not found");
+
+
+
+
+            _mapper.Map(activityType, existingActivityType);
+            await _context.SaveChangesAsync();
+           
 
             return NoContent();
         }

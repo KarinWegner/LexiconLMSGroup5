@@ -10,6 +10,8 @@ using LMS.Infrastructure.Data;
 using AutoMapper;
 using LMS.Shared.DTOs.ModuleDTOs;
 using Bogus;
+using LMS.Shared.DTOs.ActivityDTOs;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace LMS.Presemtation.Controllers
 {
@@ -52,32 +54,46 @@ namespace LMS.Presemtation.Controllers
         // PUT: api/Modules/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutModule(int id, Module @module)
+        public async Task<IActionResult> PutModule(int id, ModuleUpdateDTO moduleDto)
         {
-            if (id != @module.ModuleId)
+            if (id != moduleDto.ModuleId)
             {
                 return BadRequest();
             }
 
-            _context.Entry(@module).State = EntityState.Modified;
+            var existingModule = await _context.Modules.FirstOrDefaultAsync(a => a.ModuleId == id);
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ModuleExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            if (existingModule == null) return NotFound("Activity not found");
+
+
+
+
+            _mapper.Map(moduleDto, existingModule);
+
+            await _context.SaveChangesAsync();
 
             return NoContent();
+        }
+        [HttpPatch("{id}")]
+        public async Task<ActionResult<ModuleDTO>> PatchModule(int id, int courseId, JsonPatchDocument<ModuleUpdateDTO> patchDocument)
+        {
+            if (!_context.Courses.Any(m => m.CourseId == courseId)) return NotFound("Course not found.");
+
+            var moduleEntity = await _context.Modules.FirstOrDefaultAsync(a => a.ModuleId == id);
+            if (moduleEntity == null) return NotFound("Activity not found");
+
+            var ModuleToPatch = _mapper.Map<ModuleUpdateDTO>(moduleEntity);
+
+            patchDocument.ApplyTo(ModuleToPatch, ModelState);
+
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            if (!TryValidateModel(ModuleToPatch)) return BadRequest(ModelState);
+
+            _mapper.Map(ModuleToPatch, moduleEntity);
+
+            await _context.SaveChangesAsync();
+
+            return Ok(_mapper.Map<ModuleDTO>(moduleEntity));
         }
 
         // POST: api/Modules
