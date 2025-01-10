@@ -242,3 +242,8 @@ h1:focus {
 .custom-min-vh-80 {
     min-height: 80vh;
 }
+
+.bg-image {
+    background-image: url('https://mdbootstrap.com/img/new/textures/full/171.jpg');
+    height: 300px;
+}
