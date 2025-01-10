@@ -30,16 +30,27 @@ namespace LMS.Presemtation.Controllers
 
         // GET: api/Courses
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CourseDTO>>> GetCourses()
+        public async Task<ActionResult<IEnumerable<CourseDTO>>> GetCourses(bool includeModules = false, bool includeEnrollments = false)
         {
-            var courses =  await _context.Courses.ToListAsync();
-            var courseDTOs = _mapper.Map<IEnumerable<CourseDTO>>(courses);
+            IEnumerable<Course> courses;
+            if (includeEnrollments)
+            {
+                 courses = includeModules ? await _context.Courses.Include(m => m.Modules).Include(e => e.Enrollments).ToListAsync() :
+                                             await _context.Courses.Include(e => e.Enrollments).ToListAsync();
+            }
+            else
+            {
+                 courses = includeModules ? await _context.Courses.Include(m => m.Modules).ToListAsync() :
+                                             await _context.Courses.ToListAsync();
+            }
+
+                var courseDTOs = _mapper.Map<IEnumerable<CourseDTO>>(courses!);
             return Ok(courseDTOs);
         }
 
         // GET: api/Courses/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<CourseDTO>> GetCourse(int id)
+        public async Task<ActionResult<CourseDTO>> GetCourse(int id, bool includeModules = false, bool includeEnrollments = false)
         {
             var course = await _context.Courses.FindAsync(id);
 
@@ -47,6 +58,17 @@ namespace LMS.Presemtation.Controllers
             {
                 return NotFound();
             }
+            if (includeEnrollments)
+            {
+                course = includeModules ?  await _context.Courses.Include(e=>e.Enrollments).Include(m => m.Modules).Where(e => e.CourseId == id).FirstOrDefaultAsync() :
+                                            await _context.Courses.Include(e => e.Enrollments).Where(e=>e.CourseId==id).FirstOrDefaultAsync();
+            }
+            else
+            {
+                course = includeModules ? await _context.Courses.Include(m => m.Modules).Where(m=>m.CourseId == id).FirstOrDefaultAsync() :
+                                            await _context.Courses.FirstOrDefaultAsync(c=>c.CourseId == id);
+            }
+
             var courseDTO = _mapper.Map<CourseDTO>(course);
             return Ok(courseDTO);
         }

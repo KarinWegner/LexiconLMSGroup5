@@ -30,18 +30,21 @@ namespace LMS.Presemtation.Controllers
 
         // GET: api/Modules
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ModuleDTO>>> GetModules()
+        public async Task<ActionResult<IEnumerable<ModuleDTO>>> GetModules(bool includeActivities)
         {
-            var modules = await _context.Modules.ToListAsync();
+            var modules = includeActivities ?  _context.Modules.Include(m=>m.Activities).ToListAsync():
+                                                 _context.Modules.ToListAsync();
             var modulesDTO = _mapper.Map<IEnumerable<Module>>(modules);
             return Ok(modulesDTO);
         }
 
         // GET: api/Modules/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<ModuleDTO>> GetModule(int id)
+        public async Task<ActionResult<ModuleDTO>> GetModule(int id, int courseId, bool includeActivities)
         {
-            var module = await _context.Modules.FindAsync(id);
+            if (!_context.Courses.Any(c => c.CourseId == courseId)) return NotFound("Course not found");
+            var module = includeActivities ? await _context.Modules.Include(m=>m.Activities).Where(m=>m.ModuleId==id).FirstOrDefaultAsync() :
+                                            await _context.Modules.FindAsync(id);
 
             if (module == null)
             {
