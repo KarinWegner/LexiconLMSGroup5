@@ -1,0 +1,151 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Domain.Models.Entities;
+using LMS.Infrastructure.Data;
+using AutoMapper;
+using LMS.Shared.DTOs.ModuleDTOs;
+using Bogus;
+using LMS.Shared.DTOs.ActivityDTOs;
+using Microsoft.AspNetCore.JsonPatch;
+
+namespace LMS.Presemtation.Controllers
+{
+    [Route("api/courses/{courseId}/modules")]
+    [ApiController]
+    public class ModulesController : ControllerBase
+    {
+        private readonly LmsContext _context;
+        private readonly IMapper _mapper;
+
+        public ModulesController(LmsContext context, IMapper mapper)
+        {
+            _context = context;
+            _mapper = mapper;
+        }
+
+        // GET: api/Modules
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<ModuleDTO>>> GetModules(bool includeActivities)
+        {
+            var modules = includeActivities ?  _context.Modules.Include(m=>m.Activities).ToListAsync():
+                                                 _context.Modules.ToListAsync();
+            var modulesDTO = _mapper.Map<IEnumerable<Module>>(modules);
+            return Ok(modulesDTO);
+        }
+
+        // GET: api/Modules/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<ModuleDTO>> GetModule(int id, int courseId, bool includeActivities)
+        {
+            if (!_context.Courses.Any(c => c.CourseId == courseId)) return NotFound("Course not found");
+            var module = includeActivities ? await _context.Modules.Include(m=>m.Activities).Where(m=>m.ModuleId==id).FirstOrDefaultAsync() :
+                                            await _context.Modules.FindAsync(id);
+
+            if (module == null)
+            {
+                return NotFound();
+            }
+            var moduleDTO = _mapper.Map<ModuleDTO>(module);
+            return moduleDTO;
+        }
+
+        // PUT: api/Modules/5
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutModule(int id, ModuleUpdateDTO moduleDto)
+        {
+            if (id != moduleDto.ModuleId)
+            {
+                return BadRequest();
+            }
+
+            var existingModule = await _context.Modules.FirstOrDefaultAsync(a => a.ModuleId == id);
+
+            if (existingModule == null) return NotFound("Activity not found");
+
+
+
+
+            _mapper.Map(moduleDto, existingModule);
+
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+        [HttpPatch("{id}")]
+        public async Task<ActionResult<ModuleDTO>> PatchModule(int id, int courseId, JsonPatchDocument<ModuleUpdateDTO> patchDocument)
+        {
+            if (!_context.Courses.Any(m => m.CourseId == courseId)) return NotFound("Course not found.");
+
+            var moduleEntity = await _context.Modules.FirstOrDefaultAsync(a => a.ModuleId == id);
+            if (moduleEntity == null) return NotFound("Activity not found");
+
+            var ModuleToPatch = _mapper.Map<ModuleUpdateDTO>(moduleEntity);
+
+            patchDocument.ApplyTo(ModuleToPatch, ModelState);
+
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            if (!TryValidateModel(ModuleToPatch)) return BadRequest(ModelState);
+
+            _mapper.Map(ModuleToPatch, moduleEntity);
+
+            await _context.SaveChangesAsync();
+
+            return Ok(_mapper.Map<ModuleDTO>(moduleEntity));
+        }
+
+        // POST: api/Modules
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPost]
+        public async Task<ActionResult<Module>> PostModule(ModuleCreateDTO moduleDto, int courseId)
+        {
+            if ((moduleDto == null)) return NotFound("No module to add was found.");
+            if (!CourseExists(courseId)) return NotFound("Course could not be found.");
+
+            Course course = await _context.Courses.FirstOrDefaultAsync(c => c.CourseId == courseId);
+
+            if (moduleDto.StartDate < course.StartDate || moduleDto.EndDate > course.EndDate) return BadRequest("Modules start/end dates is not within the course timeframe.");
+            if (moduleDto.EndDate < moduleDto.StartDate) return BadRequest("The module cannot end before it starts.");
+           
+            //ToDo: Add check for overlapping start/end dates
+
+            Module module = _mapper.Map<Module>(moduleDto);
+            course.Modules.Add(module);
+            await _context.SaveChangesAsync();
+
+            var createdModuleToReturn = _mapper.Map<ModuleDTO>(module);
+
+            return CreatedAtAction("GetModule", new { courseId = courseId,id = module.ModuleId }, createdModuleToReturn);
+        }
+
+        // DELETE: api/Modules/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteModule(int id)
+        {
+            var @module = await _context.Modules.FindAsync(id);
+            if (@module == null)
+            {
+                return NotFound();
+            }
+
+            _context.Modules.Remove(@module);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        private bool ModuleExists(int id)
+        {
+            return _context.Modules.Any(e => e.ModuleId == id);
+        }
+        private bool CourseExists(int id) 
+        {
+            return _context.Courses.Any(c => c.CourseId == id);
+        }
+    }
+}
