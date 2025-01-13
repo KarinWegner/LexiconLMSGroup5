@@ -30,6 +30,15 @@ public static class ServiceExtensions
         services.AddScoped<IServiceManager, ServiceManager>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddLazy<IAuthService>();
+
+        services.AddScoped<ICourseService, CourseService>();
+        services.AddLazy<ICourseService>();
+        //services.AddScoped<IModuleService, ModuleService>();
+        //services.AddScoped<IActivityService, ActivityService>();
+        //services.AddScoped<IDocumentService, DocumentService>();
+        //services.AddLazy<IModuleService>();
+        //services.AddLazy<IActivityService>();
+        //services.AddLazy<IDocumentService>();
     }
 
     public static void ConfigureRepositories(this IServiceCollection services)
