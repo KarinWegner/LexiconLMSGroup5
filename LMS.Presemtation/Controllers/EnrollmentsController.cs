@@ -45,6 +45,7 @@ namespace LMS.Presemtation.Controllers
         [HttpGet("{courseId}")]
         public async Task<ActionResult<IEnumerable<EnrolledUserDTO>>> GetEnrollmentsForCourse(int courseId)
         {
+            //var course = await _context.Courses.Include(c => c.Enrollments).Where(c => c.CourseId == courseId).FirstOrDefaultAsync();
             var course = await _context.Courses.FindAsync(courseId);
 
             if (course == null)
@@ -52,16 +53,18 @@ namespace LMS.Presemtation.Controllers
                 return NotFound("Course not found");
             }
 
-            var enrollments = course.Enrollments.ToList();
-            if (enrollments.Count == 0) return Ok("Course has no enrollments");
+            var enrolledUsers = await _context.Courses.Where(c => c.CourseId == courseId).SelectMany(c => c.Enrollments).ToListAsync();
 
-            var enrolledUserDto = enrollments
+
+            var enrolledUserDto = 
+            _context.Users
             .Join(_context.UserRoles, u => u.Id, ur => ur.UserId, (u, ur) => new { u, ur })
             .Join(_context.Roles, ur => ur.ur.RoleId, r => r.Id, (ur, r) => new { ur, r })
             .Select(c => new EnrolledUserDTO()
             {
                 Name = c.ur.u.Name,
-                Role = c.r.Name
+                Id = c.ur.u.Id,
+                Role = c.r.Name 
             }).ToList();
 
             return Ok(enrolledUserDto);

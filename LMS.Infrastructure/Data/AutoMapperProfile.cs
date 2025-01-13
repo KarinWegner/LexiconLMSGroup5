@@ -32,5 +32,9 @@ public class AutoMapperProfile : Profile
 
         CreateMap<Course, EnrollmentListDTO>()
         .ForMember(dest => dest.CourseName, opt => opt.MapFrom(src => src.Name));
+        CreateMap<(ApplicationUser user, string role), EnrolledUserDTO>()
+        .ForMember(d => d.Name, opt => opt.MapFrom(s => s.user.Name))
+        .ForMember(d => d.Id, opt => opt.MapFrom(s => s.user.Id))
+        .ForMember(d => d.Role, opt => opt.MapFrom(s => s.role));
     }
 }
