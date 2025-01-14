@@ -33,10 +33,10 @@ public static class ServiceExtensions
 
         services.AddScoped<ICourseService, CourseService>();
         services.AddLazy<ICourseService>();
-        //services.AddScoped<IModuleService, ModuleService>();
+        services.AddScoped<IModuleService, ModuleService>();
+        services.AddLazy<IModuleService>();
         //services.AddScoped<IActivityService, ActivityService>();
         //services.AddScoped<IDocumentService, DocumentService>();
-        //services.AddLazy<IModuleService>();
         //services.AddLazy<IActivityService>();
         //services.AddLazy<IDocumentService>();
     }

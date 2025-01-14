@@ -13,21 +13,21 @@ public class ServiceManager : IServiceManager
 
     public ICourseService CourseService => courseService.Value;
 
-    //public IModuleService ModuleService => moduleService.Value;
+    public IModuleService ModuleService => moduleService.Value;
     //public IActivityService ActivityService => activityService.Value;
     //public IDocumentService DocumentService => documentService.Value;
 
     public ServiceManager(
          Lazy<IAuthService> authService,
-         Lazy<ICourseService> courseService
-         //Lazy<IModuleService> moduleService
+         Lazy<ICourseService> courseService,
+         Lazy<IModuleService> moduleService
          //Lazy<IActivityService> activityService,
          //Lazy<IDocumentService> documentService
          )
     {
         this.authService = authService;
         this.courseService = courseService;
-        //this.moduleService = moduleService;
+        this.moduleService = moduleService;
         //this.activityService = activityService;
         //this.documentService = documentService;
     }
