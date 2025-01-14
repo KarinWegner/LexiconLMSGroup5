@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Domain.Contracts;
 using Domain.Models.Entities;
 using LMS.Infrastructure.Data;
 using LMS.Shared.DTOs.CourseDTOs;
@@ -11,18 +12,18 @@ namespace LMS.Services
     public class CourseService : ICourseService
     {
 
-        private readonly LmsContext _context;
+        private readonly IUnitOfWork _uow;
         private readonly IMapper _mapper;
 
-        public CourseService(LmsContext context, IMapper mapper)
+        public CourseService(IUnitOfWork uow, IMapper mapper)
         {
-            _context = context;
+            _uow = uow;
             _mapper = mapper;
         }
 
         public async Task<IEnumerable<CourseDTO>> GetAllCoursesAsync(bool includeModules = false, bool includeEnrollments = false)
         {
-            IQueryable<Course> query = _context.Courses;
+            IQueryable<Course> query = _uow.Courses.Query();
 
             if (includeModules)
             {
@@ -40,7 +41,7 @@ namespace LMS.Services
 
         public async Task<CourseDTO> GetCourseByIdAsync(int id, bool includeModules = false, bool includeEnrollments = false)
         {
-            IQueryable<Course> query = _context.Courses.Where(c => c.CourseId == id);
+            IQueryable<Course> query = _uow.Courses.Query().Where(c => c.CourseId == id);
 
             if (includeModules)
             {
@@ -70,29 +71,32 @@ namespace LMS.Services
             }
 
             var courseToAdd = _mapper.Map<Course>(courseDto);
-            _context.Courses.Add(courseToAdd);
-            await _context.SaveChangesAsync();
+            await _uow.Courses.AddAsync(courseToAdd);
+
+            await _uow.CompleteASync();
 
             return _mapper.Map<CourseDTO>(courseToAdd);
         }
        
         public async Task<bool> DeleteCourseAsync(int id)
         {
-            var course = await _context.Courses.FindAsync(id);
+            var course = await _uow.Courses.GetByIdAsync(id);
             if (course == null) return false;
 
-            _context.Courses.Remove(course);
-            await _context.SaveChangesAsync();
+            await _uow.Courses.DeleteAsync(course);
+            await _uow.CompleteASync();
             return true;
         }
 
         public async Task<bool> UpdateCourseAsync(int id, CourseUpdateDTO courseDto)
         {
-            var existingCourse = await _context.Courses.FindAsync(id);
+            var existingCourse = await _uow.Courses.GetByIdAsync(id);
             if (existingCourse == null) return false;
 
             _mapper.Map(courseDto, existingCourse);
-            await _context.SaveChangesAsync();
+
+            await _uow.Courses.UpdateAsync(existingCourse);
+            await _uow.CompleteASync();
             return true;
         }
 
