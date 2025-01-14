@@ -33,7 +33,7 @@ public static class SeedData
             try
             {
                 await CreateRolesAsync([teacherRole, studentRole]);
-                await GenerateUsersAsync(5, 2);
+                await GenerateUsersAsync(10, 4);
                 await AssignRolesAsync(db.Users.ToList());
 
                 List<Course> courses = await GenerateCoursesAsync(3);
@@ -47,12 +47,37 @@ public static class SeedData
                 List<Activity> activities= await GenerateActivitiesInModules(db.Modules.ToList(), db.ActivityTypes.ToList());
                 await db.Activities.AddRangeAsync(activities);
                 await db.SaveChangesAsync();
+
+                await EnrollUsersInCourses(await db.Users.Where(u=>u.Role == teacherRole).Include(t=>t.Enrollments).ToListAsync(), await db.Users.Where(u=>u.Role == studentRole).Include(t => t.Enrollments).ToListAsync(), await db.Courses.ToListAsync());
+                await db.SaveChangesAsync();
             }
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
         }
+    }
+
+    private static async Task EnrollUsersInCourses(List<ApplicationUser> teachers, List<ApplicationUser> students, List<Course> courses)
+    {
+        var rnd = new Random();
+        int extraTeachers= teachers.Count-courses.Count;
+        int i = 0;
+        for (i = 0; i < courses.Count; i++)
+        {
+            teachers[i].Enrollments.Add(courses[i]);
+        }
+        //Adds teachers that are left after assigning one to each course to a random course
+        for ( int j = 0; j < extraTeachers; j++) 
+        {
+            teachers[i++].Enrollments.Add(courses[rnd.Next(0,courses.Count-1)]);
+        }
+
+        foreach (var student in students)
+        {
+            student.Enrollments.Add(courses[rnd.Next(0, courses.Count - 1)]);
+        }
+
     }
 
     private static async Task<List<Activity>> GenerateActivitiesInModules(List<Module> modules, List<ActivityType> activityTypes)
@@ -97,7 +122,7 @@ public static class SeedData
                 m.StartDate= course.StartDate.Add(moduleSpan * (moduleNumber-1));
                 m.EndDate = course.StartDate.Add(moduleSpan *  moduleNumber);
                 m.Name = "Module " + moduleNumber++ +": "+f.Hacker.Noun();
-                m.Description = m.Name + ". About " + f.Hacker.Adjective() + " " + f.Hacker.Verb() +" "+ moduleWords[f.Random.Int(0, moduleWordCount - 1)];
+                m.Description = m.Name + ". How " + f.Hacker.Adjective() + " " + f.Hacker.Verb() +" "+ moduleWords[f.Random.Int(0, moduleWordCount - 1)];
             });
             moduleLists.Add(faker.Generate(numberOfModules));
         }
