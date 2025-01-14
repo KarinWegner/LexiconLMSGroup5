@@ -57,7 +57,7 @@ namespace LMS.Presemtation.Controllers
 
 
             var enrolledUserDto = 
-            _context.Users
+            enrolledUsers
             .Join(_context.UserRoles, u => u.Id, ur => ur.UserId, (u, ur) => new { u, ur })
             .Join(_context.Roles, ur => ur.ur.RoleId, r => r.Id, (ur, r) => new { ur, r })
             .Select(c => new EnrolledUserDTO()
@@ -112,9 +112,9 @@ namespace LMS.Presemtation.Controllers
         // POST: api/Enrollments
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost("{courseId}")]
-        public async Task<ActionResult<Course>> AddEnrollment(int courseId, string userId)
+        public async Task<ActionResult<Course>> AddEnrollment(string userId, int courseId)
         {
-            var course = await _context.Courses.FindAsync(courseId);
+            var course = await _context.Courses.Where(c=>c.CourseId == courseId).Include(c => c.Enrollments).FirstOrDefaultAsync();
 
             if (course == null)
             {
