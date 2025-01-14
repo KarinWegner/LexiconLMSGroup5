@@ -57,15 +57,7 @@ namespace LMS.Presemtation.Controllers
 
 
             var enrolledUserDto = 
-            enrolledUsers
-            .Join(_context.UserRoles, u => u.Id, ur => ur.UserId, (u, ur) => new { u, ur })
-            .Join(_context.Roles, ur => ur.ur.RoleId, r => r.Id, (ur, r) => new { ur, r })
-            .Select(c => new EnrolledUserDTO()
-            {
-                Name = c.ur.u.Name,
-                Id = c.ur.u.Id,
-                Role = c.r.Name 
-            }).ToList();
+            _mapper.Map<IEnumerable<EnrolledUserDTO>>(enrolledUsers);
 
             return Ok(enrolledUserDto);
         }
