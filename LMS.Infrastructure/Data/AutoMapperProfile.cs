@@ -30,8 +30,10 @@ public class AutoMapperProfile : Profile
 
         CreateMap<ApplicationUserDTO, ApplicationUser>();
 
-        CreateMap<Course, EnrollmentListDTO>()
-        .ForMember(dest => dest.CourseName, opt => opt.MapFrom(src => src.Name));
+       
+
+
+
         CreateMap<ApplicationUser , EnrolledUserDTO > ();
         
     }
