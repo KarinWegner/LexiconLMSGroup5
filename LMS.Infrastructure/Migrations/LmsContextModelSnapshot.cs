@@ -39,11 +39,11 @@ namespace LMS.Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Models.Entities.Activity", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("ActivityId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ActivityId"));
 
                     b.Property<int>("ActivityTypeId")
                         .HasColumnType("int");
@@ -65,7 +65,7 @@ namespace LMS.Infrastructure.Migrations
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("Id");
+                    b.HasKey("ActivityId");
 
                     b.HasIndex("ActivityTypeId");
 
@@ -76,19 +76,51 @@ namespace LMS.Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Models.Entities.ActivityType", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("ActivityTypeId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ActivityTypeId"));
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.HasKey("ActivityTypeId");
 
                     b.ToTable("ActivityTypes");
+
+                    b.HasData(
+                        new
+                        {
+                            ActivityTypeId = 1,
+                            Name = "Lecture"
+                        },
+                        new
+                        {
+                            ActivityTypeId = 2,
+                            Name = "Essay"
+                        },
+                        new
+                        {
+                            ActivityTypeId = 3,
+                            Name = "Assignment"
+                        },
+                        new
+                        {
+                            ActivityTypeId = 4,
+                            Name = "Discussion"
+                        },
+                        new
+                        {
+                            ActivityTypeId = 5,
+                            Name = "Webinar"
+                        },
+                        new
+                        {
+                            ActivityTypeId = 6,
+                            Name = "Other"
+                        });
                 });
 
             modelBuilder.Entity("Domain.Models.Entities.ApplicationUser", b =>
@@ -104,7 +136,6 @@ namespace LMS.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
-                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
@@ -415,15 +446,13 @@ namespace LMS.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Domain.Models.Entities.Module", "Module")
-                        .WithMany()
+                    b.HasOne("Domain.Models.Entities.Module", null)
+                        .WithMany("Activities")
                         .HasForeignKey("ModuleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("ActivityType");
-
-                    b.Navigation("Module");
                 });
 
             modelBuilder.Entity("Domain.Models.Entities.Document", b =>
@@ -437,13 +466,11 @@ namespace LMS.Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Models.Entities.Module", b =>
                 {
-                    b.HasOne("Domain.Models.Entities.Course", "Course")
-                        .WithMany()
+                    b.HasOne("Domain.Models.Entities.Course", null)
+                        .WithMany("Modules")
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Course");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -495,6 +522,16 @@ namespace LMS.Infrastructure.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Domain.Models.Entities.Course", b =>
+                {
+                    b.Navigation("Modules");
+                });
+
+            modelBuilder.Entity("Domain.Models.Entities.Module", b =>
+                {
+                    b.Navigation("Activities");
                 });
 #pragma warning restore 612, 618
         }
