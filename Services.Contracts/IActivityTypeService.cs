@@ -12,7 +12,7 @@ namespace Services.Contracts
         Task<IEnumerable<ActivityTypeDTO>> GetActivityTypesAsync();
         Task<ActivityTypeDTO> GetActivityTypeByIdAsync(int id);
         Task<ActivityTypeDTO> CreateActivityTypeAsync(ActivityTypeCreateDTO activityTypeDto);
-        Task<bool> UpdateActivityTypeAsync(int id, ActivityTypeDTO activityTypeDto);
+        Task<bool> UpdateActivityTypeAsync(int id, ActivityTypeUpdateDTO activityTypeUpdateDto);
         Task<bool> DeleteActivityTypeAsync(int id);
     }
 }

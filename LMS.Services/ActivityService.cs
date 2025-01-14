@@ -34,11 +34,11 @@ namespace LMS.Services
         }
 
         
-        public async Task<ActivityDTO> GetActivityByIdAsync(int id, int moduleId)
+        public async Task<ActivityDTO> GetActivityByIdAsync(int id)
         {
             var activity = await _uow.Activities
                 .Query()
-                .Where(a => a.ActivityId == id && a.ModuleId == moduleId)
+                .Where(a => a.ActivityId == id)
                 .FirstOrDefaultAsync();
 
             if (activity == null) return null;
@@ -51,6 +51,25 @@ namespace LMS.Services
             var module = await _uow.Modules.GetByIdAsync(moduleId);
             if (module == null) return null;
 
+            // Check module constraints
+            if (activityDto.StartDate < module.StartDate || activityDto.EndDate > module.EndDate)
+            {
+                throw new ArgumentException("Activity dates must be within the module timeframe.");
+            }
+
+            // Check for overlapping activities
+            var overlappingActivity = await _uow.Activities
+                .Query()
+                .Where(a => a.ModuleId == moduleId &&
+                            ((activityDto.StartDate >= a.StartDate && activityDto.StartDate <= a.EndDate) ||
+                             (activityDto.EndDate >= a.StartDate && activityDto.EndDate <= a.EndDate)))
+                .FirstOrDefaultAsync();
+
+            if (overlappingActivity != null)
+            {
+                throw new ArgumentException("Activity times overlap with another activity.");
+            }
+
             var activity = _mapper.Map<Activity>(activityDto);
             activity.ModuleId = moduleId; // Ensure that the moduleId is set
 
@@ -60,11 +79,34 @@ namespace LMS.Services
             return _mapper.Map<ActivityDTO>(activity);
         }
 
-        // Update an existing activity
+
         public async Task<bool> UpdateActivityAsync(int id, ActivityUpdateDTO activityDto)
         {
             var activity = await _uow.Activities.GetByIdAsync(id);
             if (activity == null) return false;
+
+            var module = await _uow.Modules.GetByIdAsync(activity.ModuleId);
+            if (module == null) return false;
+
+            // Validate module timeframe
+            if (activityDto.StartDate < module.StartDate || activityDto.EndDate > module.EndDate)
+            {
+                throw new ArgumentException("Activity dates must be within the module timeframe.");
+            }
+
+            // Check for overlapping activities
+            var overlappingActivity = await _uow.Activities
+                .Query()
+                .Where(a => a.ModuleId == activity.ModuleId &&
+                            a.ActivityId != id && // Exclude the current activity
+                            ((activityDto.StartDate >= a.StartDate && activityDto.StartDate <= a.EndDate) ||
+                             (activityDto.EndDate >= a.StartDate && activityDto.EndDate <= a.EndDate)))
+                .FirstOrDefaultAsync();
+
+            if (overlappingActivity != null)
+            {
+                throw new ArgumentException("Activity times overlap with another activity.");
+            }
 
             _mapper.Map(activityDto, activity);
 
@@ -74,7 +116,7 @@ namespace LMS.Services
             return true;
         }
 
-        // Delete an activity
+
         public async Task<bool> DeleteActivityAsync(int id)
         {
             var activity = await _uow.Activities.GetByIdAsync(id);
@@ -87,19 +129,20 @@ namespace LMS.Services
         }
 
 
-        //public async Task<ActivityDTO> PatchActivityAsync(int id, JsonPatchDocument<ActivityUpdateDTO> patchDocument)
-        //{
-        //    var activity = await _uow.Activities.GetByIdAsync(id);
-        //    if (activity == null) return null;
+        public async Task<ActivityDTO> PatchActivityAsync(int id, JsonPatchDocument<ActivityUpdateDTO> patchDocument)
+        {
+            var activity = await _uow.Activities.GetByIdAsync(id);
+            if (activity == null) return null;
 
-        //    var activityToPatch = _mapper.Map<ActivityUpdateDTO>(activity);
-        //    patchDocument.ApplyTo(activityToPatch);
+            var activityToPatch = _mapper.Map<ActivityUpdateDTO>(activity);
+            patchDocument.ApplyTo(activityToPatch);
 
-        //    _mapper.Map(activityToPatch, activity);
-        //    await _uow.CompleteASync();
+            _mapper.Map(activityToPatch, activity);
+            await _uow.Activities.UpdateAsync(activity);
+            await _uow.CompleteASync();
 
-        //    return _mapper.Map<ActivityDTO>(activity);
-        //}
-    
-}
+            return _mapper.Map<ActivityDTO>(activity);
+        }
+
+    }
 }

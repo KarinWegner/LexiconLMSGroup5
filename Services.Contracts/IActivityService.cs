@@ -11,10 +11,10 @@ namespace Services.Contracts
     public interface IActivityService
     {
         Task<IEnumerable<ActivityDTO>> GetActivitiesAsync(int moduleId);
-        Task<ActivityDTO> GetActivityByIdAsync(int id, int moduleId);
+        Task<ActivityDTO> GetActivityByIdAsync(int id);
         Task<ActivityDTO> CreateActivityAsync(ActivityCreateDTO activityDto, int moduleId);
         Task<bool> UpdateActivityAsync(int id, ActivityUpdateDTO activityDto);
         Task<bool> DeleteActivityAsync(int id);
-        //Task<ActivityDTO> PatchActivityAsync(int id, JsonPatchDocument<ActivityUpdateDTO> patchDocument);
+        Task<ActivityDTO> PatchActivityAsync(int id, JsonPatchDocument<ActivityUpdateDTO> patchDocument);
     }
 }

@@ -2,6 +2,7 @@
 using Domain.Contracts;
 using Domain.Models.Entities;
 using LMS.Shared.DTOs.ActivityTypeDTOs;
+using Microsoft.EntityFrameworkCore;
 using Services.Contracts;
 using System;
 using System.Collections.Generic;
@@ -32,14 +33,15 @@ namespace LMS.Services
         public async Task<ActivityTypeDTO> GetActivityTypeByIdAsync(int id)
         {
             var activityType = await _uow.ActivityTypes.GetByIdAsync(id);
-            if (activityType == null)
-                return null;
+            if (activityType == null) return null;
 
             return _mapper.Map<ActivityTypeDTO>(activityType);
         }
 
         public async Task<ActivityTypeDTO> CreateActivityTypeAsync(ActivityTypeCreateDTO activityTypeDto)
         {
+            if (await ActivityTypeExistsAsync(activityTypeDto.Name)) throw new ArgumentException("ActivityType with the same name already exists.");
+
             var activityType = _mapper.Map<ActivityType>(activityTypeDto);
             await _uow.ActivityTypes.AddAsync(activityType);
             await _uow.CompleteASync();
@@ -48,12 +50,15 @@ namespace LMS.Services
         }
 
 
-        public async Task<bool> UpdateActivityTypeAsync(int id, ActivityTypeDTO activityTypeDto)
+        public async Task<bool> UpdateActivityTypeAsync(int id, ActivityTypeUpdateDTO activityTypeUpdateDto)
         {
             var activityType = await _uow.ActivityTypes.GetByIdAsync(id);
             if (activityType == null) return false;
 
-            _mapper.Map(activityTypeDto, activityType);
+            if (await ActivityTypeExistsAsync(activityTypeUpdateDto.Name)) throw new ArgumentException("ActivityType with the same name already exists.");
+
+            _mapper.Map(activityTypeUpdateDto, activityType);
+            await _uow.ActivityTypes.UpdateAsync(activityType);
             await _uow.CompleteASync();
 
             return true;
@@ -69,6 +74,13 @@ namespace LMS.Services
             await _uow.CompleteASync();
 
             return true;
+        }
+
+        private async Task<bool> ActivityTypeExistsAsync(string name)
+        {
+            var query = _uow.ActivityTypes.Query().Where(at => at.Name == name);
+
+            return await query.AnyAsync();
         }
 
     }

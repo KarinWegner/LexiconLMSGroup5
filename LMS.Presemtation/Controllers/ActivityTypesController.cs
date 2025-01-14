@@ -10,6 +10,7 @@ using LMS.Infrastructure.Data;
 using LMS.Shared.DTOs.ActivityTypeDTOs;
 using AutoMapper;
 using LMS.Shared.DTOs.ActivityDTOs;
+using Services.Contracts;
 
 namespace LMS.Presemtation.Controllers
 {
@@ -17,11 +18,11 @@ namespace LMS.Presemtation.Controllers
     [ApiController]
     public class ActivityTypesController : ControllerBase
     {
-        private readonly LmsContext _context;
+        private readonly IServiceManager _serviceManager;
         private readonly IMapper _mapper;
-        public ActivityTypesController(LmsContext context, IMapper mapper)
+        public ActivityTypesController(IServiceManager serviceManager, IMapper mapper)
         {
-            _context = context;
+            _serviceManager = serviceManager;
             _mapper = mapper;
         }
 
@@ -29,49 +30,40 @@ namespace LMS.Presemtation.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ActivityTypeDTO>>> GetActivityTypes()
         {
-            var activityTypes = await _context.ActivityTypes.ToListAsync();
-            var activityTypeDtos = _mapper.Map<IEnumerable<ActivityTypeDTO>>(activityTypes);
-            return Ok(activityTypeDtos);
+            var activityTypes = await _serviceManager.ActivityTypeService.GetActivityTypesAsync();
+            return Ok(activityTypes);
         }
 
         // GET: api/ActivityTypes/5
         [HttpGet("{id}")]
         public async Task<ActionResult<ActivityTypeDTO>> GetActivityType(int id)
         {
-            var activityType = await _context.ActivityTypes.FindAsync(id);
+            var activityType = await _serviceManager.ActivityTypeService.GetActivityTypeByIdAsync(id);
 
             if (activityType == null)
             {
-                return NotFound();
+                return NotFound("Activity type not found.");
             }
-            var activityTypeDTO = _mapper.Map<ActivityTypeDTO>(activityType);
 
-            return Ok(activityTypeDTO);
+            return Ok(activityType);
         }
 
         // PUT: api/ActivityTypes/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutActivityType(int id, ActivityTypeDTO activityType)
+        public async Task<IActionResult> PutActivityType(int id, ActivityTypeUpdateDTO activityTypeDto)
         {
-            if (id != activityType.ActivityTypeId)
+            if (id != activityTypeDto.ActivityTypeId)
             {
-                return BadRequest();
+                return BadRequest("Activity type ID mismatch.");
             }
 
-            if (activityType.ActivityTypeId != id) return BadRequest("Not allowed to change Activity type Id.");
+            var isUpdated = await _serviceManager.ActivityTypeService.UpdateActivityTypeAsync(id, activityTypeDto);
 
-            var existingActivityType = await _context.ActivityTypes.FirstOrDefaultAsync(a => a.ActivityTypeId == id);
-
-
-            if (existingActivityType == null) return NotFound("Activity not found");
-
-
-
-
-            _mapper.Map(activityType, existingActivityType);
-            await _context.SaveChangesAsync();
-           
+            if (!isUpdated)
+            {
+                return NotFound("Activity type not found.");
+            }
 
             return NoContent();
         }
@@ -81,35 +73,29 @@ namespace LMS.Presemtation.Controllers
         [HttpPost]
         public async Task<ActionResult<ActivityTypeDTO>> PostActivityType(ActivityTypeCreateDTO activityTypeDto)
         {
-            if(!_context.ActivityTypes.Any(a=>a.Name == activityTypeDto.Name)) return BadRequest("Activity already exists");
-
-            ActivityType activityToAdd = _mapper.Map<ActivityType>(activityTypeDto);
-            _context.ActivityTypes.Add(activityToAdd);
-            await _context.SaveChangesAsync();
-
-            var dtoToReturn = _mapper.Map<ActivityTypeDTO>(activityToAdd);
-            return CreatedAtAction("GetActivityType", new { id = dtoToReturn.ActivityTypeId }, dtoToReturn);
+            try
+            {
+                var createdActivityType = await _serviceManager.ActivityTypeService.CreateActivityTypeAsync(activityTypeDto);
+                return CreatedAtAction(nameof(GetActivityType), new { id = createdActivityType.ActivityTypeId }, createdActivityType);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // DELETE: api/ActivityTypes/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteActivityType(int id)
         {
-            var activityType = await _context.ActivityTypes.FindAsync(id);
-            if (activityType == null)
+            var isDeleted = await _serviceManager.ActivityTypeService.DeleteActivityTypeAsync(id);
+
+            if (!isDeleted)
             {
-                return NotFound();
+                return NotFound("Activity type not found.");
             }
 
-            _context.ActivityTypes.Remove(activityType);
-            await _context.SaveChangesAsync();
-
             return NoContent();
-        }
-
-        private bool ActivityTypeExists(int id)
-        {
-            return _context.ActivityTypes.Any(e => e.ActivityTypeId == id);
         }
     }
 }
