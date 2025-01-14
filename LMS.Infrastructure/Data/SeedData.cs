@@ -1,8 +1,10 @@
 ﻿using Bogus;
+using Bogus.DataSets;
 using Domain.Models.Entities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace LMS.Infrastructure.Data;
@@ -11,6 +13,7 @@ public static class SeedData
 {
     private static UserManager<ApplicationUser> userManager = null!;
     private static RoleManager<IdentityRole> roleManager = null!;
+
     //private const string adminRole = "Admin";
     private const string teacherRole = "Teacher";
     private const string studentRole = "Student";
@@ -32,13 +35,89 @@ public static class SeedData
                 await CreateRolesAsync([teacherRole, studentRole]);
                 await GenerateUsersAsync(5, 2);
                 await AssignRolesAsync(db.Users.ToList());
+
+                List<Course> courses = await GenerateCoursesAsync(3);
+                 await db.Courses.AddRangeAsync(courses);
+                await db.SaveChangesAsync();
+
+                List<Module> modules = await GenerateModulesInCourses(db.Courses.ToList());
+                await db.Modules.AddRangeAsync(modules);
+                await db.SaveChangesAsync();
+
+                List<Activity> activities= await GenerateActivitiesInModules(db.Modules.ToList(), db.ActivityTypes.ToList());
+                await db.Activities.AddRangeAsync(activities);
                 await db.SaveChangesAsync();
             }
             catch (Exception ex)
             {
-                throw;
+                throw new Exception(ex.Message);
             }
         }
+    }
+
+    private static async Task<List<Activity>> GenerateActivitiesInModules(List<Module> modules, List<ActivityType> activityTypes)
+    {
+        int activitiesPerModule = 5;
+        List<List<Activity>> activityLists = new List<List<Activity>>();
+        foreach (var module in modules) 
+        {
+            TimeSpan activitySpan = (module.StartDate - module.EndDate) / activitiesPerModule;
+            
+        int activityNumber = 1;
+            
+                var faker = new Faker<Activity>("sv").Rules((f, m) =>
+                {
+                    m.ModuleId = module.ModuleId;
+                    m.StartDate = module.StartDate.Add(activitySpan * (activityNumber - 1));
+                    m.EndDate = module.StartDate.Add(activitySpan * activityNumber++);
+                    m.ActivityType = activityTypes[f.Random.Int(0, activityTypes.Count - 1)];
+                    m.ActivityTypeId= m.ActivityType.ActivityTypeId;
+                    m.Name = m.ActivityType.Name +": " +f.Hacker.Noun();
+                    m.Description = "A(n) " + m.ActivityType.Name + " about " + module.Name;
+                });
+            activityLists.Add(faker.Generate(activitiesPerModule));
+            
+        }
+        return activityLists.SelectMany(a=>a).ToList();
+    }
+
+    private static async Task<List<Module>> GenerateModulesInCourses(List<Course> courses)
+    {
+        var moduleWords = new string[] { "integration", "is built", "is applied", "functions", "", "works" };
+        int moduleWordCount = moduleWords.Count();
+        List<List<Module>> moduleLists = new();
+        foreach (var course in courses) 
+        {
+            int numberOfModules = 3;
+            TimeSpan moduleSpan = (course.StartDate - course.EndDate) / numberOfModules;
+            int moduleNumber = 1;
+            var faker = new Faker<Module>("sv").Rules((f, m) =>
+            {
+                m.CourseId = course.CourseId;
+                m.StartDate= course.StartDate.Add(moduleSpan * (moduleNumber-1));
+                m.EndDate = course.StartDate.Add(moduleSpan *  moduleNumber);
+                m.Name = "Module " + moduleNumber++ +": "+f.Hacker.Noun();
+                m.Description = m.Name + ". About " + f.Hacker.Adjective() + " " + f.Hacker.Verb() +" "+ moduleWords[f.Random.Int(0, moduleWordCount - 1)];
+            });
+            moduleLists.Add(faker.Generate(numberOfModules));
+        }
+        return moduleLists.SelectMany(m=>m).ToList();
+
+    }
+
+    private static async Task<List<Course>> GenerateCoursesAsync(int nrOfCourses)
+    {
+       
+        DateTime refDate = DateTime.UtcNow;
+        var faker = new Faker<Course>("sv").Rules((f, c) =>
+        {
+            c.Name = f.Hacker.IngVerb();
+            c.StartDate = f.Date.Past(1, refDate);
+            c.EndDate = c.StartDate.AddMonths(6);
+            c.Description = "";            
+        });
+        return faker.Generate(nrOfCourses);
+
     }
 
     //Assigns set number of teachers and remaining users to students
