@@ -10,6 +10,7 @@ using LMS.Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
 using LMS.Shared.DTOs;
 using AutoMapper;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace LMS.Presemtation.Controllers
 {
@@ -31,6 +32,7 @@ namespace LMS.Presemtation.Controllers
         ///
         // GET: api/Enrollments
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<EnrollmentListDTO>>> GetEnrollments()
         {
 
@@ -61,9 +63,13 @@ namespace LMS.Presemtation.Controllers
             //.Join(_context.UserRoles, u => u.Id, ur => ur.UserId, (u, ur) => new { u, ur })
             //.Join(_context.Roles, ur => ur.ur.RoleId, r => r.Id, (ur, r) => new { ur, r })
             //.Select(c => new EnrolledUserDTO()
-        //{
-        //    return await _context.Courses.ToListAsync();
-        //}
+            //{
+            //    Name = c.ur.u.Name,
+            //    Id = c.ur.u.Id,
+            //    Role = c.r.Name
+            //}).ToList();
+            return Ok(EnrollmentListDTOs);
+        }
 
         /// <summary>
         /// Returns list of all students and teachers enrolled in a course
@@ -72,7 +78,10 @@ namespace LMS.Presemtation.Controllers
         /// <returns></returns>
         // GET: api/Enrollments/5
         [HttpGet("{courseId}")]
-        public async Task<ActionResult<IEnumerable<EnrolledUserDTO>>> GetEnrollmentsForCourse(int courseId)
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<IEnumerable<EnrolledUserDTO>>> GetEnrollmentsForCourse(int courseId, bool excludeTeachers = false)
         {
             //var course = await _context.Courses.Include(c => c.Enrollments).Where(c => c.CourseId == courseId).FirstOrDefaultAsync();
             var course = await _context.Courses.FindAsync(courseId);
@@ -87,18 +96,30 @@ namespace LMS.Presemtation.Controllers
                 await _context.Courses.Where(c => c.CourseId == courseId).SelectMany(c => c.Enrollments).ToListAsync();
 
 
-            var enrolledUserDto = 
+            var enrolledUserDto =
             _mapper.Map<IEnumerable<EnrolledUserDTO>>(enrolledUsers);
 
             return Ok(enrolledUserDto);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="courseId">The id of the course a user is currently in (and want to change to another course)</param>
+        /// <param name="userId">The id of the user to move</param>
+        /// <param name="newCourseId">The id of the course to move the user to</param>
+        /// <returns></returns>
+        /// <response code="200"></responsecode>
         // PUT: api/Enrollments/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{courseid}")]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> EditEnrollment(int courseId, string userId, int newCourseId)
         {
             var course = await _context.Courses.FindAsync(courseId);
+            if (courseId == newCourseId) return BadRequest("Current and new course cannot have the same course Id");
 
             if (course == null)
             {
@@ -135,7 +156,10 @@ namespace LMS.Presemtation.Controllers
         // POST: api/Enrollments
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost("{courseId}")]
-        public async Task<ActionResult<Course>> AddEnrollment(string userId, int courseId)
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        public async Task<ActionResult<Course>> AddEnrollment(int courseId, string userId)
         {
             var course = await _context.Courses.Where(c=>c.CourseId == courseId).Include(c => c.Enrollments).FirstOrDefaultAsync();
 
@@ -160,7 +184,7 @@ namespace LMS.Presemtation.Controllers
             {
                 var userEnrollments = await _context.Users.Where(u => u.Id == userId).Include(u => u.Enrollments).Select(u=>u.Enrollments).FirstOrDefaultAsync();
                 if (userEnrollments.Count >0) 
-                {
+                {                
                     return BadRequest("Student can only be enrolled in one course at a time.");
                 }
             }
@@ -186,6 +210,9 @@ namespace LMS.Presemtation.Controllers
         /// <returns></returns>
         // DELETE: api/Enrollments/5
         [HttpDelete("{courseId}")]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> RemoveEnrollment(int courseId, string userId)
         {
             var course = await _context.Courses.FindAsync(courseId);
@@ -223,6 +250,8 @@ namespace LMS.Presemtation.Controllers
         /// <param name="userId"></param>
         /// <returns></returns>
         [HttpGet("user/{userId}")]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<EnrollmentListDTO>>> GetUserEnrollments(string userId)
         {
             var user = await _userManager.FindByIdAsync(userId);
@@ -234,9 +263,9 @@ namespace LMS.Presemtation.Controllers
             var enrollmentList = await _context.Courses.Where(c => c.Enrollments.Contains(user)).ToListAsync();
 
             if (enrollmentList.Count == 0) return Ok("User has no enrollments");
-            var enrollmentDto = _mapper.Map<IEnumerable<EnrollmentListDTO>>(enrollmentList);
+            var enrollmentlist = enrollmentList.Select(c=>c.Name);
 
-            return Ok(enrollmentDto.ToList());
+            return Ok(enrollmentList.ToList());
         }
     }
 }
