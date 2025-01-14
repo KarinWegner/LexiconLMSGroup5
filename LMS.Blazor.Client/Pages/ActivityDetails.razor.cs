@@ -6,16 +6,17 @@ using LMS.Shared.DTOs;
 
 namespace LMS.Blazor.Client.Pages
 {
-    public partial class ModuleOverview
+    public partial class ActivityDetails
     {
         [Parameter]
         public int Id { get; set; }
-        public CourseEntryModel Entries { get; set; }
-        public string ModuleName = string.Empty;
+        [Parameter]
+        public int ParentId { get; set; }
+        public CourseEntryDO Activity = default!;
         protected async override Task OnInitializedAsync()
         {
-            ModuleName = FakeDataService.GetModules().First(x => x.Id == Id).Name;
-            Entries = new CourseEntryModel(ECourseEntryType.Activity, FakeDataService.GetActivities().Where(x => x.ParentId == Id));
+            Activity = FakeDataService.GetActivities().Where(x => x.ParentId == ParentId).First(x => x.Id == Id);
+            
             await base.OnInitializedAsync();
         }
     }

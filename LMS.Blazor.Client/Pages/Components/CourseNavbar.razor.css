@@ -1,0 +1,34 @@
+﻿::deep .nav-link {
+    color: #41464b !important;
+}
+
+.bg-expanded {
+    background-color: #C3C3C3;
+    border-radius: 7px;
+    padding: 4px 40px 5px 10px;
+}
+
+.bg-opened
+{
+    margin-top: 5px;
+    outline: 2px solid black;
+    border-radius: 5px;
+}
+
+/*.bg-opened > .nav-link{
+    margin-left: 10px !important;
+}*/
+
+::deep .navbar-nav .nav-link {
+    padding-right: 10px !important;
+     padding-left: 10px !important; 
+}
+
+.navbar-toggler {
+    outline: 2px solid black !important;
+}
+
+::deep .navbar-nav > .active{
+    background-color: white;
+    border-radius: 10px;
+}

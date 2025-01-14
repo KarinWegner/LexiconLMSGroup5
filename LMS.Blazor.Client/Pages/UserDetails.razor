@@ -1,0 +1,7 @@
+﻿@attribute [Route(VBRoutes.Student.LinkToCourseParticipantDetails)]
+
+<h3>User Details - @CourseParticipant.Name</h3>
+
+<CourseNavbar ActiveNav="ECourseNav.Modules"></CourseNavbar>
+
+<UserDetailComponent CourseParticipant="@CourseParticipant"></UserDetailComponent>

@@ -1,0 +1,20 @@
+﻿@rendermode InteractiveWebAssembly
+
+<nav class="navbar navbar-expand-lg">
+    <div class="container-fluid">
+        <button class="navbar-toggler" type="button" @onclick="ToggleNavbar" aria-controls="navbarNavAltMarkup" aria-expanded="@isOpen.ToString()" aria-label="Toggle navigation">
+            <i class="bi bi-list"></i>
+        </button>
+        <div class="@navstate navbar-collapse row" id="navbarNavAltMarkup">
+            <div class="navbar-nav @NavstateBg">
+                @*Disabled and manually reimplemented the default navlink active behavior for overview, as navlink would act as if set to prefix mode irregardless of actual seting.*@
+                <NavLink class="@($"{onInfo} nav-link col-sm-auto")" href="@LinkToOverview" ActiveClass="">Course Information</NavLink>
+                <NavLink class="nav-link col-sm-auto" href="@LinkToModules">Modules</NavLink>
+                <NavLink class="nav-link  col-sm-auto" href="@LinkToCourseParticipants">Course Participants</NavLink>
+                <NavLink class="nav-link disabled col-sm-auto" href="@LinkToSchedule" aria-disabled="true">Schedule</NavLink>
+                <NavLink class="nav-link disabled col-sm-auto" href="@LinkToPlanning" aria-disabled="true">Planning</NavLink>
+                <div class="@filler"></div>
+            </div>
+        </div>
+    </div>
+</nav>
