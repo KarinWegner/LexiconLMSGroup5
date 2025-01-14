@@ -30,6 +30,11 @@ public class AutoMapperProfile : Profile
 
         CreateMap<ApplicationUserDTO, ApplicationUser>();
 
+       
 
+
+
+        CreateMap<ApplicationUser , EnrolledUserDTO > ();
+        
     }
 }
