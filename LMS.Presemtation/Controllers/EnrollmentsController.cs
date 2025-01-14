@@ -158,8 +158,8 @@ namespace LMS.Presemtation.Controllers
 
             if (await _userManager.IsInRoleAsync(user, "student"))
             {
-
-                if (user.Enrollments.Count > 0)
+                var userEnrollments = await _context.Users.Where(u => u.Id == userId).Include(u => u.Enrollments).Select(u=>u.Enrollments).FirstOrDefaultAsync();
+                if (userEnrollments.Count >0) 
                 {
                     return BadRequest("Student can only be enrolled in one course at a time.");
                 }
@@ -174,7 +174,8 @@ namespace LMS.Presemtation.Controllers
 
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetEnrollmentsForCourse", new { id = course.CourseId }, course);
+            return Created();
+            //return CreatedAtAction("GetEnrollmentsForCourse", new { id = course.CourseId }, course);
         }
 
         /// <summary>
