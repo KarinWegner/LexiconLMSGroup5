@@ -4,6 +4,7 @@ using LMS.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LMS.Infrastructure.Migrations
 {
     [DbContext(typeof(LmsContext))]
-    partial class LmsContextModelSnapshot : ModelSnapshot
+    [Migration("20250109160054_addedActivityTypesToContext")]
+    partial class addedActivityTypesToContext
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -39,11 +42,11 @@ namespace LMS.Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Models.Entities.Activity", b =>
                 {
-                    b.Property<int>("ActivityId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ActivityId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("ActivityTypeId")
                         .HasColumnType("int");
@@ -65,7 +68,7 @@ namespace LMS.Infrastructure.Migrations
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("ActivityId");
+                    b.HasKey("Id");
 
                     b.HasIndex("ActivityTypeId");
 
@@ -76,49 +79,49 @@ namespace LMS.Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Models.Entities.ActivityType", b =>
                 {
-                    b.Property<int>("ActivityTypeId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ActivityTypeId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("ActivityTypeId");
+                    b.HasKey("Id");
 
                     b.ToTable("ActivityTypes");
 
                     b.HasData(
                         new
                         {
-                            ActivityTypeId = 1,
+                            Id = 1,
                             Name = "Lecture"
                         },
                         new
                         {
-                            ActivityTypeId = 2,
+                            Id = 2,
                             Name = "Essay"
                         },
                         new
                         {
-                            ActivityTypeId = 3,
+                            Id = 3,
                             Name = "Assignment"
                         },
                         new
                         {
-                            ActivityTypeId = 4,
+                            Id = 4,
                             Name = "Discussion"
                         },
                         new
                         {
-                            ActivityTypeId = 5,
+                            Id = 5,
                             Name = "Webinar"
                         },
                         new
                         {
-                            ActivityTypeId = 6,
+                            Id = 6,
                             Name = "Other"
                         });
                 });
@@ -446,13 +449,15 @@ namespace LMS.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Domain.Models.Entities.Module", null)
-                        .WithMany("Activities")
+                    b.HasOne("Domain.Models.Entities.Module", "Module")
+                        .WithMany()
                         .HasForeignKey("ModuleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("ActivityType");
+
+                    b.Navigation("Module");
                 });
 
             modelBuilder.Entity("Domain.Models.Entities.Document", b =>
@@ -527,11 +532,6 @@ namespace LMS.Infrastructure.Migrations
             modelBuilder.Entity("Domain.Models.Entities.Course", b =>
                 {
                     b.Navigation("Modules");
-                });
-
-            modelBuilder.Entity("Domain.Models.Entities.Module", b =>
-                {
-                    b.Navigation("Activities");
                 });
 #pragma warning restore 612, 618
         }

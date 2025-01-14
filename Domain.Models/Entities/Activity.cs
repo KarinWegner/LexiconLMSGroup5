@@ -8,7 +8,7 @@ namespace Domain.Models.Entities
 {
     public class Activity
     {
-        public int Id { get; set; }       
+        public int ActivityId { get; set; }       
         public string Name { get; set; }
         public string Description { get; set; } = string.Empty;
         public DateTime StartDate { get; set; }
@@ -20,7 +20,7 @@ namespace Domain.Models.Entities
 
         //Navigation Properties
         public ActivityType ActivityType { get; set; }
-        public Module Module { get; set; }
+        
 
     }
 }

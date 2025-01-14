@@ -14,5 +14,8 @@ namespace Domain.Models.Entities
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public ICollection<ApplicationUser> Enrollments { get; set; }
+        =new List<ApplicationUser>();
+        public ICollection<Module> Modules { get; set; }
+        = new List<Module>();
     }
 }
