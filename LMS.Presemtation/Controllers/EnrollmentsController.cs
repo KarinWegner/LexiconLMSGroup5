@@ -30,8 +30,37 @@ namespace LMS.Presemtation.Controllers
 
         ///
         // GET: api/Enrollments
-        //[HttpGet]
-        //public async Task<ActionResult<IEnumerable<Course>>> GetCourses()
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<EnrollmentListDTO>>> GetEnrollments()
+        {
+
+            var enrollments = await _context.Users.Include(u=>u.Enrollments).ToListAsync();
+
+            var EnrollmentListDTOs = new List<EnrollmentListDTO>();
+
+            foreach (var user in enrollments) 
+            {
+                foreach (var enrollment in user.Enrollments)
+                {
+                    EnrollmentListDTOs.Add(new EnrollmentListDTO
+                    {
+                        CourseName = enrollment.Name,
+                        CourseStart = enrollment.StartDate,
+                        CourseEnd = enrollment.EndDate,
+                        User = user.Name,
+                        TeacherNames = await _context.Courses.Where(c => c.CourseId == enrollment.CourseId).SelectMany(c => c.Enrollments).Where(u => u.Role == "Teacher").Select(u=>u.Name).ToListAsync()
+                    });
+                }
+            }
+
+
+            //var teachers = await _context.Courses.Select(c => c.Enrollments).Select(u => u.Role)
+
+            //var enrolledUserDto =
+            //enrollments
+            //.Join(_context.UserRoles, u => u.Id, ur => ur.UserId, (u, ur) => new { u, ur })
+            //.Join(_context.Roles, ur => ur.ur.RoleId, r => r.Id, (ur, r) => new { ur, r })
+            //.Select(c => new EnrolledUserDTO()
         //{
         //    return await _context.Courses.ToListAsync();
         //}
