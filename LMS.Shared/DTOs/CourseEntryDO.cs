@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace LMS.Shared.DTOs
 {
-    public class CourseEntryDto
+    public class CourseEntryDO
     {
         public int Id { get; set; } = -1;
         public int ParentId { get; set; } = -1;
@@ -27,7 +27,7 @@ namespace LMS.Shared.DTOs
         /// <param name="startTime">Activity start time.</param>
         /// <param name="endTime">Activity end time.</param>
         /// <exception cref="ArgumentNullException"></exception>
-        public CourseEntryDto(int id, int parentId, string name, string description, string activityType, DateTime startTime, DateTime endTime)
+        public CourseEntryDO(int id, int parentId, string name, string description, string activityType, DateTime startTime, DateTime endTime)
         {
             Id = id;
             ParentId = parentId;
@@ -48,7 +48,7 @@ namespace LMS.Shared.DTOs
         /// <param name="startTime">Module start date.</param>
         /// <param name="endTime">Module end date.</param>
         /// <exception cref="ArgumentNullException"></exception>
-        public CourseEntryDto(int id, int parentId, string name, string description, DateTime startTime, DateTime endTime)
+        public CourseEntryDO(int id, int parentId, string name, string description, DateTime startTime, DateTime endTime)
         {
             Id = id;
             ParentId = parentId;
@@ -61,7 +61,7 @@ namespace LMS.Shared.DTOs
         /// <summary>
         /// Empty constructor.
         /// </summary>
-        public CourseEntryDto() { }
+        public CourseEntryDO() { }
 
 
     }

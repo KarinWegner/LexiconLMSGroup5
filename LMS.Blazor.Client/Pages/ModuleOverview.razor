@@ -4,18 +4,4 @@
 
 <CourseNavbar ActiveNav="ECourseNav.Modules"></CourseNavbar>
 
-@if (UpcommingEntries.CourseEntries.Count() > 0)
-{
-    <div>
-        <h4 class="h4-marg"> Upcomming:</h4>
-        <CourseEntryList ListEntries="@UpcommingEntries"></CourseEntryList>
-    </div>
-}
-@if (ExpiredEntries.CourseEntries.Count() > 0)
-{
-    <div>
-        <h4 class="h4-marg"> Expired: </h4>
-        <CourseEntryList ListEntries="@ExpiredEntries"></CourseEntryList>
-    </div>
-
-}
+<CourseEntryList ListEntries="@Entries"></CourseEntryList>

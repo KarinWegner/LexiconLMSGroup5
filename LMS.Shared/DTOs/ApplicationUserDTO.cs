@@ -14,5 +14,15 @@ namespace LMS.Shared.DTOs
         public string? Name { get; init; }
         public string? Email { get; init; }
 
+        public ApplicationUserDTO() { }
+
+        public ApplicationUserDTO(string? id, string? username, string? name, string? email)
+        {
+            Id = id;
+            UserName = username;
+            Name = name;
+            Email = email;
+        }
+
     }
 }

@@ -11,6 +11,8 @@
             public const string LinkToSchedule = $"/{RoutingVariables.CourseOverview}/{RoutingVariables.Schedule}";
             public const string LinkToPlanning = $"{RoutingVariables.CourseOverview}/{RoutingVariables.Planning}";
             public const string LinkToSpecificModule = $"/{RoutingVariables.CourseOverview}/{RoutingVariables.Modules}/{RoutingVariables.WithIntId}";
+            public const string LinkToActivityDetails = $"/{RoutingVariables.CourseOverview}/{RoutingVariables.Modules}/{RoutingVariables.WithIntIdAndIntParentId}";
+            public const string LinkToCourseParticipantDetails = $"/{RoutingVariables.CourseOverview}/{RoutingVariables.CourseParticipants}/{RoutingVariables.WithStringId}";
         }
     }
 }

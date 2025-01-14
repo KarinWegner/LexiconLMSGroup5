@@ -1,0 +1,38 @@
+﻿::deep .nav-link {
+    /*    color: #41464b !important;*/
+    text-decoration: underline;
+
+}
+.align-right{
+    text-align: right
+}
+
+.no-padding {
+ padding: 0px !important;
+}
+
+.profilePicture{
+    width: 100%;
+    height: auto;
+    max-height: 40px;
+    max-width: 40px;
+    min-width: 16px;
+    min-height: 16px;
+    border-radius: 100% !important;
+    
+}
+
+.profilePictureContainer
+{
+    margin-left: 1rem;
+}
+
+.less-padding{
+    padding: .5rem;
+    min-height: 60px;
+}
+
+::deep h4{
+    margin-bottom: 0px;
+    
+}
