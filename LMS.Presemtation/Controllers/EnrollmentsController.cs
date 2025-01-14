@@ -82,7 +82,9 @@ namespace LMS.Presemtation.Controllers
                 return NotFound("Course not found");
             }
 
-            var enrolledUsers = await _context.Courses.Where(c => c.CourseId == courseId).SelectMany(c => c.Enrollments).ToListAsync();
+            var enrolledUsers = excludeTeachers ? 
+                await _context.Courses.Where(c => c.CourseId == courseId).SelectMany(c => c.Enrollments).Where(u=>u.Role == "Student").ToListAsync() : 
+                await _context.Courses.Where(c => c.CourseId == courseId).SelectMany(c => c.Enrollments).ToListAsync();
 
 
             var enrolledUserDto = 
