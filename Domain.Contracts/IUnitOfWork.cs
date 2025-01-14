@@ -8,5 +8,6 @@ public interface IUnitOfWork
     IGenericRepository<Module> Modules { get; }
     IGenericRepository<Activity> Activities { get; }
     IGenericRepository<Document> Documents { get; }
+    IGenericRepository<ActivityType> ActivityTypes { get; }
     Task CompleteASync();
 }

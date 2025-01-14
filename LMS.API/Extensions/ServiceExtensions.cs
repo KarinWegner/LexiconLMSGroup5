@@ -35,10 +35,12 @@ public static class ServiceExtensions
         services.AddLazy<ICourseService>();
         services.AddScoped<IModuleService, ModuleService>();
         services.AddLazy<IModuleService>();
-        //services.AddScoped<IActivityService, ActivityService>();
-        //services.AddScoped<IDocumentService, DocumentService>();
-        //services.AddLazy<IActivityService>();
-        //services.AddLazy<IDocumentService>();
+        services.AddScoped<IActivityService, ActivityService>();
+        services.AddLazy<IActivityService>();
+        services.AddScoped<IDocumentService, DocumentService>();
+        services.AddLazy<IDocumentService>();
+        services.AddScoped<IActivityTypeService, ActivityTypeService>();
+        services.AddLazy<IActivityTypeService>();
     }
 
     public static void ConfigureRepositories(this IServiceCollection services)
