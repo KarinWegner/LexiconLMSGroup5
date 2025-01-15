@@ -61,8 +61,7 @@ namespace LMS.Services
             var overlappingActivity = await _uow.Activities
                 .Query()
                 .Where(a => a.ModuleId == moduleId &&
-                            ((activityDto.StartDate >= a.StartDate && activityDto.StartDate <= a.EndDate) ||
-                             (activityDto.EndDate >= a.StartDate && activityDto.EndDate <= a.EndDate)))
+                            ((activityDto.StartDate < a.EndDate && activityDto.EndDate > a.StartDate)))
                 .FirstOrDefaultAsync();
 
             if (overlappingActivity != null)
@@ -99,8 +98,7 @@ namespace LMS.Services
                 .Query()
                 .Where(a => a.ModuleId == activity.ModuleId &&
                             a.ActivityId != id && // Exclude the current activity
-                            ((activityDto.StartDate >= a.StartDate && activityDto.StartDate <= a.EndDate) ||
-                             (activityDto.EndDate >= a.StartDate && activityDto.EndDate <= a.EndDate)))
+                            ((activityDto.StartDate < a.EndDate && activityDto.EndDate > a.StartDate)))
                 .FirstOrDefaultAsync();
 
             if (overlappingActivity != null)
@@ -143,6 +141,17 @@ namespace LMS.Services
 
             return _mapper.Map<ActivityDTO>(activity);
         }
+
+        //private async Task<bool> IsOverlappingActivityAsync(int moduleId, int? activityId, DateTime startDate, DateTime endDate)
+        //{
+        //    return await _uow.Activities
+        //        .Query()
+        //        .Where(a => a.ModuleId == moduleId &&
+        //                    a.ActivityId != activityId && // Exclude the current activity (for updates)
+        //                    !(endDate < a.StartDate || startDate > a.EndDate)) // No overlap condition
+        //        .AnyAsync();
+        //}
+
 
     }
 }
