@@ -8,4 +8,5 @@ public interface IServiceManager
 
     IActivityTypeService ActivityTypeService { get; }
     IDocumentService DocumentService { get; }
+    IEnrollmentService EnrollmentService { get; }
 }
