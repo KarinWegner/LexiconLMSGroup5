@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace LMS.Services
 {
@@ -64,9 +65,23 @@ namespace LMS.Services
             return EnrollmentListDTOs;
         }
 
-        public Task<IEnumerable<EnrolledUserDTO>> GetEnrollmentsForCourse(int courseId, bool excludeTeachers = false)
+        public async Task<IEnumerable<EnrolledUserDTO>> GetEnrollmentsForCourse(int courseId, bool excludeTeachers = false)
         {
-            throw new NotImplementedException();
+            IQueryable<ApplicationUser> enrollments = _uow.Courses.Query().Where(c => c.CourseId == courseId).Include(c=>c.Enrollments).SelectMany(c=>c.Enrollments);
+
+            if (enrollments == null)
+            {
+                //ToDo: Add error handling
+                // return NotFound("Course not found");
+            }
+            var enrolledUsers = excludeTeachers ?
+                 enrollments!.Where(u => u.Role == "Student")
+                 .ToList() :
+                enrollments!.ToList();
+
+
+            return _mapper.Map<IEnumerable<EnrolledUserDTO>>(enrolledUsers);
+           
         }
 
         public Task<IEnumerable<EnrollmentListDTO>> GetUserEnrollments(string userId)

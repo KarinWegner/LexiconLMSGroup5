@@ -42,36 +42,25 @@ namespace LMS.Presemtation.Controllers
             return Ok(enrollments);
         }
 
-        ///// <summary>
-        ///// Returns list of all students and teachers enrolled in a course
-        ///// </summary>
-        ///// <param name="id"></param>
-        ///// <returns></returns>
-        //// GET: api/Enrollments/5
-        //[HttpGet("{courseId}")]
-        //[ProducesResponseType(StatusCodes.Status404NotFound)]
-        
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //public async Task<ActionResult<IEnumerable<EnrolledUserDTO>>> GetEnrollmentsForCourse(int courseId, bool excludeTeachers = false)
-        //{
-        //    //var course = await _context.Courses.Include(c => c.Enrollments).Where(c => c.CourseId == courseId).FirstOrDefaultAsync();
-        //    var course = await _context.Courses.FindAsync(courseId);
+        /// <summary>
+        /// Returns list of all students and teachers enrolled in a course
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        // GET: api/Enrollments/5
+        [HttpGet("{courseId}")]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
 
-        //    if (course == null)
-        //    {
-        //        return NotFound("Course not found");
-        //    }
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<IEnumerable<EnrolledUserDTO>>> GetEnrollmentsForCourse(int courseId, bool excludeTeachers = false)
+        {
+            //var course = await _context.Courses.Include(c => c.Enrollments).Where(c => c.CourseId == courseId).FirstOrDefaultAsync();
 
-        //    var enrolledUsers = excludeTeachers ? 
-        //        await _context.Courses.Where(c => c.CourseId == courseId).SelectMany(c => c.Enrollments).Where(u=>u.Role == "Student").ToListAsync() : 
-        //        await _context.Courses.Where(c => c.CourseId == courseId).SelectMany(c => c.Enrollments).ToListAsync();
+            var enrolledUsers = _serviceManager.EnrollmentService.GetEnrollmentsForCourse(courseId, excludeTeachers);
+            
 
-
-        //    var enrolledUserDto =
-        //    _mapper.Map<IEnumerable<EnrolledUserDTO>>(enrolledUsers);
-
-        //    return Ok(enrolledUserDto);
-        //}
+            return Ok(enrolledUsers);
+        }
 
         ///// <summary>
         ///// 
