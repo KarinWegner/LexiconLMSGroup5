@@ -1,0 +1,18 @@
+﻿<li class="no-padding list-group-item card">
+    <div class="row">
+        <div class="col-1 profilePictureContainer position-relative">
+            <img src="@Model.ProfilePictureLink" class="profilePicture ms-lg-4 ms-3 me-auto position-absolute top-50  translate-middle" alt="@($"{Model.Name} profile picture")">
+        </div>
+        <div class="col">
+            <div class="less-padding card-body row position-relative">
+                <div class="col-auto position-absolute top-50 translate-middle-y">
+                    <h4>@Model.Name</h4>
+                </div>
+                <div class="col"></div>
+                <div class="col-auto align-right"> <NavLink class="nav-link" href="@ThisNavLink">Details</NavLink></div>
+            </div>
+        </div>
+    </div>
+</li>
+
+@*  *@

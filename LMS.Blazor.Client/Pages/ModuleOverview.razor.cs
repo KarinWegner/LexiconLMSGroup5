@@ -10,25 +10,12 @@ namespace LMS.Blazor.Client.Pages
     {
         [Parameter]
         public int Id { get; set; }
-        public CourseEntryModel UpcommingEntries { get; set; }
-        public CourseEntryModel ExpiredEntries { get; set; }
-
+        public CourseEntryModel Entries { get; set; }
         public string ModuleName = string.Empty;
         protected async override Task OnInitializedAsync()
         {
             ModuleName = FakeDataService.GetModules().First(x => x.Id == Id).Name;
-            var store = FakeDataService.GetActivities().OrderBy(x => x.EndTime); 
-
-            List<CourseEntryDto> expired = new(), next = new();
-            foreach (var module in store)
-            {
-                if (module.EndTime < DateTime.Now)
-                    expired.Add(module);
-                else
-                    next.Add(module);
-            }
-            UpcommingEntries = new(ECourseEntryType.Activity, next);
-            ExpiredEntries = new(ECourseEntryType.Activity, expired);
+            Entries = new CourseEntryModel(ECourseEntryType.Activity, FakeDataService.GetActivities().Where(x => x.ParentId == Id));
             await base.OnInitializedAsync();
         }
     }

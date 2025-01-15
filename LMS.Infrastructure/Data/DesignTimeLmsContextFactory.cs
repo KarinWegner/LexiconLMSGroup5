@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-
+using Microsoft.Extensions.Configuration;
 
 namespace LMS.Infrastructure.Data
 {
@@ -8,11 +8,18 @@ namespace LMS.Infrastructure.Data
     {
         public LmsContext CreateDbContext(string[] args)
         {
-            var optionsBuilder = new DbContextOptionsBuilder<LmsContext>();
 
-            optionsBuilder.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=LMSDB;Trusted_Connection=True;MultipleActiveResultSets=true");
+            var basePath = Directory.GetParent(Directory.GetCurrentDirectory())?.FullName;
+            ArgumentNullException.ThrowIfNull(nameof(basePath));
 
-            return new LmsContext(optionsBuilder.Options);
+            var configuration = new ConfigurationBuilder()
+                                        .SetBasePath(Path.Combine(basePath!, "LMS.API"))
+                                        .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                                        .Build();
+
+            var builder = new DbContextOptionsBuilder<LmsContext>().UseSqlServer(configuration.GetConnectionString("LmsContext"));
+
+            return new LmsContext(builder.Options);
         }
     }
 }

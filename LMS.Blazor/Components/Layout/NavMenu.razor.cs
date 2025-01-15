@@ -4,6 +4,6 @@ namespace LMS.Blazor.Components.Layout
 {
     public partial class NavMenu
     {
-        private string CourseOverviewRoute => $"/{RoutingVariables.CourseOverview}/{RoutingVariables.Modules}";
+        private string CourseOverviewRoute => VBRoutes.Student.LinkToOverview;
     }
 }

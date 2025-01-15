@@ -1,19 +1,7 @@
-﻿@attribute [Route($"/{RoutingVariables.CourseOverview}/{RoutingVariables.Modules}/{RoutingVariables.WithIntId}")]
+﻿@attribute [Route(VBRoutes.Student.LinkToSpecificModule)]
 
 <h3>Module Overview - @ModuleName</h3>
 
-@if (UpcommingEntries.CourseEntries.Count() > 0)
-{
-    <div>
-        <h4 class="h4-marg"> Upcomming:</h4>
-        <CourseEntryList ListEntries="@UpcommingEntries"></CourseEntryList>
-    </div>
-}
-@if (ExpiredEntries.CourseEntries.Count() > 0)
-{
-    <div>
-        <h4 class="h4-marg"> Expired: </h4>
-        <CourseEntryList ListEntries="@ExpiredEntries"></CourseEntryList>
-    </div>
+<CourseNavbar ActiveNav="ECourseNav.Modules"></CourseNavbar>
 
-}
+<CourseEntryList ListEntries="@Entries"></CourseEntryList>

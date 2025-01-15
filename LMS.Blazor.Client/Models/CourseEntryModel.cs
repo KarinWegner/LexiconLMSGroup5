@@ -6,9 +6,9 @@ namespace LMS.Blazor.Client.Models
     public class CourseEntryModel
     {
         public ECourseEntryType CourseEntryType { get; set; }
-        public IEnumerable<CourseEntryDto> CourseEntries { get; set; }
+        public IEnumerable<CourseEntryDO> CourseEntries { get; set; }
 
-        public CourseEntryModel(ECourseEntryType entryType, IEnumerable<CourseEntryDto> courseEntries)
+        public CourseEntryModel(ECourseEntryType entryType, IEnumerable<CourseEntryDO> courseEntries)
         {
             CourseEntryType = entryType;
             CourseEntries = courseEntries;
