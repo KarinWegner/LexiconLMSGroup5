@@ -27,6 +27,7 @@ public class AutoMapperProfile : Profile
 
         CreateMap<ActivityType, ActivityTypeDTO>().ReverseMap();
         CreateMap<ActivityTypeCreateDTO, ActivityType>();
+        CreateMap<ActivityTypeUpdateDTO, ActivityType>();
 
         CreateMap<ApplicationUserDTO, ApplicationUser>();
 
