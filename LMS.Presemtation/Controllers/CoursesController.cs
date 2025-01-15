@@ -82,7 +82,7 @@ namespace LMS.Presemtation.Controllers
             try
             {
                 var createdCourse = await _serviceManager.CourseService.CreateCourseAsync(courseDto);
-                return CreatedAtAction("GetCourse", new { id = createdCourse.Id }, createdCourse);
+                return CreatedAtAction("GetCourse", new { id = createdCourse.CourseId }, createdCourse);
             }
             catch (Exception ex)
             {
