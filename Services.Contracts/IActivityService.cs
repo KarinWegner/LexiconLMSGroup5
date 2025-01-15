@@ -16,5 +16,8 @@ namespace Services.Contracts
         Task<bool> UpdateActivityAsync(int id, ActivityUpdateDTO activityDto);
         Task<bool> DeleteActivityAsync(int id);
         Task<ActivityDTO> PatchActivityAsync(int id, JsonPatchDocument<ActivityUpdateDTO> patchDocument);
+
+       // Task<bool> IsOverlappingActivityAsync(int moduleId, int? activityId, DateTime startDate, DateTime endDate);
     }
 }
+
