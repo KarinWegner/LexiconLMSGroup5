@@ -70,41 +70,6 @@ namespace LMS.Presemtation.Controllers
         }
 
 
-        [HttpPatch("{id}")]
-        public async Task<ActionResult> PatchCourse(int id, JsonPatchDocument<CourseUpdateDTO> patchDocument)
-        {
-            if (patchDocument == null) return BadRequest("Invalid patch document.");
-
-            try
-            {
-                var courseToPatch = await _serviceManager.CourseService.GetCourseByIdAsync(id);
-                if (courseToPatch == null) return NotFound($"Course with ID {id} not found.");
-
-                var dto = _mapper.Map<CourseUpdateDTO>(courseToPatch);
-                patchDocument.ApplyTo(dto, ModelState);
-
-                if (!ModelState.IsValid || !TryValidateModel(dto))
-                {
-                    return BadRequest(ModelState);
-                }
-
-               _mapper.Map(dto, courseToPatch);
-                await _serviceManager.CourseService.UpdateCourseAsync(id, dto);
-
-                return NoContent();
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred: {ex.Message}");
-            }
-
-        }
-
-
         // POST: api/Courses
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
@@ -139,5 +104,39 @@ namespace LMS.Presemtation.Controllers
             return NoContent();
         }
 
+
+        //[HttpPatch("{id}")]
+        //public async Task<ActionResult> PatchCourse(int id, JsonPatchDocument<CourseUpdateDTO> patchDocument)
+        //{
+        //    if (patchDocument == null) return BadRequest("Invalid patch document.");
+
+        //    try
+        //    {
+        //        var courseToPatch = await _serviceManager.CourseService.GetCourseByIdAsync(id);
+        //        if (courseToPatch == null) return NotFound($"Course with ID {id} not found.");
+
+        //        var dto = _mapper.Map<CourseUpdateDTO>(courseToPatch);
+        //        patchDocument.ApplyTo(dto, ModelState);
+
+        //        if (!ModelState.IsValid || !TryValidateModel(dto))
+        //        {
+        //            return BadRequest(ModelState);
+        //        }
+
+        //        _mapper.Map(dto, courseToPatch);
+        //        await _serviceManager.CourseService.UpdateCourseAsync(id, dto);
+
+        //        return NoContent();
+        //    }
+        //    catch (KeyNotFoundException ex)
+        //    {
+        //        return NotFound(ex.Message);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, $"An error occurred: {ex.Message}");
+        //    }
+
+        //}
     }
 }

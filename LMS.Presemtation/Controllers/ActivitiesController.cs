@@ -69,17 +69,6 @@ namespace LMS.Presemtation.Controllers
             return NoContent();
         }
 
-        [HttpPatch("{id}")]
-        public async Task<ActionResult<ActivityDTO>> PatchActivity(int id, int moduleId, JsonPatchDocument<ActivityUpdateDTO> patchDocument)
-        {
-            if (patchDocument == null) return BadRequest("Invalid patch document");
-
-            var updatedActivity = await _serviceManager.ActivityService.PatchActivityAsync(id, patchDocument);
-            if (updatedActivity == null) return NotFound("Activity not found");
-
-            return Ok(updatedActivity);
-        }
-
         // POST: api/Activities
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
@@ -100,6 +89,17 @@ namespace LMS.Presemtation.Controllers
             if (!isDeleted) return NotFound("Activity not found");
             return NoContent();
         }
+
+        //[HttpPatch("{id}")]
+        //public async Task<ActionResult<ActivityDTO>> PatchActivity(int id, int moduleId, JsonPatchDocument<ActivityUpdateDTO> patchDocument)
+        //{
+        //    if (patchDocument == null) return BadRequest("Invalid patch document");
+
+        //    var updatedActivity = await _serviceManager.ActivityService.PatchActivityAsync(id, patchDocument);
+        //    if (updatedActivity == null) return NotFound("Activity not found");
+
+        //    return Ok(updatedActivity);
+        //}
 
     }
 }
