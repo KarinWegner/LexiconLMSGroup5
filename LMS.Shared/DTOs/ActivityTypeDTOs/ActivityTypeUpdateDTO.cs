@@ -8,7 +8,6 @@ namespace LMS.Shared.DTOs.ActivityTypeDTOs
 {
     public class ActivityTypeUpdateDTO
     {
-        public int ActivityTypeId { get; }
         public string Name { get; set; }
     }
 }
