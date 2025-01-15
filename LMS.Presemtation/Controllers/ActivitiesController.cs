@@ -12,44 +12,41 @@ using AutoMapper;
 using LMS.Shared.DTOs.ModuleDTOs;
 using Azure;
 using Microsoft.AspNetCore.JsonPatch;
+using Services.Contracts;
+using System.Reflection;
 
 namespace LMS.Presemtation.Controllers
 {
-    [Route("api/courses/{courseId}/modules/{moduleId}/activities")]
+    [Route("api/activities")]
     [ApiController]
     public class ActivitiesController : ControllerBase
     {
-        private readonly LmsContext _context;
         private readonly IMapper _mapper;
+        private readonly IServiceManager _serviceManager;
 
-        public ActivitiesController(LmsContext context, IMapper mapper)
+
+        public ActivitiesController(IServiceManager serviceManager, IMapper mapper)
         {
-            _context = context;
+            _serviceManager = serviceManager;
             _mapper = mapper;
         }
 
         // GET: api/Activities
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ActivityDTO>>> GetActivities()
+        public async Task<ActionResult<IEnumerable<ActivityDTO>>> GetActivities(int moduleId)
         {
-            IEnumerable<Activity> activities = await _context.Activities.ToListAsync();
-            var activitiesDto = _mapper.Map<IEnumerable<Activity>>(activities);
-            return Ok(activitiesDto);
+            var activities = await _serviceManager.ActivityService.GetActivitiesAsync(moduleId);
+            return Ok(activities);
         }
+
 
         // GET: api/Activities/5
         [HttpGet("{id}")]
         public async Task<ActionResult<ActivityDTO>> GetActivity(int id)
         {
-            var activity = await _context.Activities.FindAsync(id);
-
-            if (activity == null)
-            {
-                return NotFound();
-            }
-            var activityDTO = _mapper.Map<ActivityDTO>(activity);
-
-            return Ok(activityDTO);
+            var activity = await _serviceManager.ActivityService.GetActivityByIdAsync(id);
+            if (activity == null) return NotFound("Activity not found");
+            return Ok(activity);
         }
 
         // PUT: api/Activities/5
@@ -57,59 +54,19 @@ namespace LMS.Presemtation.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutActivity(int id, ActivityUpdateDTO activityDto)
         {
-            if (id != activityDto.ActivityId)
+            //if (id != activityDto.ActivityId)
+            //{
+            //    return BadRequest("Activity ID mismatch.");
+            //}
+
+            var isUpdated = await _serviceManager.ActivityService.UpdateActivityAsync(id, activityDto);
+
+            if (!isUpdated)
             {
-                return BadRequest();
+                return NotFound("Activity not found");
             }
 
-            var existingActivity = await _context.Activities.FirstOrDefaultAsync(a => a.ActivityId == id);
-
-            if (existingActivity == null) return NotFound("Activity not found");
-
-
-
-
-            _mapper.Map(activityDto, existingActivity);
-
-            await _context.SaveChangesAsync();
-            //try
-            //{
-            //}
-            //catch (DbUpdateConcurrencyException)
-            //{
-            //    if (!ActivityExists(id))
-            //    {
-            //        return NotFound();
-            //    }
-            //    else
-            //    {
-            //        throw;
-            //    }
-            //}
-
             return NoContent();
-        }
-
-        [HttpPatch("{id}")]
-        public async Task<ActionResult<ActivityDTO>> PatchActivity(int id, int moduleId, JsonPatchDocument<ActivityUpdateDTO> patchDocument)
-        {
-            if (!_context.Modules.Any(m => m.ModuleId == moduleId)) return NotFound("Module not found.");
-
-            var activityEntity = await _context.Activities.FirstOrDefaultAsync(a => a.ActivityId == id);
-            if (activityEntity == null) return NotFound("Activity not found");
-
-            var ActivityToPatch = _mapper.Map<ActivityUpdateDTO>(activityEntity);
-
-            patchDocument.ApplyTo(ActivityToPatch, ModelState);
-
-            if (!ModelState.IsValid) return BadRequest(ModelState);
-            if(!TryValidateModel(ActivityToPatch)) return BadRequest(ModelState);
-
-            _mapper.Map(ActivityToPatch, activityEntity);
-
-            await _context.SaveChangesAsync();
-
-            return Ok(_mapper.Map<ActivityDTO>(activityEntity));
         }
 
         // POST: api/Activities
@@ -117,47 +74,32 @@ namespace LMS.Presemtation.Controllers
         [HttpPost]
         public async Task<ActionResult<ActivityDTO>> PostActivity(ActivityCreateDTO activityDto, int courseId, int moduleId)
         {
-            if(!_context.Courses.Any(c=> c.CourseId == courseId)) return NotFound("Course not found");
-            if (!_context.ActivityTypes.Any(a => a.ActivityTypeId == activityDto.ActivityTypeId)) return NotFound("ActivityType could not be found");
+            var createdActivity = await _serviceManager.ActivityService.CreateActivityAsync(activityDto, moduleId);
 
-            var module = _context.Modules.FirstOrDefault(m=>m.ModuleId == moduleId);
+            if (createdActivity == null) return BadRequest("Invalid module or course details");
 
-            if(module == null) return NotFound("Module not found");
-            if (module.CourseId != courseId) return BadRequest("Module is not part of selected course");
-
-            if (activityDto.StartDate < module.StartDate || activityDto.EndDate > module.EndDate) return BadRequest("Activity start/end date is not within the course timeframe.");
-            if (activityDto.EndDate < activityDto.StartDate) return BadRequest("The module cannot end before it starts.");
-
-            Activity activityToAdd = _mapper.Map<Activity>(activityDto);
-
-            module.Activities.Add(activityToAdd);
-            await _context.SaveChangesAsync();
-
-            ActivityDTO createdActivityToReturn = _mapper.Map<ActivityDTO>(activityToAdd);
-
-            return CreatedAtAction("GetActivity", new {courseId = courseId, moduleId = moduleId, id = createdActivityToReturn.ActivityId}, createdActivityToReturn);
+            return CreatedAtAction(nameof(GetActivity), new { courseId, moduleId, id = createdActivity.ActivityId }, createdActivity);
         }
 
         // DELETE: api/Activities/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteActivity(int id)
         {
-            var activity = await _context.Activities.FindAsync(id);
-            if (activity == null)
-            {
-                return NotFound();
-            }
-
-            _context.Activities.Remove(activity);
-            await _context.SaveChangesAsync();
-
+            var isDeleted = await _serviceManager.ActivityService.DeleteActivityAsync(id);
+            if (!isDeleted) return NotFound("Activity not found");
             return NoContent();
         }
 
+        //[HttpPatch("{id}")]
+        //public async Task<ActionResult<ActivityDTO>> PatchActivity(int id, int moduleId, JsonPatchDocument<ActivityUpdateDTO> patchDocument)
+        //{
+        //    if (patchDocument == null) return BadRequest("Invalid patch document");
 
-        private bool ActivityExists(int id)
-        {
-            return _context.Activities.Any(e => e.ActivityId == id);
-        }
+        //    var updatedActivity = await _serviceManager.ActivityService.PatchActivityAsync(id, patchDocument);
+        //    if (updatedActivity == null) return NotFound("Activity not found");
+
+        //    return Ok(updatedActivity);
+        //}
+
     }
 }
