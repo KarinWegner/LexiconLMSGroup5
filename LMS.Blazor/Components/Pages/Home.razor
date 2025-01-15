@@ -31,8 +31,26 @@
 
 @code {
 
-    // todo Implement the authefication, get user name from Auth Provider
-    private bool isAuthenticated = false;
-    private string userName = "Anna";
+    private bool isAuthenticated;
+    private string userName = "";
+
+    [Inject] private AuthenticationStateProvider AuthenticationStateProvider { get; set; } = default!;
+    [Inject] private NavigationManager NavigationManager { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity?.IsAuthenticated == true)
+        {
+            isAuthenticated = true;
+            userName = user.Identity.Name ?? "User";
+        }
+        else
+        {
+            isAuthenticated = false;
+        }
+    }
 
 }

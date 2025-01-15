@@ -14,6 +14,7 @@
 @inject ILogger<Register> Logger
 @inject NavigationManager NavigationManager
 @inject IdentityRedirectManager RedirectManager
+@inject HttpClient HttpClient
 
 <PageTitle>Register</PageTitle>
 
@@ -48,26 +49,13 @@
                                 <DataAnnotationsValidator />
                                 <ValidationSummary class="text-danger" role="alert" />
                             </div>
-                            <div class="row">
-                                <!-- First Name -->
-                                <div class="col-12 col-md-6 mb-4">
-                                    <div class="form-floating mb-3">
-                                        <InputText type="text" @bind-Value="Input.FirstName" class="form-control" autocomplete="first-name" aria-required="true" placeholder="first name" />
-                                        <label for="firstname">First Name</label>
-                                        <div class="text-start">
-                                            <ValidationMessage For="() => Input.FirstName" class="text-danger" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- Last Name -->
-                                <div class="col-12 col-md-6 mb-4">
-                                    <div class="form-floating mb-3">
-                                        <InputText type="text" @bind-Value="Input.LastName" class="form-control" autocomplete="last-name" aria-required="true" placeholder="last name" />
-                                        <label for="lastname">Last Name</label>
-                                        <div class="text-start">
-                                            <ValidationMessage For="() => Input.LastName" class="text-danger" />
-                                        </div>
-                                    </div>
+                           
+                            <!-- UserName input -->
+                            <div class="form-floating mb-3">
+                                <InputText @bind-Value="Input.UserName" class="form-control" autocomplete="username" aria-required="true" placeholder="John" />
+                                <label for="username">User Name</label>
+                                <div class="text-start">
+                                    <ValidationMessage For="() => Input.UserName" class="text-danger" />
                                 </div>
                             </div>
 
@@ -119,74 +107,13 @@
 
     private string? Message => identityErrors is null ? null : $"Error: {string.Join(", ", identityErrors.Select(error => error.Description))}";
 
-    public async Task RegisterUser(EditContext editContext)
-    {
-        var user = CreateUser();
-
-        await UserStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
-        var emailStore = GetEmailStore();
-        await emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
-        var result = await UserManager.CreateAsync(user, Input.Password);
-
-        if (!result.Succeeded)
-        {
-            identityErrors = result.Errors;
-            return;
-        }
-
-        Logger.LogInformation("User created a new account with password.");
-
-        var userId = await UserManager.GetUserIdAsync(user);
-        var code = await UserManager.GenerateEmailConfirmationTokenAsync(user);
-        code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-        var callbackUrl = NavigationManager.GetUriWithQueryParameters(
-            NavigationManager.ToAbsoluteUri("Account/ConfirmEmail").AbsoluteUri,
-            new Dictionary<string, object?> { ["userId"] = userId, ["code"] = code, ["returnUrl"] = ReturnUrl });
-
-        await EmailSender.SendConfirmationLinkAsync(user, Input.Email, HtmlEncoder.Default.Encode(callbackUrl));
-
-        if (UserManager.Options.SignIn.RequireConfirmedAccount)
-        {
-            RedirectManager.RedirectTo(
-                "Account/RegisterConfirmation",
-                new() { ["email"] = Input.Email, ["returnUrl"] = ReturnUrl });
-        }
-
-        await SignInManager.SignInAsync(user, isPersistent: false);
-        RedirectManager.RedirectTo(ReturnUrl);
-    }
-
-    private ApplicationUser CreateUser()
-    {
-        try
-        {
-            return Activator.CreateInstance<ApplicationUser>();
-        }
-        catch
-        {
-            throw new InvalidOperationException($"Can't create an instance of '{nameof(ApplicationUser)}'. " +
-                $"Ensure that '{nameof(ApplicationUser)}' is not an abstract class and has a parameterless constructor.");
-        }
-    }
-
-    private IUserEmailStore<ApplicationUser> GetEmailStore()
-    {
-        if (!UserManager.SupportsUserEmail)
-        {
-            throw new NotSupportedException("The default UI requires a user store with email support.");
-        }
-        return (IUserEmailStore<ApplicationUser>)UserStore;
-    }
-
+ 
     private sealed class InputModel
     {
         [Required]
-        [Display(Name = "First Name")]
-        public string FirstName { get; set; } = "";
 
-        [Required]
-        [Display(Name = "Last Name")]
-        public string LastName { get; set; } = "";
+        [Display(Name = "User Name")]
+        public string UserName { get; set; } = "";
 
         [Required]
         [EmailAddress]
@@ -203,5 +130,49 @@
         [Display(Name = "Confirm password")]
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; } = "";
+    }
+
+    // protected override async Task OnInitializedAsync()
+    // {
+    //     await base.OnInitializedAsync();
+        
+    //     RedirectManager.RedirectTo("/Account/RegisterConfirmation?email=user@example.com&returnUrl=%2Fhome");
+    // }
+
+    public async Task RegisterUser(EditContext editContext)
+    {
+        var registrationDto = new LMS.Shared.DTOs.UserForRegistrationDto
+            {
+                UserName = Input.UserName,
+        Email = Input.Email,
+                Password = Input.Password
+            };
+
+        try
+        {
+            // todo set the Base url
+            var response = await HttpClient.PostAsJsonAsync("https://localhost:7044/api/auth", registrationDto);
+
+            if (response.IsSuccessStatusCode)
+            {
+                Logger.LogInformation("User registered successfully.");
+                RedirectManager.RedirectTo("/Account/RegisterConfirmation",
+                 new() { ["email"] = Input.Email, ["returnUrl"] = ReturnUrl });
+            }
+            else
+            {
+                // errors from API
+                var errorResponse = await response.Content.ReadFromJsonAsync<IdentityError[]>();
+                identityErrors = errorResponse;
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError($"An error occurred while registering the user: {ex.Message}");
+            identityErrors = new List<IdentityError>
+            {
+                new IdentityError { Description = "An unexpected error occurred. Please try again later." }
+            };
+        }
     }
 }
