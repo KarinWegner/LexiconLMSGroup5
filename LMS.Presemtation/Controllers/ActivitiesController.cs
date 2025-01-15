@@ -17,7 +17,7 @@ using System.Reflection;
 
 namespace LMS.Presemtation.Controllers
 {
-    [Route("api/courses/{courseId}/modules/{moduleId}/activities")]
+    [Route("api/activities")]
     [ApiController]
     public class ActivitiesController : ControllerBase
     {
@@ -54,10 +54,10 @@ namespace LMS.Presemtation.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutActivity(int id, ActivityUpdateDTO activityDto)
         {
-            if (id != activityDto.ActivityId)
-            {
-                return BadRequest("Activity ID mismatch.");
-            }
+            //if (id != activityDto.ActivityId)
+            //{
+            //    return BadRequest("Activity ID mismatch.");
+            //}
 
             var isUpdated = await _serviceManager.ActivityService.UpdateActivityAsync(id, activityDto);
 
@@ -67,7 +67,6 @@ namespace LMS.Presemtation.Controllers
             }
 
             return NoContent();
-
         }
 
         [HttpPatch("{id}")]

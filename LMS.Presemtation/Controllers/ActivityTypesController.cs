@@ -53,10 +53,10 @@ namespace LMS.Presemtation.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutActivityType(int id, ActivityTypeUpdateDTO activityTypeDto)
         {
-            if (id != activityTypeDto.ActivityTypeId)
-            {
-                return BadRequest("Activity type ID mismatch.");
-            }
+            //if (id != activityTypeDto.ActivityTypeId)
+            //{
+            //    return BadRequest("Activity type ID mismatch.");
+            //}
 
             var isUpdated = await _serviceManager.ActivityTypeService.UpdateActivityTypeAsync(id, activityTypeDto);
 
