@@ -8,10 +8,10 @@ using Microsoft.EntityFrameworkCore;
 using Domain.Models.Entities;
 using LMS.Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
-using LMS.Shared.DTOs;
 using AutoMapper;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Services.Contracts;
+using LMS.Shared.DTOs.EnrollmentDTOs;
 
 namespace LMS.Presemtation.Controllers
 {
@@ -57,7 +57,7 @@ namespace LMS.Presemtation.Controllers
             //var course = await _context.Courses.Include(c => c.Enrollments).Where(c => c.CourseId == courseId).FirstOrDefaultAsync();
 
             var enrolledUsers = _serviceManager.EnrollmentService.GetEnrollmentsForCourse(courseId, excludeTeachers);
-            
+            if (enrolledUsers == null) { return NotFound("course not found"); }
 
             return Ok(enrolledUsers);
         }
@@ -83,7 +83,7 @@ namespace LMS.Presemtation.Controllers
             if (courseId != updateDTO.MoveFromCourseId) return BadRequest("Mismatched Course Id");
             if (courseId == updateDTO.MoveToCourseId) return BadRequest("Current and new course cannot have the same course Id");
             await _serviceManager.EnrollmentService.EditEnrollment(courseId, updateDTO);
-
+           
 
             return Ok();
         }
@@ -122,8 +122,7 @@ namespace LMS.Presemtation.Controllers
         public async Task<IActionResult> RemoveEnrollment(int courseId, string userId)
         {
             await _serviceManager.EnrollmentService.RemoveEnrollment(courseId, userId);
-
-        //    await _context.SaveChangesAsync();
+           
 
             return NoContent();
         }
