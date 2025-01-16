@@ -5,6 +5,7 @@ using LMS.Shared.DTOs.CourseDTOs;
 using LMS.Shared.DTOs.ModuleDTOs;
 using LMS.Shared.DTOs.ActivityDTOs;
 using LMS.Shared.DTOs.ActivityTypeDTOs;
+using LMS.Shared.DTOs.EnrollmentDTOs;
 namespace LMS.Infrastructure.Data;
 
 public class AutoMapperProfile : Profile

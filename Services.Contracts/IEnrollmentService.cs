@@ -1,5 +1,5 @@
 ﻿using Domain.Models.Entities;
-using LMS.Shared.DTOs;
+using LMS.Shared.DTOs.EnrollmentDTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,8 +13,8 @@ namespace Services.Contracts
         Task<IEnumerable<EnrollmentListDTO>> GetEnrollments();
 
         Task<IEnumerable<EnrolledUserDTO>> GetEnrollmentsForCourse(int courseId, bool excludeTeachers = false);
-        Task EditEnrollment(int courseId, string userId, int newCourseId);
-        Task AddEnrollment(int courseId, string userId);
+        Task EditEnrollment(int courseId, EnrollmentUpdateDTO updateDto);
+        Task AddEnrollment(int courseId, EnrollmentCreateDTO createDto);
         Task RemoveEnrollment(int courseId, string userId);
         Task<IEnumerable<EnrollmentListDTO>> GetUserEnrollments(string userId);
     }

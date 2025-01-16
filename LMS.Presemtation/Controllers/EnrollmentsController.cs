@@ -72,15 +72,17 @@ namespace LMS.Presemtation.Controllers
         /// <response code="200"></responsecode>
         // PUT: api/Enrollments/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{courseid}")]
+        [HttpPut("{courseId}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IActionResult> EditEnrollment(int courseId, string userId, int newCourseId)
+        public async Task<IActionResult> EditEnrollment(int courseId, EnrollmentUpdateDTO updateDTO)
         {
+            if (updateDTO == null) { return NotFound("Update information not found."); }
 
-            if (courseId == newCourseId) return BadRequest("Current and new course cannot have the same course Id");
-            await _serviceManager.EnrollmentService.EditEnrollment(courseId, userId, newCourseId);
+            if (courseId != updateDTO.MoveFromCourseId) return BadRequest("Mismatched Course Id");
+            if (courseId == updateDTO.MoveToCourseId) return BadRequest("Current and new course cannot have the same course Id");
+            await _serviceManager.EnrollmentService.EditEnrollment(courseId, updateDTO);
 
 
             return Ok();
@@ -98,9 +100,9 @@ namespace LMS.Presemtation.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public async Task<ActionResult<Course>> AddEnrollment(int courseId, string userId)
+        public async Task<ActionResult<Course>> AddEnrollment(int courseId, EnrollmentCreateDTO enrollmentCreateDTO)
         {
-            await _serviceManager.EnrollmentService.AddEnrollment(courseId, userId);
+            await _serviceManager.EnrollmentService.AddEnrollment(courseId, enrollmentCreateDTO);
 
             return Created();
             //return CreatedAtAction("GetEnrollmentsForCourse", new { id = course.CourseId }, course);
