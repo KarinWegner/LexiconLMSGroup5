@@ -62,41 +62,29 @@ namespace LMS.Presemtation.Controllers
             return Ok(enrolledUsers);
         }
 
-        ///// <summary>
-        ///// 
-        ///// </summary>
-        ///// <param name="courseId">The id of the course a user is currently in (and want to change to another course)</param>
-        ///// <param name="userId">The id of the user to move</param>
-        ///// <param name="newCourseId">The id of the course to move the user to</param>
-        ///// <returns></returns>
-        ///// <response code="200"></responsecode>
-        //// PUT: api/Enrollments/5
-        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        //[HttpPut("{courseid}")]
-        //[ProducesResponseType(StatusCodes.Status404NotFound)]
-        //[ProducesResponseType(StatusCodes.Status400BadRequest)]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //public async Task<IActionResult> EditEnrollment(int courseId, string userId, int newCourseId)
-        //{
-        //    var course = await _context.Courses.FindAsync(courseId);
-        //    if (courseId == newCourseId) return BadRequest("Current and new course cannot have the same course Id");
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="courseId">The id of the course a user is currently in (and want to change to another course)</param>
+        /// <param name="userId">The id of the user to move</param>
+        /// <param name="newCourseId">The id of the course to move the user to</param>
+        /// <returns></returns>
+        /// <response code="200"></responsecode>
+        // PUT: api/Enrollments/5
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut("{courseid}")]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> EditEnrollment(int courseId, string userId, int newCourseId)
+        {
 
-        //    if (course == null)
-        //    {
-        //        return NotFound("Course not found");
-        //    }
-        //    var user = await _userManager.FindByIdAsync(userId);
+            if (courseId == newCourseId) return BadRequest("Current and new course cannot have the same course Id");
+            await _serviceManager.EnrollmentService.EditEnrollment(courseId, userId, newCourseId);
 
-        //    if (user == null)
-        //    {
-        //        return NotFound("Student not found");
-        //    }
 
-        //    var newCourse = await _context.Courses.FindAsync(newCourseId);
-        //    if (course == null)
-        //    {
-        //        return NotFound("New course not found");
-        //    }
+            return Ok();
+        }
 
         //    user.Enrollments.Remove(course);
         //    user.Enrollments.Add(newCourse);

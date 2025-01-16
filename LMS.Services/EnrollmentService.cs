@@ -25,13 +25,24 @@ namespace LMS.Services
             _mapper = mapper;
         }
         public Task<Course> AddEnrollment(int courseId, string userId)
+        public async Task EditEnrollment(int courseId, string userId, int newCourseId)
         {
-            throw new NotImplementedException();
+            await _uow.Enrollments.EditEnrollment(courseId, userId, newCourseId);
+
+
+            //Checks that user has been removed from old course
+            if( await _uow.Courses.Query().Where(c => c.CourseId == courseId).Include(c => c.Enrollments).SelectMany(c => c.Enrollments).Where(c => c.Id == userId).AnyAsync())
+            {
+                //ToDo: Add error
         }
 
-        public Task EditEnrollment(int courseId, string userId, int newCourseId)
+            //Checks that user has been added to new course
+            if (await _uow.Courses.Query().Where(c => c.CourseId == newCourseId).Include(c => c.Enrollments).SelectMany(c => c.Enrollments).Where(c => c.Id == userId).AnyAsync())
         {
-            throw new NotImplementedException();
+            await _uow.CompleteASync();
+                return;
+            }
+            //ToDo: add error
         }
 
         public async Task<IEnumerable<EnrollmentListDTO>> GetEnrollments()
