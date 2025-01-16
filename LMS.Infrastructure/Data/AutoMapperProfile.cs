@@ -16,6 +16,7 @@ public class AutoMapperProfile : Profile
         CreateMap<Course, CourseDTO>();
         CreateMap<CourseCreateDTO, Course>();
         CreateMap<CourseUpdateDTO, Course>().ReverseMap();
+        CreateMap<CourseDTO, CourseUpdateDTO>();
 
         CreateMap<Module, ModuleDTO>();
         CreateMap<ModuleCreateDTO, Module>();
@@ -30,11 +31,6 @@ public class AutoMapperProfile : Profile
         CreateMap<ActivityTypeUpdateDTO, ActivityType>();
 
         CreateMap<ApplicationUserDTO, ApplicationUser>();
-
-       
-
-
-
         CreateMap<ApplicationUser , EnrolledUserDTO > ();
         
     }

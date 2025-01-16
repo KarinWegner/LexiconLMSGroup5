@@ -5,7 +5,7 @@ namespace Services.Contracts
 {
     public interface ICourseService
     {
-        Task<IEnumerable<CourseDTO>> GetAllCoursesAsync(bool includeModules = false, bool includeEnrollments = false);
+        Task<IEnumerable<CourseDTO>> GetAllCoursesAsync(bool includeModules = false, bool includeEnrollments = false, int pageNr = 1, int pageSize = 10);
         Task<CourseDTO> GetCourseByIdAsync(int id, bool includeModules = false, bool includeEnrollments = false);
         Task<CourseDTO> CreateCourseAsync(CourseCreateDTO courseDto);
         Task<bool> UpdateCourseAsync(int id, CourseUpdateDTO courseDto);
