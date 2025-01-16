@@ -108,40 +108,25 @@ namespace LMS.Presemtation.Controllers
             //return CreatedAtAction("GetEnrollmentsForCourse", new { id = course.CourseId }, course);
         }
 
-        ///// <summary>
-        ///// Removes a user from a courses Enrollment
-        ///// </summary>
-        ///// <param name="courseId"></param>
-        ///// <param name="userId"></param>
-        ///// <returns></returns>
-        //// DELETE: api/Enrollments/5
-        //[HttpDelete("{courseId}")]
-        //[ProducesResponseType(StatusCodes.Status404NotFound)]
-        //[ProducesResponseType(StatusCodes.Status400BadRequest)]
-        //[ProducesResponseType(StatusCodes.Status204NoContent)]
-        //public async Task<IActionResult> RemoveEnrollment(int courseId, string userId)
-        //{
-        //    var course = await _context.Courses.FindAsync(courseId);
-        //    if (course == null)
-        //    {
-        //        return NotFound("Course not found");
-        //    }
-
-        //    var user = await _userManager.FindByIdAsync(userId);
-        //    if (user == null)
-        //    {
-        //        return NotFound("User not found");
-        //    }
-
-        //    if (!course.Enrollments.Any(u => u.Id == userId))
-        //        return BadRequest("User is not enrolled in course.");
-
-        //    course.Enrollments.Remove(user);
+        /// <summary>
+        /// Removes a user from a courses Enrollment
+        /// </summary>
+        /// <param name="courseId"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        // DELETE: api/Enrollments/5
+        [HttpDelete("{courseId}")]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<IActionResult> RemoveEnrollment(int courseId, string userId)
+        {
+            await _serviceManager.EnrollmentService.RemoveEnrollment(courseId, userId);
 
         //    await _context.SaveChangesAsync();
 
-        //    return NoContent();
-        //}
+            return NoContent();
+        }
 
         //private bool CourseExists(int id)
         //{
