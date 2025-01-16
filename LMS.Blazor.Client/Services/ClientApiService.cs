@@ -60,7 +60,6 @@ public class ClientApiService(IHttpClientFactory httpClientFactory, NavigationMa
 
         
         var res = await JsonSerializer.DeserializeAsync<TResponse>(await response.Content.ReadAsStreamAsync(), _jsonSerializerOptions, CancellationToken.None);
-        Console.WriteLine("@@@@@@@@@@@@@@@@@@@"+ res);
         return res;
     }
 }
