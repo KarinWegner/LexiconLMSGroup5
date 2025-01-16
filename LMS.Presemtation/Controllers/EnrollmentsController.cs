@@ -86,69 +86,25 @@ namespace LMS.Presemtation.Controllers
             return Ok();
         }
 
-        //    user.Enrollments.Remove(course);
-        //    user.Enrollments.Add(newCourse);
+        /// <summary>
+        /// Adds a user to a course Enrollment
+        /// </summary>
+        /// <param name="course"></param>
+        /// <returns></returns>
 
+        // POST: api/Enrollments
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPost("{courseId}")]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        public async Task<ActionResult<Course>> AddEnrollment(int courseId, string userId)
+        {
+            await _serviceManager.EnrollmentService.AddEnrollment(courseId, userId);
 
-        //    await _context.SaveChangesAsync();
-
-        //    return Ok();
-        //}
-
-        ///// <summary>
-        ///// Adds a user to a course Enrollment
-        ///// </summary>
-        ///// <param name="course"></param>
-        ///// <returns></returns>
-
-        //// POST: api/Enrollments
-        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        //[HttpPost("{courseId}")]
-        //[ProducesResponseType(StatusCodes.Status404NotFound)]
-        //[ProducesResponseType(StatusCodes.Status400BadRequest)]
-        //[ProducesResponseType(StatusCodes.Status201Created)]
-        //public async Task<ActionResult<Course>> AddEnrollment(int courseId, string userId)
-        //{
-        //    var course = await _context.Courses.Where(c=>c.CourseId == courseId).Include(c => c.Enrollments).FirstOrDefaultAsync();
-
-        //    if (course == null)
-        //    {
-        //        return NotFound("Course not found");
-        //    }
-
-        //    var user = await _userManager.FindByIdAsync(userId);
-
-        //    if (user == null)
-        //    {
-        //        return NotFound("Student not found");
-        //    }
-
-
-
-        //    var assignedRoles = await _userManager.GetRolesAsync(user);
-        //    if (assignedRoles.Count == 0) { return BadRequest("User has not been assigned a role"); }
-
-        //    if (await _userManager.IsInRoleAsync(user, "student"))
-        //    {
-        //        var userEnrollments = await _context.Users.Where(u => u.Id == userId).Include(u => u.Enrollments).Select(u=>u.Enrollments).FirstOrDefaultAsync();
-        //        if (userEnrollments.Count >0) 
-        //        {                
-        //            return BadRequest("Student can only be enrolled in one course at a time.");
-        //        }
-        //    }
-
-        //    if (course.Enrollments.Any(u => u.Id == userId))
-        //    {
-        //        return BadRequest("User is already enrolled in course");
-        //    }
-
-        //    course.Enrollments.Add(user);
-
-        //    await _context.SaveChangesAsync();
-
-        //    return Created();
-        //    //return CreatedAtAction("GetEnrollmentsForCourse", new { id = course.CourseId }, course);
-        //}
+            return Created();
+            //return CreatedAtAction("GetEnrollmentsForCourse", new { id = course.CourseId }, course);
+        }
 
         ///// <summary>
         ///// Removes a user from a courses Enrollment

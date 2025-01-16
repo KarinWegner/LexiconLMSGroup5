@@ -2,15 +2,8 @@
 using Domain.Contracts;
 using Domain.Models.Entities;
 using LMS.Shared.DTOs;
-using LMS.Shared.DTOs.CourseDTOs;
 using Microsoft.EntityFrameworkCore;
 using Services.Contracts;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace LMS.Services
 {
@@ -24,7 +17,57 @@ namespace LMS.Services
             _uow = uow;
             _mapper = mapper;
         }
-        public Task<Course> AddEnrollment(int courseId, string userId)
+        public async Task AddEnrollment(int courseId, string userId)
+        {
+
+            var course = await _uow.Courses.Query().Where(c => c.CourseId == courseId).Include(c => c.Enrollments).FirstOrDefaultAsync();
+
+            if (course == null)
+            {
+                //ToDo: Add error
+               // return NotFound("Course not found");
+            }
+
+            var user = await _uow.Enrollments.FindUserByIdAsync(userId);
+
+            if (user == null)
+            {
+               // return NotFound("Student not found");
+            }
+
+           
+
+            if (string.IsNullOrEmpty(user.Role)) 
+            {
+               // return BadRequest("User has not been assigned a role");
+            }
+
+
+            if (course.Enrollments.Any(u => u.Id == userId))
+            {
+               // return BadRequest("User is already enrolled in course");
+            }
+
+
+           
+
+            if (user.Role == "Student")
+            {
+                
+                if (await _uow.Courses.Query().Include(c => c.Enrollments).SelectMany(c => c.Enrollments).Where(c => c.Id == userId).AnyAsync())
+                {
+                    //return BadRequest("Student can only be enrolled in one course at a time.");
+                }
+            }
+
+            
+
+            await _uow.Enrollments.AddEnrollment(courseId, user);
+
+            await _uow.CompleteASync();
+           
+        }
+
         public async Task EditEnrollment(int courseId, string userId, int newCourseId)
         {
             await _uow.Enrollments.EditEnrollment(courseId, userId, newCourseId);
