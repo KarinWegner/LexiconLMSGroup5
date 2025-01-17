@@ -148,7 +148,7 @@
 
         try
         {
-            var response = await apiService.PostAsync<UserForRegistrationDto, ApiResponse>("api/auth", registrationDto);
+            var response = await apiService.CallRegisterAsync<UserForRegistrationDto, ApiResponse>("api/auth", registrationDto);
 
             if (response != null && response.Success)
             {

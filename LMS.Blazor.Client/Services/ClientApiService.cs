@@ -38,7 +38,7 @@ public class ClientApiService(IHttpClientFactory httpClientFactory, NavigationMa
 
     private async Task<TResponse?> CallApiAsync<TRequest, TResponse>(string endpoint, HttpMethod httpMethod, TRequest? dto)
     {
-        var request = new HttpRequestMessage(httpMethod, $"https://localhost:7044/{endpoint}");
+        var request = new HttpRequestMessage(httpMethod, $"proxy-endpoint/{endpoint}");
         request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
         if (httpMethod != HttpMethod.Get && dto is not null)
@@ -55,6 +55,47 @@ public class ClientApiService(IHttpClientFactory httpClientFactory, NavigationMa
         {
             navigationManager.NavigateTo("AccessDenied");
         }
+
+        response.EnsureSuccessStatusCode();
+
+        var res = await JsonSerializer.DeserializeAsync<TResponse>(await response.Content.ReadAsStreamAsync(), _jsonSerializerOptions, CancellationToken.None);
+        return res;
+    }
+
+
+
+    public async Task<IEnumerable<DemoDto>> CallApiAsync()
+    {
+        var requestMessage = new HttpRequestMessage(HttpMethod.Get, "proxy-endpoint");
+        var response = await httpClient.SendAsync(requestMessage);
+
+        if (response.StatusCode == System.Net.HttpStatusCode.Forbidden
+           || response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+        {
+            navigationManager.NavigateTo("AccessDenied");
+        }
+
+        response.EnsureSuccessStatusCode();
+
+        var demoDtos = await JsonSerializer.DeserializeAsync<List<DemoDto>>(await response.Content.ReadAsStreamAsync(), _jsonSerializerOptions, CancellationToken.None) ?? [];
+        return demoDtos;
+    }
+
+
+    public async Task<TResponse?> CallRegisterAsync<TRequest, TResponse>(string endpoint, TRequest? dto)
+    {
+        var request = new HttpRequestMessage(HttpMethod.Post, $"https://localhost:7044/{endpoint}");
+        request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+
+        var serialized = JsonSerializer.Serialize(dto);
+        request.Content = new StringContent(serialized);
+        request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+        
+
+        var response = await httpClient.SendAsync(request);
+
+        
 
         response.EnsureSuccessStatusCode();
 
@@ -83,5 +124,10 @@ public class ClientApiService(IHttpClientFactory httpClientFactory, NavigationMa
         // return new ApiResponse();
         var res = await JsonSerializer.DeserializeAsync<TResponse>(await response.Content.ReadAsStreamAsync(), _jsonSerializerOptions, CancellationToken.None);
         return res;
+
     }
+
+
+
+   
 }
