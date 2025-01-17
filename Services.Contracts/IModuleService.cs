@@ -11,13 +11,11 @@ namespace Services.Contracts
 {
     public interface IModuleService
     {
-        Task<IEnumerable<ModuleDTO>> GetModulesAsync(int courseId, bool includeActivities);
-        Task<ModuleDTO> GetModuleByIdAsync(int id, int courseId, bool includeActivities);
-        Task<bool> UpdateModuleAsync(int id, ModuleUpdateDTO moduleDto);
+        Task<IEnumerable<ModuleDTO>> GetModulesAsync(int courseId, bool includeActivities = false, int pageNr = 1, int pageSize = 10);
+        Task<ModuleDTO> GetModuleByIdAsync(int id, bool includeActivities = false);
+        Task<bool> UpdateModuleAsync(int id, int courseId, ModuleUpdateDTO moduleDto);
         Task<ModuleDTO> CreateModuleAsync(ModuleCreateDTO moduleDto, int courseId);
         Task<bool> DeleteModuleAsync(int id);
-
-        //Task<ModuleDTO> PatchModuleAsync(int id, int courseId, JsonPatchDocument<ModuleUpdateDTO> patchDocument);
     }
 
 }
