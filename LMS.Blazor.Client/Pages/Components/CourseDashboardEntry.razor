@@ -1,0 +1,22 @@
+﻿<li class="mx-3 my-1 bg-expanded list-group-item">
+    <div class="row">
+        <NavLink class="clickable nav-link" @onclick="toggleExpanded">
+            <div class="row">
+
+                    <div class="col-sm-auto">
+                        <h4>@CourseEntry.Name</h4>
+                    </div>
+                    <div class="col"></div>
+                @if (!isExpanded)
+                {
+                    <div class="col-sm-auto align-right"><DateWidget DisplayType="@(EDateDisplayType.DateInline)" StartTime="CourseEntry.StartTime" EndTime="CourseEntry.EndTime"></DateWidget></div>
+                }
+            </div>
+        </NavLink>
+    </div>
+    @if (isExpanded)
+    {
+        <CourseDashboardEntryBody CourseEntry="CourseEntry" CourseEntryType="CourseEntryType"></CourseDashboardEntryBody>
+
+    }
+</li>

@@ -14,5 +14,12 @@
             public const string LinkToActivityDetails = $"/{RoutingVariables.CourseOverview}/{RoutingVariables.Modules}/{RoutingVariables.WithIntIdAndIntParentId}";
             public const string LinkToCourseParticipantDetails = $"/{RoutingVariables.CourseOverview}/{RoutingVariables.CourseParticipants}/{RoutingVariables.WithStringId}";
         }
+
+        public record Administration
+        {
+            public const string LinkToDashboard = $"/{RoutingVariables.AdministrationDashboard}";
+            public const string LinkToCourseDashboard = $"/{RoutingVariables.AdministrationDashboard}/{RoutingVariables.CourseDashboard}";
+            public const string LinkToStudentDashboard = $"/{RoutingVariables.AdministrationDashboard}/{RoutingVariables.StudentDashboard}";
+        }
     }
 }
