@@ -3,6 +3,8 @@
 @using System.ComponentModel.DataAnnotations
 @using System.Text
 @using System.Text.Encodings.Web
+@using LMS.Blazor.Client.Services
+@using LMS.Shared.DTOs
 @using Microsoft.AspNetCore.Identity
 @using Microsoft.AspNetCore.WebUtilities
 @using LMS.Blazor.Data
@@ -97,6 +99,8 @@
 </div>
 
 @code {
+    [Inject]
+    private IApiService apiService { get; set; }
     private IEnumerable<IdentityError>? identityErrors;
 
     [SupplyParameterFromForm]
@@ -107,7 +111,7 @@
 
     private string? Message => identityErrors is null ? null : $"Error: {string.Join(", ", identityErrors.Select(error => error.Description))}";
 
- 
+
     private sealed class InputModel
     {
         [Required]
@@ -132,47 +136,44 @@
         public string ConfirmPassword { get; set; } = "";
     }
 
-    // protected override async Task OnInitializedAsync()
-    // {
-    //     await base.OnInitializedAsync();
-        
-    //     RedirectManager.RedirectTo("/Account/RegisterConfirmation?email=user@example.com&returnUrl=%2Fhome");
-    // }
-
-    public async Task RegisterUser(EditContext editContext)
+    public async Task RegisterUser()
     {
-        var registrationDto = new LMS.Shared.DTOs.UserForRegistrationDto
+        var registrationDto = new UserForRegistrationDto
             {
                 UserName = Input.UserName,
-        Email = Input.Email,
+                Email = Input.Email,
                 Password = Input.Password
             };
+        var redirectToConfirmation = false;
 
         try
         {
-            // todo set the Base url
-            var response = await HttpClient.PostAsJsonAsync("https://localhost:7044/api/auth", registrationDto);
+            var response = await apiService.PostAsync<UserForRegistrationDto, ApiResponse>("api/auth", registrationDto);
 
-            if (response.IsSuccessStatusCode)
+            if (response != null && response.Success)
             {
                 Logger.LogInformation("User registered successfully.");
-                RedirectManager.RedirectTo("/Account/RegisterConfirmation",
-                 new() { ["email"] = Input.Email, ["returnUrl"] = ReturnUrl });
+                redirectToConfirmation = true;
             }
             else
             {
-                // errors from API
-                var errorResponse = await response.Content.ReadFromJsonAsync<IdentityError[]>();
-                identityErrors = errorResponse;
+                identityErrors = response?.Errors?.Select(e => new IdentityError { Description = e }).ToList();
             }
         }
         catch (Exception ex)
         {
             Logger.LogError($"An error occurred while registering the user: {ex.Message}");
             identityErrors = new List<IdentityError>
-            {
-                new IdentityError { Description = "An unexpected error occurred. Please try again later." }
-            };
+        {
+            new IdentityError { Description = "An unexpected error occurred. Please try again later." }
+        };
+        }
+
+        if (redirectToConfirmation)
+        {
+            RedirectManager.RedirectTo("/Account/RegisterConfirmation",
+               new() { ["email"] = Input.Email, ["returnUrl"] = ReturnUrl });
         }
     }
+}
 }

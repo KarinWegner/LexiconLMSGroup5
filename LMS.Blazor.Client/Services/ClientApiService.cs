@@ -58,7 +58,29 @@ public class ClientApiService(IHttpClientFactory httpClientFactory, NavigationMa
 
         response.EnsureSuccessStatusCode();
 
-        
+        if (!response.IsSuccessStatusCode)
+        {
+            // Handle non-successful status codes
+            var errorResponse = await response.Content.ReadAsStringAsync();
+            var errors = new List<string> { $"Error: {response.StatusCode}, Message: {errorResponse}" };
+            if (typeof(TResponse) == typeof(ApiResponse))
+            {
+                return (TResponse)(object)new ApiResponse { Success = false, Errors = errors };
+            }
+            return default;
+        }
+
+        if (response.Content.Headers.ContentLength.GetValueOrDefault() == 0)
+        {
+            // Return a successful ApiResponse if the response is empty
+            if (typeof(TResponse) == typeof(ApiResponse))
+            {
+                return (TResponse)(object)new ApiResponse { Success = true };
+            }
+            return default;
+        }
+
+        // return new ApiResponse();
         var res = await JsonSerializer.DeserializeAsync<TResponse>(await response.Content.ReadAsStreamAsync(), _jsonSerializerOptions, CancellationToken.None);
         return res;
     }
