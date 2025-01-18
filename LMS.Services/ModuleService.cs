@@ -59,13 +59,13 @@ namespace LMS.Services
 
         public async Task<ModuleDTO> CreateModuleAsync(ModuleCreateDTO moduleDto, int courseId)
         {
-            var course = await _uow.Courses.GetByIdAsync(courseId); // does NOT return modules
+            var course = await _uow.Courses.GetByIdAsync(courseId, c => c.Modules); // does NOT return modules
             if (course == null) return null;
 
             //Check dates - does it end before it starts, does it fit into the course timeline, does it overlap with other modules
             ValidateModuleDates(moduleDto);
-            if (!ValidateModuleFitsCourseDate(moduleDto, course)) throw new ArgumentException("The module date must fit into the course timeline."); 
-          //  if (!ValidateModulesDoNotOverlap(moduleDto, course)) throw new ArgumentException("The module dates can't overlap."); 
+            if (!ValidateModuleFitsCourseDate(moduleDto, course)) throw new ArgumentException("The module date must fit into the course timeline.");
+            if (!ValidateModulesDoNotOverlap(moduleDto, course)) throw new ArgumentException("The module dates can't overlap.");
 
             var moduleToAdd = _mapper.Map<Module>(moduleDto);
             moduleToAdd.CourseId = courseId;
@@ -78,21 +78,23 @@ namespace LMS.Services
 
         public async Task<bool> UpdateModuleAsync(int id, int courseId, ModuleUpdateDTO moduleDto)
         {
-            var course = await _uow.Courses.GetByIdAsync(courseId);
+            var existingModule = await GetModuleIfExists(id);
+            if (existingModule == null) return false;
+
+            var course = await _uow.Courses.GetByIdAsync(courseId, c => c.Modules);
             if (course == null) return false;
 
             //Validate dates
             ValidateModuleDates(moduleDto);
             if (!ValidateModuleFitsCourseDate(moduleDto, course)) throw new ArgumentException("The module date must fit into the course timeline.");
             if (!ValidateModulesDoNotOverlap(moduleDto, course)) throw new ArgumentException("The module dates can't overlap.");
-            var existingModule = await GetModuleIfExists(id);
 
             _mapper.Map(moduleDto, existingModule);
 
             await _uow.CompleteASync();
             return true;
         }
-
+         
 
         public async Task<bool> DeleteModuleAsync(int id)
         {
@@ -132,7 +134,7 @@ namespace LMS.Services
             return moduleStartDate >= courseStartDate && moduleEndDate <= courseEndDate;
         }
 
-        private bool ValidateModulesDoNotOverlap(ModuleUpdateDTO moduleDto, Course course)
+        private bool ValidateModulesDoNotOverlap(dynamic moduleDto, Course course)
         {
             DateTime moduleStartDate = moduleDto.StartDate;
             DateTime moduleEndDate = moduleDto.EndDate;
@@ -149,10 +151,14 @@ namespace LMS.Services
 
             foreach (var existingModule in existingModulesList)
             {
+                // Skip comparison if the existingModule is the same object as moduleDto - used reference instead of ID as id doesn't exist on CreateModuleDTO
+                if (ReferenceEquals(existingModule, moduleDto)) continue;
+
                 if (moduleDto.StartDate.Date == existingModule.StartDate.Date || moduleDto.EndDate.Date == existingModule.EndDate.Date) return false;
                 if (moduleDto.StartDate.Date == existingModule.EndDate.Date || moduleDto.EndDate.Date == existingModule.StartDate.Date) return false;
                 if (moduleDto.StartDate.Date > existingModule.StartDate.Date && moduleDto.EndDate.Date < existingModule.EndDate.Date) return false;
                 if (moduleDto.StartDate.Date < existingModule.StartDate.Date && moduleDto.EndDate.Date > existingModule.EndDate.Date) return false;
+                if (moduleDto.StartDate.Date < existingModule.EndDate.Date && moduleDto.EndDate.Date > existingModule.StartDate.Date) return false;
             }
 
             return true;
