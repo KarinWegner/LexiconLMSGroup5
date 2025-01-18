@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -21,10 +22,26 @@ namespace LMS.Infrastructure.Repositories
             _dbSet = context.Set<T>();
         }
 
-        public async Task<T> GetByIdAsync(int id)
+        public async Task<T> GetByIdAsync(int id, params Expression<Func<T, object>>[] includes)
         {
-            return await _dbSet.FindAsync(id);
+            IQueryable<T> query = _dbSet;
+
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+
+            var entityTypeName = typeof(T).Name; // Get the entity's type name (e.g., "Course", "Module")
+            var primaryKeyName = $"{entityTypeName}Id";
+
+            return await query.FirstOrDefaultAsync(entity => EF.Property<int>(entity, primaryKeyName).Equals(id));
         }
+
+
+        //public async Task<T> GetByIdAsync(int id)
+        //{
+        //    return await _dbSet.FindAsync(id);
+        //}
 
         public async Task<IEnumerable<T>> GetAllAsync()
         {
