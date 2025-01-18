@@ -73,9 +73,9 @@ namespace LMS.Presemtation.Controllers
             return Ok(new
             {
                 message = "File uploaded successfully",
-                documentId = document.Id,
+                documentId = document.DocumentId,
                 fileName = document.Name,
-                downloadUrl = Url.Action("DownloadDocument", new { id = document.Id })  //generates a URL for downloading a document
+                downloadUrl = Url.Action("DownloadDocument", new { id = document.DocumentId })  //generates a URL for downloading a document
             });
         }
 
@@ -93,11 +93,11 @@ namespace LMS.Presemtation.Controllers
             //ToDo: Implement restrictions on who can access what documents
             var documentDto = new DocumentDto
             {
-                Id = document.Id,
+                Id = document.DocumentId,
                 Name = document.Name,
                 Description = document.Description,
                 UploadedAt = document.UploadedAt,
-                DownloadUrl = Url.Action("DownloadDocument", new { id = document.Id })
+                DownloadUrl = Url.Action("DownloadDocument", new { id = document.DocumentId })
             };
 
             return Ok(documentDto);
@@ -115,11 +115,11 @@ namespace LMS.Presemtation.Controllers
                 .Where(d => d.ModuleId == moduleId)
                 .Select(d => new DocumentDto
                    {
-                       Id = d.Id,
+                       Id = d.DocumentId,
                        Name = d.Name,
                        Description = d.Description,
                        UploadedAt = d.UploadedAt,
-                       DownloadUrl = Url.Action("DownloadDocument", new { id = d.Id })
+                       DownloadUrl = Url.Action("DownloadDocument", new { id = d.DocumentId })
                    })
                 .ToListAsync();
 
@@ -138,11 +138,11 @@ namespace LMS.Presemtation.Controllers
                 .Where(d => d.ActivityId == activityId)
                 .Select(d => new DocumentDto
                 {
-                    Id = d.Id,
+                    Id = d.DocumentId,
                     Name = d.Name,
                     Description = d.Description,
                     UploadedAt = d.UploadedAt,
-                    DownloadUrl = Url.Action("DownloadDocument", new { id = d.Id })
+                    DownloadUrl = Url.Action("DownloadDocument", new { id = d.DocumentId })
                 })
                 .ToListAsync();
 
