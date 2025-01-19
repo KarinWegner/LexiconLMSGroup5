@@ -8,6 +8,8 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using System.Linq.Dynamic.Core;
+
 
 namespace LMS.Infrastructure.Repositories
 {
@@ -46,6 +48,33 @@ namespace LMS.Infrastructure.Repositories
         public async Task<IEnumerable<T>> GetAllAsync()
         {
             return await _dbSet.ToListAsync();
+        }
+
+        public async Task<IEnumerable<T>> GetFilteredAndSortedAsync(
+        Expression<Func<T, bool>>? filter = null,
+        string? sortBy = null,
+        bool isAscending = true,
+        int pageNr = 1,
+        int pageSize = 10)
+        {
+            var query = _dbSet.AsQueryable();
+
+            // Apply filtering
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+
+            // Apply sorting
+            if (!string.IsNullOrEmpty(sortBy))
+            {
+                query = query.OrderBy($"{sortBy} {(isAscending ? "ascending" : "descending")}");
+            }
+
+            // Apply pagination
+            query = query.Skip((pageNr - 1) * pageSize).Take(pageSize);
+
+            return await query.ToListAsync();
         }
 
         public async Task AddAsync(T entity)

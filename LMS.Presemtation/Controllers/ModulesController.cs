@@ -75,7 +75,7 @@ namespace LMS.Presemtation.Controllers
         {
             if (patchDocument == null) return BadRequest("Invalid patch document.");
 
-            var moduleToPatch = _serviceManager.ModuleService.GetModuleByIdAsync(id, false);
+            var moduleToPatch = await _serviceManager.ModuleService.GetModuleByIdAsync(id, false);
             if (moduleToPatch == null) return NotFound($"Module with ID {id} not found.");
 
             var moduleUpdateDto = _mapper.Map<ModuleUpdateDTO>(moduleToPatch);

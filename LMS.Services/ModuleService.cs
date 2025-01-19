@@ -10,6 +10,7 @@ using Services.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -30,17 +31,41 @@ namespace LMS.Services
                 int courseId,
                 bool includeActivities = false,
                 int pageNr = 1,
-                int pageSize = 10)
+                int pageSize = 10,
+                string? sortBy = null,
+                bool isAscending = true,
+                string? filterByName = null
+                )
         {
-            IQueryable<Module> query = _uow.Modules.Query();
+            Expression<Func<Module, bool>> filter = m =>
+                m.CourseId == courseId &&
+                (string.IsNullOrEmpty(filterByName) || m.Name.Contains(filterByName));
 
-            if (includeActivities) query = query.Include(m => m.Activities);
+            // Query for modules with optional sorting/pagination/filtering
+            var query = _uow.Modules.Query();
 
-            var modules = await query.Where(m => m.CourseId == courseId)
-                .Skip((pageNr - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
+            if (includeActivities)
+            {
+                query = query.Include(m => m.Activities);
+            }
+
+            var modules = await _uow.GetFilteredAndSortedEntitiesAsync(
+                filter: filter,
+                sortBy: sortBy,
+                isAscending: isAscending,
+                pageNr: pageNr,
+                pageSize: pageSize
+            );
+
             return _mapper.Map<IEnumerable<ModuleDTO>>(modules);
+
+            //if (includeActivities) query = query.Include(m => m.Activities);
+
+            //var modules = await query.Where(m => m.CourseId == courseId)
+            //    .Skip((pageNr - 1) * pageSize)
+            //    .Take(pageSize)
+            //    .ToListAsync();
+            //return _mapper.Map<IEnumerable<ModuleDTO>>(modules);
         }
 
         public async Task<ModuleDTO> GetModuleByIdAsync(int id, bool includeActivities = false)
@@ -152,7 +177,8 @@ namespace LMS.Services
             foreach (var existingModule in existingModulesList)
             {
                 // Skip comparison if the existingModule is the same object as moduleDto - used reference instead of ID as id doesn't exist on CreateModuleDTO
-                if (ReferenceEquals(existingModule, moduleDto)) continue;
+              
+
 
                 if (moduleDto.StartDate.Date == existingModule.StartDate.Date || moduleDto.EndDate.Date == existingModule.EndDate.Date) return false;
                 if (moduleDto.StartDate.Date == existingModule.EndDate.Date || moduleDto.EndDate.Date == existingModule.StartDate.Date) return false;
