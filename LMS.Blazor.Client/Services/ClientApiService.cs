@@ -62,26 +62,6 @@ public class ClientApiService(IHttpClientFactory httpClientFactory, NavigationMa
         return res;
     }
 
-
-
-    public async Task<IEnumerable<DemoDto>> CallApiAsync()
-    {
-        var requestMessage = new HttpRequestMessage(HttpMethod.Get, "proxy-endpoint");
-        var response = await httpClient.SendAsync(requestMessage);
-
-        if (response.StatusCode == System.Net.HttpStatusCode.Forbidden
-           || response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-        {
-            navigationManager.NavigateTo("AccessDenied");
-        }
-
-        response.EnsureSuccessStatusCode();
-
-        var demoDtos = await JsonSerializer.DeserializeAsync<List<DemoDto>>(await response.Content.ReadAsStreamAsync(), _jsonSerializerOptions, CancellationToken.None) ?? [];
-        return demoDtos;
-    }
-
-
     public async Task<TResponse?> CallRegisterAsync<TRequest, TResponse>(string endpoint, TRequest? dto)
     {
         var request = new HttpRequestMessage(HttpMethod.Post, $"https://localhost:7044/{endpoint}");
@@ -126,8 +106,4 @@ public class ClientApiService(IHttpClientFactory httpClientFactory, NavigationMa
         return res;
 
     }
-
-
-
-   
 }
