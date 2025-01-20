@@ -1,4 +1,5 @@
 ﻿using LMS.Blazor.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http.Headers;
@@ -19,15 +20,12 @@ public class ProxyController : ControllerBase
         _tokenService = tokenService;
     }
 
-    [HttpGet]
-    //[HttpPost]
-    //[HttpPut]
-    //[HttpDelete]
-    //[HttpPatch]
-    public async Task<IActionResult> Proxy() //ToDo send endpoint uri here!
+
+    [Route("{*endpoint}")]
+    [Authorize]
+    public async Task<IActionResult> Proxy(string endpoint)
     {
-        string endpoint = "api/demoauth";
-        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value; //Usermanager can be used here!
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value; //Usermanager can be used here! 
 
         if (userId == null)
             return Unauthorized();
@@ -51,7 +49,14 @@ public class ProxyController : ControllerBase
 
         if (method != HttpMethod.Get && Request.ContentLength > 0)
         {
+
             requestMessage.Content = new StreamContent(Request.Body);
+
+            if (!string.IsNullOrWhiteSpace(Request.ContentType))
+            {
+                requestMessage.Content.Headers.ContentType
+                    = MediaTypeHeaderValue.Parse(Request.ContentType);
+            }
         }
 
         foreach (var header in Request.Headers)
@@ -62,12 +67,18 @@ public class ProxyController : ControllerBase
             }
         }
 
-
         var response = await client.SendAsync(requestMessage);
 
         if (!response.IsSuccessStatusCode)
-            return Unauthorized();
+            return Unauthorized(); //ToDo pass correct statuscode to caller
 
-        return StatusCode((int)response.StatusCode, await response.Content.ReadAsStringAsync());
+        Response.StatusCode = (int)response.StatusCode;
+        Response.ContentType = response.Content.Headers.ContentType?.ToString() ?? "application/json";
+
+        var stream = await response.Content.ReadAsStreamAsync();
+        await stream.CopyToAsync(Response.Body);
+
+        return new EmptyResult();
+
     }
 }
