@@ -154,8 +154,7 @@ namespace LMS.Services
             foreach (var course in enrollmentList)
             {
                 var teacherNames = await _uow.Courses.Query().Where(c => c.CourseId == course.CourseId).SelectMany(c => c.Enrollments).Where(u => u.Role == "Teacher").Select(u => u.Name).ToListAsync();
-                foreach (var enrollment in course.Enrollments)
-                {
+               
                     enrollmentListDTO.Add(new EnrollmentUserCourseListDTO
                     {
                         CourseName = course.Name,
@@ -163,7 +162,7 @@ namespace LMS.Services
                         CourseEnd = course.EndDate,
                         TeacherNames = teacherNames
                     });
-                }
+                
             }
 
 
