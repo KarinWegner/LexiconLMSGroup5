@@ -75,14 +75,14 @@ namespace Domain.Models.Responses
     }
     public class ActivityTypeNotFoundResponse : ApiNotFoundResponse
     {
-        public ActivityTypeNotFoundResponse(int id) : base($"The Activity Type with id {id} is not found")
+        public ActivityTypeNotFoundResponse(int id) : base($"The Activity Type with id {id} was not found")
         {
 
         }
     }
     public class UserNotFoundResponse : ApiNotFoundResponse
     {
-        public UserNotFoundResponse(string id) : base($"The User with id {id} is not found")
+        public UserNotFoundResponse(string id) : base($"The User with id {id} was not found")
         {
 
         }

@@ -16,35 +16,35 @@ namespace Domain.Models.Exceptions
     }
     public class CourseNotFoundException : NotFoundException
     {
-        public CourseNotFoundException(int id) : base($"The Course with {id} is not found")
+        public CourseNotFoundException(int id) : base($"The Course with id {id} was not found")
         {
 
         }
     }
     public class ModuleNotFoundException : NotFoundException
     {
-        public ModuleNotFoundException(int id) : base($"The Module with {id} is not found")
+        public ModuleNotFoundException(int id) : base($"The Module with id {id} was not found")
         {
 
         }
     }
     public class ActivityNotFoundException : NotFoundException
     {
-        public ActivityNotFoundException(int id) : base($"The Activity with {id} is not found")
+        public ActivityNotFoundException(int id) : base($"The Activity with id {id} was not found")
         {
 
         }
     }
     public class ActivityTypeNotFoundException : NotFoundException
     {
-        public ActivityTypeNotFoundException(int id) : base($"The Activity Type with id {id} is not found")
+        public ActivityTypeNotFoundException(int id) : base($"The Activity Type with id {id} was not found")
         {
 
         }
     }
     public class UserNotFoundException : NotFoundException
     {
-        public UserNotFoundException(string id) : base($"The User with id {id} is not found")
+        public UserNotFoundException(string id) : base($"The User with id {id} was not found")
         {
 
         }
