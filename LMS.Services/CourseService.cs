@@ -85,6 +85,7 @@ namespace LMS.Services
             return true;
         }
 
+
         private IQueryable<Course> IncludeRelatedEntities(
         IQueryable<Course> query, 
         bool includeModules, 
@@ -114,6 +115,7 @@ namespace LMS.Services
             }
             return existingCourse;
         }
+
 
     }
 }

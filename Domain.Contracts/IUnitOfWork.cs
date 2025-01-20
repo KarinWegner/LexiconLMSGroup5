@@ -9,5 +9,7 @@ public interface IUnitOfWork
     IGenericRepository<Activity> Activities { get; }
     IGenericRepository<Document> Documents { get; }
     IGenericRepository<ActivityType> ActivityTypes { get; }
+    IEnrollmentRepository Enrollments { get; }
+    
     Task CompleteASync();
 }

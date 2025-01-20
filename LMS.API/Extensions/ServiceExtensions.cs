@@ -41,6 +41,9 @@ public static class ServiceExtensions
         services.AddLazy<IDocumentService>();
         services.AddScoped<IActivityTypeService, ActivityTypeService>();
         services.AddLazy<IActivityTypeService>();
+        services.AddScoped<IEnrollmentService, EnrollmentService>();
+        services.AddLazy<IEnrollmentService>();
+
     }
 
     public static void ConfigureRepositories(this IServiceCollection services)
