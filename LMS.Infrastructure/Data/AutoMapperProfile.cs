@@ -27,10 +27,12 @@ public class AutoMapperProfile : Profile
         CreateMap<Activity, ActivityDTO>();
         CreateMap<ActivityCreateDTO, Activity>();
         CreateMap<ActivityUpdateDTO, Activity>().ReverseMap();
+        CreateMap<ActivityDTO, ActivityUpdateDTO>();
 
         CreateMap<ActivityType, ActivityTypeDTO>().ReverseMap();
         CreateMap<ActivityTypeCreateDTO, ActivityType>();
         CreateMap<ActivityTypeUpdateDTO, ActivityType>();
+
 
         CreateMap<ApplicationUserDTO, ApplicationUser>().ReverseMap();
 
