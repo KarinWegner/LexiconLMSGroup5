@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq.Expressions;
 using System.Linq.Dynamic.Core;
-
 
 namespace LMS.Shared.Extensions
 {
@@ -20,8 +14,9 @@ namespace LMS.Shared.Extensions
         {
             if (string.IsNullOrEmpty(sortBy)) return query;
 
-            // Use System.Linq.Dynamic.Core for dynamic sorting
-            return query.OrderBy($"{sortBy} {(isAscending ? "ascending" : "descending")}");
+            // Using System.Linq.Dynamic.Core for dynamic sorting
+            var sortDirection = isAscending ? "ascending" : "descending";
+            return query.OrderBy($"{sortBy} {sortDirection}");
         }
 
         public static IQueryable<T> ApplyPagination<T>(this IQueryable<T> query, int pageNr, int pageSize)
@@ -29,5 +24,4 @@ namespace LMS.Shared.Extensions
             return query.Skip((pageNr - 1) * pageSize).Take(pageSize);
         }
     }
-
 }
