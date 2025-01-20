@@ -8,6 +8,7 @@ using Bogus;
 using LMS.Shared.DTOs.ActivityDTOs;
 using Microsoft.AspNetCore.JsonPatch;
 using Services.Contracts;
+using System.Text.Json;
 
 namespace LMS.Presemtation.Controllers
 {
@@ -26,10 +27,38 @@ namespace LMS.Presemtation.Controllers
 
         // GET: api/Modules
         [HttpGet]
-        public async Task<ActionResult> GetModules(int courseId, bool includeActivities = false)
+        public async Task<ActionResult> GetModules(
+            int courseId, 
+            bool includeActivities = false,
+            int pageNr = 1,
+            int pageSize = 10,
+            string? sortBy = null,
+            bool isAscending = true,
+            string? filteringValue = null
+            )
         {
-            var modules = await _serviceManager.ModuleService.GetModulesAsync(courseId, includeActivities);
+            var (modules, totalCount )= await _serviceManager.ModuleService.GetModulesAsync(
+                courseId: courseId,
+                includeActivities: includeActivities,
+                pageNr: pageNr,
+                pageSize: pageSize,
+                sortBy: sortBy,
+                isAscending: isAscending,
+                filteringValue: filteringValue
+                );
+
+            var metadata = new
+            {
+                TotalItems = totalCount,
+                PageSize = pageSize,
+                CurrentPage = pageNr,
+                TotalPages = (totalCount / pageSize)
+            };
+
+            Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(metadata));
+
             return Ok(modules);
+
         }
 
 
