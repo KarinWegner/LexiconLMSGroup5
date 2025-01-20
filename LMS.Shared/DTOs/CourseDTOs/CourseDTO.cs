@@ -15,8 +15,8 @@ namespace LMS.Shared.DTOs.CourseDTOs
         public string Description { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
-        public IEnumerable<ApplicationUser> Enrollments { get; set; }
-        = new List<ApplicationUser>();
+        public IEnumerable<ApplicationUserDTO> Enrollments { get; set; }
+        = new List<ApplicationUserDTO>();
         public IEnumerable<ModuleDTO> Modules { get; set; }
         = new List<ModuleDTO>();
     }

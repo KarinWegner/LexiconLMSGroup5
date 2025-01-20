@@ -1,12 +1,11 @@
 ﻿using Domain.Contracts;
 using LMS.Infrastructure.Data;
+using LMS.Shared.Extensions;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Linq.Expressions;
+
+
 
 namespace LMS.Infrastructure.Repositories
 {
@@ -21,14 +20,55 @@ namespace LMS.Infrastructure.Repositories
             _dbSet = context.Set<T>();
         }
 
-        public async Task<T> GetByIdAsync(int id)
+        public async Task<T> GetByIdAsync(int id, params Expression<Func<T, object>>[] includes)
         {
-            return await _dbSet.FindAsync(id);
+            IQueryable<T> query = _dbSet;
+
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+
+            var entityTypeName = typeof(T).Name; 
+            var primaryKeyName = $"{entityTypeName}Id";
+
+            return await query.FirstOrDefaultAsync(entity => EF.Property<int>(entity, primaryKeyName).Equals(id));
         }
+
 
         public async Task<IEnumerable<T>> GetAllAsync()
         {
             return await _dbSet.ToListAsync();
+        }
+
+        public async Task<int> GetTotalCountAsync()
+        {
+            var all = await _dbSet.ToListAsync();
+            return all.Count;
+        }
+
+        public async Task<(IEnumerable<T> Items, int TotalCount)> GetFilteredAndSortedEntitiesAsync(
+         Expression<Func<T, bool>>? filter,
+         string? sortBy,
+         bool isAscending,
+         int? pageNr,
+         int? pageSize)
+        {
+
+            var query = _dbSet.AsQueryable()
+                .ApplyFiltering(filter)
+                .ApplySorting(sortBy, isAscending);
+
+            // Get the total count before pagination
+            var totalCount = await query.CountAsync();
+
+            if (pageNr.HasValue && pageSize.HasValue)
+                {
+                    query.ApplyPagination(pageNr.Value, pageSize.Value);
+                }
+
+            var items = await query.ToListAsync();
+            return (Items: items, TotalCount: totalCount);
         }
 
         public async Task AddAsync(T entity)

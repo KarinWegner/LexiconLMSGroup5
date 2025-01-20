@@ -5,6 +5,7 @@ using LMS.Shared.DTOs.CourseDTOs;
 using LMS.Shared.DTOs.ModuleDTOs;
 using LMS.Shared.DTOs.ActivityDTOs;
 using LMS.Shared.DTOs.ActivityTypeDTOs;
+using LMS.Shared.DTOs.EnrollmentDTOs;
 namespace LMS.Infrastructure.Data;
 
 public class AutoMapperProfile : Profile
@@ -21,6 +22,7 @@ public class AutoMapperProfile : Profile
         CreateMap<Module, ModuleDTO>();
         CreateMap<ModuleCreateDTO, Module>();
         CreateMap<ModuleUpdateDTO, Module>().ReverseMap();
+        CreateMap<ModuleDTO, ModuleUpdateDTO>();
 
         CreateMap<Activity, ActivityDTO>();
         CreateMap<ActivityCreateDTO, Activity>();
@@ -30,7 +32,8 @@ public class AutoMapperProfile : Profile
         CreateMap<ActivityTypeCreateDTO, ActivityType>();
         CreateMap<ActivityTypeUpdateDTO, ActivityType>();
 
-        CreateMap<ApplicationUserDTO, ApplicationUser>();
+        CreateMap<ApplicationUserDTO, ApplicationUser>().ReverseMap();
+
         CreateMap<ApplicationUser , EnrolledUserDTO > ();
         
     }

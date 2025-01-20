@@ -86,7 +86,7 @@ public static class SeedData
         List<List<Activity>> activityLists = new List<List<Activity>>();
         foreach (var module in modules) 
         {
-            TimeSpan activitySpan = (module.StartDate - module.EndDate) / activitiesPerModule;
+            TimeSpan activitySpan = (module.EndDate - module.StartDate) / activitiesPerModule;
             
         int activityNumber = 1;
             
@@ -114,14 +114,14 @@ public static class SeedData
         foreach (var course in courses) 
         {
             int numberOfModules = 3;
-            TimeSpan moduleSpan = (course.StartDate - course.EndDate) / numberOfModules;
+            TimeSpan moduleSpan = (course.EndDate - course.StartDate) / numberOfModules;
             int moduleNumber = 1;
             var faker = new Faker<Module>("sv").Rules((f, m) =>
             {
                 m.CourseId = course.CourseId;
                 m.StartDate= course.StartDate.Add(moduleSpan * (moduleNumber-1));
-                m.EndDate = course.StartDate.Add(moduleSpan *  moduleNumber);
-                m.Name = "Module " + moduleNumber++ +": "+f.Hacker.Noun();
+                m.Name = "Module " + moduleNumber +": "+f.Hacker.Noun();
+                m.EndDate = course.StartDate.Add(moduleSpan *  moduleNumber++);
                 m.Description = m.Name + ". How " + f.Hacker.Adjective() + " " + f.Hacker.Verb() +" "+ moduleWords[f.Random.Int(0, moduleWordCount - 1)];
             });
             moduleLists.Add(faker.Generate(numberOfModules));
