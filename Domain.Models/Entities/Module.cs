@@ -16,6 +16,9 @@ namespace Domain.Models.Entities
         public ICollection<Activity> Activities { get; set; }
         =new List<Activity>();
 
+        public ICollection<Document> Documents { get; set; }
+        = new List<Document>();
+
         //Foreign key
         public int CourseId { get; set; }
 

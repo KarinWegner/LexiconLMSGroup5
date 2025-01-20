@@ -64,7 +64,7 @@ namespace LMS.Infrastructure.Repositories
 
             if (pageNr.HasValue && pageSize.HasValue)
                 {
-                    query.ApplyPagination(pageNr.Value, pageSize.Value);
+                    query = query.ApplyPagination(pageNr.Value, pageSize.Value);
                 }
 
             var items = await query.ToListAsync();
