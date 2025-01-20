@@ -21,5 +21,19 @@
             public const string LinkToCourseDashboard = $"/{RoutingVariables.AdministrationDashboard}/{RoutingVariables.CourseDashboard}";
             public const string LinkToStudentDashboard = $"/{RoutingVariables.AdministrationDashboard}/{RoutingVariables.StudentDashboard}";
         }
+
+        public record API
+        {
+            public record Module
+            {
+                public const string Modules = RoutingVariables.APIModules;
+            }
+            public record Course
+            {
+                public const string Courses = RoutingVariables.APICourses;
+                public const string CoursesWithModulesAndEnrollments = $"{RoutingVariables.APICourses}?{RoutingVariables.APICoursesIncludeModules}&{RoutingVariables.APICoursesIncludeEnrollments}";
+
+            }
+        }
     }
 }

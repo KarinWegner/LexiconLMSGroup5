@@ -3,13 +3,24 @@
         <NavLink class="clickable nav-link" @onclick="toggleExpanded">
             <div class="row">
 
-                    <div class="col-sm-auto">
-                        <h4>@CourseEntry.Name</h4>
-                    </div>
-                    <div class="col"></div>
-                @if (!isExpanded)
+                <div class="col-sm-auto">
+                    <h4>@CourseEntry.Name</h4>
+                </div>
+                @if (CourseEntryType == ECourseEntryType.Class)
                 {
-                    <div class="col-sm-auto align-right"><DateWidget DisplayType="@(EDateDisplayType.DateInline)" StartTime="CourseEntry.StartTime" EndTime="CourseEntry.EndTime"></DateWidget></div>
+                    <div class="col"></div>
+                    @if (!isExpanded)
+                    {
+                        <div class="col-sm-auto align-right"><DateWidget DisplayType="@(EDateDisplayType.DateInline)" StartTime="CourseEntry.StartTime" EndTime="CourseEntry.EndTime"></DateWidget></div>
+                    }
+                }
+                else
+                {
+                    <div class="col"></div>
+                    <div class="col-sm-auto"><DateWidget DisplayType="@(EDateDisplayType.DateInline)" StartTime="CourseEntry.StartTime" EndTime="CourseEntry.EndTime"></DateWidget></div>
+                    <div class="col"></div>
+                    <span class=" align-right col-sm-auto"><NavLink class="blue nav-link py-0" href="">Edit</NavLink></span>
+
                 }
             </div>
         </NavLink>

@@ -8,5 +8,9 @@
         public const string WithIntId = "{Id:int}", WithIntIdAndIntParentId = "{ParentId:int}/{Id:int}", WithStringId = "{Id}";
         //Adminstration route
         public const string AdministrationDashboard = "AdministrationDashboard", CourseDashboard = "CourseDashboard", StudentDashboard = "StudentDashboard";
+        //API Endpoints
+        public const string APIModules = "api/modules", APICourses = "api/Courses";
+        //APIQueries
+        public const string APICoursesIncludeModules = "includeModules=true", APICoursesIncludeEnrollments = "includeEnrollments=true";
     }
 }

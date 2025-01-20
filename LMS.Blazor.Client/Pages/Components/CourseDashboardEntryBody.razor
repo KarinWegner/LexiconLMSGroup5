@@ -1,21 +1,41 @@
 ﻿<li class="notClick mx-3 my-1 bg-expanded list-group-item ">
-    <div class="row">
-        <NavLink class="notClick nav-link">
-            <div class="row">
-                <div class="col-sm-auto">
-                    <h4>@CourseEntry.Name</h4>
+    @if (CourseEntryType == ECourseEntryType.Class)
+    {
+        <div class="row">
+            <NavLink class="notClick nav-link">
+                <div class="row">
+                    <div class="col-sm-auto">
+                        <h4>@CourseEntry.Name</h4>
+                    </div>
+                    <div class="col"></div>
+                    <div class="col-sm-auto align-right"><DateWidget DisplayType="@(EDateDisplayType.DateInline)" StartTime="CourseEntry.StartTime" EndTime="CourseEntry.EndTime"></DateWidget></div>
                 </div>
-                <div class="col"></div>
-                <div class="col-sm-auto align-right"><DateWidget DisplayType="@(EDateDisplayType.DateInline)" StartTime="CourseEntry.StartTime" EndTime="CourseEntry.EndTime"></DateWidget></div>
-            </div>
-        </NavLink>
-    </div>
-    <div class="row">
-        <div class="col-8">
-            @if (CourseEntryType == ECourseEntryType.Class)
-            {
-                <CourseDashboardList courseEntries="modules" CourseEntryType="ECourseEntryType.Module"></CourseDashboardList>
-            }
+            </NavLink>
         </div>
-    </div>
+        <div class="row">
+            <div class="col-8">
+                <div class="row">
+                    <span class="h5 col-sm-auto ms-3">Modules</span>
+                    <span class="col"></span>
+                    <span class=" align-right col-sm-auto  "> <NavLink class="blue nav-link h5 py-0 " href="">Create Module</NavLink></span>
+                </div>
+                <CourseDashboardList courseEntries="modules" CourseEntryType="ECourseEntryType.Module"></CourseDashboardList>
+            </div>
+
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col">
+                <NavLink class="blue nav-link h5 py-0 my-2" href="">Rename</NavLink>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <NavLink class="blue nav-link h5 my-2" href="">Change dates</NavLink>
+            </div>
+            <span class=" align-right col"> <NavLink class="blue nav-link h5 my-2" href="">Delete</NavLink></span>
+        </div>
+    }
 </li>

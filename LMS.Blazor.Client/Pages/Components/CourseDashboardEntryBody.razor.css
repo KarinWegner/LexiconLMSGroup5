@@ -39,3 +39,12 @@
 ::deep h4 {
     margin-bottom: 0px;
 }
+
+.align-right {
+    text-align: right
+}
+
+::deep .blue
+{
+   color: #0d32ff !important;
+}

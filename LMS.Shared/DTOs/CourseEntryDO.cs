@@ -1,5 +1,7 @@
-﻿using System;
+﻿using LMS.Shared.DTOs.ModuleDTOs;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -62,6 +64,16 @@ namespace LMS.Shared.DTOs
         /// Empty constructor.
         /// </summary>
         public CourseEntryDO() { }
+
+        public CourseEntryDO(ModuleDTO from)
+        {
+            Id = from.ModuleId;
+            ParentId = from.CourseId;
+            Name = from.Name!;
+            Description = from.Description!;
+            StartTime = from.StartDate;
+            EndTime = from.EndDate;
+        }
 
 
     }
