@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -27,21 +28,20 @@ namespace LMS.Services
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<ModuleDTO>> GetModulesAsync(
+        public async Task<(IEnumerable<ModuleDTO> Modules, int TotalCount)> GetModulesAsync(
                 int courseId,
                 bool includeActivities = false,
-                int pageNr = 1,
-                int pageSize = 10,
+                int? pageNr = null,
+                int? pageSize = null,
                 string? sortBy = null,
                 bool isAscending = true,
-                string? filterByName = null
+                string? filteringValue = null
                 )
         {
-            Expression<Func<Module, bool>> filter = m =>
+            Expression<Func<Domain.Models.Entities.Module, bool>> filter = m =>
                 m.CourseId == courseId &&
-                (string.IsNullOrEmpty(filterByName) || m.Name.Contains(filterByName));
+                (string.IsNullOrEmpty(filteringValue) || m.Name.Contains(filteringValue));
 
-            // Query for modules with optional sorting/pagination/filtering
             var query = _uow.Modules.Query();
 
             if (includeActivities)
@@ -49,7 +49,7 @@ namespace LMS.Services
                 query = query.Include(m => m.Activities);
             }
 
-            var modules = await _uow.GetFilteredAndSortedEntitiesAsync(
+            var (modules, totalCount) = await _uow.Modules.GetFilteredAndSortedEntitiesAsync(
                 filter: filter,
                 sortBy: sortBy,
                 isAscending: isAscending,
@@ -57,20 +57,14 @@ namespace LMS.Services
                 pageSize: pageSize
             );
 
-            return _mapper.Map<IEnumerable<ModuleDTO>>(modules);
+            var moduleDTOs = _mapper.Map<IEnumerable<ModuleDTO>>(modules);
 
-            //if (includeActivities) query = query.Include(m => m.Activities);
-
-            //var modules = await query.Where(m => m.CourseId == courseId)
-            //    .Skip((pageNr - 1) * pageSize)
-            //    .Take(pageSize)
-            //    .ToListAsync();
-            //return _mapper.Map<IEnumerable<ModuleDTO>>(modules);
+            return (moduleDTOs, totalCount);
         }
 
         public async Task<ModuleDTO> GetModuleByIdAsync(int id, bool includeActivities = false)
         {
-            IQueryable<Module> query = _uow.Modules.Query().Where(m => m.ModuleId == id);
+            IQueryable<Domain.Models.Entities.Module> query = _uow.Modules.Query().Where(m => m.ModuleId == id);
 
             if (includeActivities) query = query.Include(m => m.Activities);
 
@@ -84,15 +78,15 @@ namespace LMS.Services
 
         public async Task<ModuleDTO> CreateModuleAsync(ModuleCreateDTO moduleDto, int courseId)
         {
-            var course = await _uow.Courses.GetByIdAsync(courseId, c => c.Modules); // does NOT return modules
+            var course = await _uow.Courses.GetByIdAsync(courseId, c => c.Modules); 
             if (course == null) return null;
 
             //Check dates - does it end before it starts, does it fit into the course timeline, does it overlap with other modules
             ValidateModuleDates(moduleDto);
             if (!ValidateModuleFitsCourseDate(moduleDto, course)) throw new ArgumentException("The module date must fit into the course timeline.");
-            if (!ValidateModulesDoNotOverlap(moduleDto, course)) throw new ArgumentException("The module dates can't overlap.");
+            if (!ValidateModulesDoNotOverlapOnCreate(moduleDto, course)) throw new ArgumentException("The module dates can't overlap.");
 
-            var moduleToAdd = _mapper.Map<Module>(moduleDto);
+            var moduleToAdd = _mapper.Map<Domain.Models.Entities.Module>(moduleDto);
             moduleToAdd.CourseId = courseId;
             await _uow.Modules.AddAsync(moduleToAdd);
 
@@ -112,14 +106,14 @@ namespace LMS.Services
             //Validate dates
             ValidateModuleDates(moduleDto);
             if (!ValidateModuleFitsCourseDate(moduleDto, course)) throw new ArgumentException("The module date must fit into the course timeline.");
-            if (!ValidateModulesDoNotOverlap(moduleDto, course)) throw new ArgumentException("The module dates can't overlap.");
+            if (!ValidateModulesDoNotOverlapOnUpdate(moduleDto, course)) throw new ArgumentException("The module dates can't overlap.");
 
             _mapper.Map(moduleDto, existingModule);
 
             await _uow.CompleteASync();
             return true;
         }
-         
+
 
         public async Task<bool> DeleteModuleAsync(int id)
         {
@@ -130,7 +124,8 @@ namespace LMS.Services
             return true;
         }
 
-        private async Task<Module> GetModuleIfExists(int id)
+
+        private async Task<Domain.Models.Entities.Module> GetModuleIfExists(int id)
         {
             var existingModule = await _uow.Modules.GetByIdAsync(id);
             if (existingModule == null)
@@ -159,29 +154,50 @@ namespace LMS.Services
             return moduleStartDate >= courseStartDate && moduleEndDate <= courseEndDate;
         }
 
-        private bool ValidateModulesDoNotOverlap(dynamic moduleDto, Course course)
+        private bool ValidateModulesDoNotOverlapOnCreate(ModuleCreateDTO moduleDto, Course course)
         {
             DateTime moduleStartDate = moduleDto.StartDate;
             DateTime moduleEndDate = moduleDto.EndDate;
             var existingModules = course.Modules;
 
-            Console.WriteLine($"moduleDto: {moduleDto.StartDate} - {moduleDto.EndDate}");
-            Console.WriteLine(course.Modules);
+            if (existingModules == null || !existingModules.Any()) return true;
+
+            var existingModulesList = existingModules.ToList();
+
+            foreach (var existingModule in existingModulesList)
+            {
+                if (moduleDto.StartDate.Date == existingModule.StartDate.Date ||
+                    moduleDto.EndDate.Date == existingModule.EndDate.Date ||
+                    moduleDto.StartDate.Date == existingModule.EndDate.Date ||
+                    moduleDto.EndDate.Date == existingModule.StartDate.Date) return false;
+                if (moduleDto.StartDate.Date > existingModule.StartDate.Date && moduleDto.EndDate.Date < existingModule.EndDate.Date) return false;
+                if (moduleDto.StartDate.Date < existingModule.StartDate.Date && moduleDto.EndDate.Date > existingModule.EndDate.Date) return false;
+                if (moduleDto.StartDate.Date < existingModule.EndDate.Date && moduleDto.EndDate.Date > existingModule.StartDate.Date) return false;
+            }
+
+            return true;
+        }
+
+
+        private bool ValidateModulesDoNotOverlapOnUpdate(ModuleUpdateDTO moduleDto, Course course)
+        {
+            DateTime moduleStartDate = moduleDto.StartDate;
+            DateTime moduleEndDate = moduleDto.EndDate;
+            var existingModules = course.Modules;
 
             if (existingModules == null || !existingModules.Any()) return true;
 
             var existingModulesList = existingModules.ToList();
 
-            //existingModules.Any(module => module.StartDate == moduleDto.StartDate || module.EndDate == moduleDto.EndDate);
-
             foreach (var existingModule in existingModulesList)
             {
-                // Skip comparison if the existingModule is the same object as moduleDto - used reference instead of ID as id doesn't exist on CreateModuleDTO
-              
+                // Skip comparison on itself
+                if (moduleDto.ModuleId == existingModule.ModuleId) continue;
 
-
-                if (moduleDto.StartDate.Date == existingModule.StartDate.Date || moduleDto.EndDate.Date == existingModule.EndDate.Date) return false;
-                if (moduleDto.StartDate.Date == existingModule.EndDate.Date || moduleDto.EndDate.Date == existingModule.StartDate.Date) return false;
+                if (moduleDto.StartDate.Date == existingModule.StartDate.Date ||
+                    moduleDto.EndDate.Date == existingModule.EndDate.Date ||
+                    moduleDto.StartDate.Date == existingModule.EndDate.Date ||
+                    moduleDto.EndDate.Date == existingModule.StartDate.Date) return false;
                 if (moduleDto.StartDate.Date > existingModule.StartDate.Date && moduleDto.EndDate.Date < existingModule.EndDate.Date) return false;
                 if (moduleDto.StartDate.Date < existingModule.StartDate.Date && moduleDto.EndDate.Date > existingModule.EndDate.Date) return false;
                 if (moduleDto.StartDate.Date < existingModule.EndDate.Date && moduleDto.EndDate.Date > existingModule.StartDate.Date) return false;
