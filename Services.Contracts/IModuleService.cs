@@ -13,12 +13,13 @@ namespace Services.Contracts
     {
         Task<(IEnumerable<ModuleDTO> Modules, int TotalCount)> GetModulesAsync(int courseId,
                 bool includeActivities = false,
+                bool includeDocuments = false,
                 int? pageNr = null,
                 int? pageSize = null,
                 string? sortBy = null,
                 bool isAscending = true,
                 string? filteringValue = null);
-        Task<ModuleDTO> GetModuleByIdAsync(int id, bool includeActivities = false);
+        Task<ModuleDTO> GetModuleByIdAsync(int id, bool includeActivities = false, bool includeDocuments = false);
         Task<bool> UpdateModuleAsync(int id, int courseId, ModuleUpdateDTO moduleDto);
         Task<ModuleDTO> CreateModuleAsync(ModuleCreateDTO moduleDto, int courseId);
         Task<bool> DeleteModuleAsync(int id);

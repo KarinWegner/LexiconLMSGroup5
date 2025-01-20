@@ -31,6 +31,7 @@ namespace LMS.Services
         public async Task<(IEnumerable<ModuleDTO> Modules, int TotalCount)> GetModulesAsync(
                 int courseId,
                 bool includeActivities = false,
+                bool includeDocuments = false,
                 int? pageNr = null,
                 int? pageSize = null,
                 string? sortBy = null,
@@ -49,6 +50,11 @@ namespace LMS.Services
                 query = query.Include(m => m.Activities);
             }
 
+            if (includeDocuments)
+            {
+                query = query.Include(m => m.Documents);
+            }
+
             var (modules, totalCount) = await _uow.Modules.GetFilteredAndSortedEntitiesAsync(
                 filter: filter,
                 sortBy: sortBy,
@@ -62,11 +68,12 @@ namespace LMS.Services
             return (moduleDTOs, totalCount);
         }
 
-        public async Task<ModuleDTO> GetModuleByIdAsync(int id, bool includeActivities = false)
+        public async Task<ModuleDTO> GetModuleByIdAsync(int id, bool includeActivities = false, bool includeDocuments = false)
         {
             IQueryable<Domain.Models.Entities.Module> query = _uow.Modules.Query().Where(m => m.ModuleId == id);
 
             if (includeActivities) query = query.Include(m => m.Activities);
+            if (includeDocuments) query = query.Include(m => m.Documents);
 
             var module = await query.FirstOrDefaultAsync();
 
@@ -100,7 +107,7 @@ namespace LMS.Services
             var existingModule = await GetModuleIfExists(id);
             if (existingModule == null) return false;
 
-            var course = await _uow.Courses.GetByIdAsync(courseId, c => c.Modules);
+            var course = await _uow.Courses.GetByIdAsync(courseId);
             if (course == null) return false;
 
             //Validate dates
@@ -140,7 +147,7 @@ namespace LMS.Services
         {
             if (moduleDto.EndDate < moduleDto.StartDate)
             {
-                throw new ArgumentException("The course cannot end before the start date.");
+                throw new ArgumentException("The module cannot end before the start date.");
             }
         }
 
@@ -151,7 +158,7 @@ namespace LMS.Services
             DateTime courseStartDate = course.StartDate;
             DateTime courseEndDate = course.EndDate;
 
-            return moduleStartDate >= courseStartDate && moduleEndDate <= courseEndDate;
+            return moduleStartDate.Date >= courseStartDate.Date && moduleEndDate.Date <= courseEndDate.Date;
         }
 
         private bool ValidateModulesDoNotOverlapOnCreate(ModuleCreateDTO moduleDto, Course course)
@@ -166,13 +173,13 @@ namespace LMS.Services
 
             foreach (var existingModule in existingModulesList)
             {
-                if (moduleDto.StartDate.Date == existingModule.StartDate.Date ||
-                    moduleDto.EndDate.Date == existingModule.EndDate.Date ||
-                    moduleDto.StartDate.Date == existingModule.EndDate.Date ||
-                    moduleDto.EndDate.Date == existingModule.StartDate.Date) return false;
-                if (moduleDto.StartDate.Date > existingModule.StartDate.Date && moduleDto.EndDate.Date < existingModule.EndDate.Date) return false;
-                if (moduleDto.StartDate.Date < existingModule.StartDate.Date && moduleDto.EndDate.Date > existingModule.EndDate.Date) return false;
-                if (moduleDto.StartDate.Date < existingModule.EndDate.Date && moduleDto.EndDate.Date > existingModule.StartDate.Date) return false;
+                if (moduleStartDate.Date == existingModule.StartDate.Date ||
+                    moduleEndDate.Date == existingModule.EndDate.Date ||
+                    moduleStartDate.Date == existingModule.EndDate.Date ||
+                    moduleEndDate.Date == existingModule.StartDate.Date) return false;
+                if (moduleStartDate.Date > existingModule.StartDate.Date && moduleEndDate.Date < existingModule.EndDate.Date) return false;
+                if (moduleStartDate.Date < existingModule.StartDate.Date && moduleEndDate.Date > existingModule.EndDate.Date) return false;
+                if (moduleStartDate.Date < existingModule.EndDate.Date && moduleEndDate.Date > existingModule.StartDate.Date) return false;
             }
 
             return true;
@@ -194,13 +201,13 @@ namespace LMS.Services
                 // Skip comparison on itself
                 if (moduleDto.ModuleId == existingModule.ModuleId) continue;
 
-                if (moduleDto.StartDate.Date == existingModule.StartDate.Date ||
-                    moduleDto.EndDate.Date == existingModule.EndDate.Date ||
-                    moduleDto.StartDate.Date == existingModule.EndDate.Date ||
-                    moduleDto.EndDate.Date == existingModule.StartDate.Date) return false;
-                if (moduleDto.StartDate.Date > existingModule.StartDate.Date && moduleDto.EndDate.Date < existingModule.EndDate.Date) return false;
-                if (moduleDto.StartDate.Date < existingModule.StartDate.Date && moduleDto.EndDate.Date > existingModule.EndDate.Date) return false;
-                if (moduleDto.StartDate.Date < existingModule.EndDate.Date && moduleDto.EndDate.Date > existingModule.StartDate.Date) return false;
+                if (moduleStartDate.Date == existingModule.StartDate.Date ||
+                     moduleEndDate.Date == existingModule.EndDate.Date ||
+                     moduleStartDate.Date == existingModule.EndDate.Date ||
+                     moduleEndDate.Date == existingModule.StartDate.Date) return false;
+                if (moduleStartDate.Date > existingModule.StartDate.Date && moduleEndDate.Date < existingModule.EndDate.Date) return false;
+                if (moduleStartDate.Date < existingModule.StartDate.Date && moduleEndDate.Date > existingModule.EndDate.Date) return false;
+                if (moduleStartDate.Date < existingModule.EndDate.Date && moduleEndDate.Date > existingModule.StartDate.Date) return false;
             }
 
             return true;
