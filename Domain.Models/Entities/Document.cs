@@ -4,7 +4,7 @@ namespace Domain.Models.Entities
 {
     public class Document
     {
-        public int Id { get; set; }
+        public int DocumentId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public DateTime UploadedAt { get; set; }

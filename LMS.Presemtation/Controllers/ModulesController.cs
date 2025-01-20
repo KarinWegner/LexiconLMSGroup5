@@ -8,10 +8,11 @@ using Bogus;
 using LMS.Shared.DTOs.ActivityDTOs;
 using Microsoft.AspNetCore.JsonPatch;
 using Services.Contracts;
+using System.Text.Json;
 
 namespace LMS.Presemtation.Controllers
 {
-    [Route("api/courses/{courseId}/modules")]
+    [Route("api/Modules")]
     [ApiController]
     public class ModulesController : ControllerBase
     {
@@ -24,92 +25,110 @@ namespace LMS.Presemtation.Controllers
             _mapper = mapper;
         }
 
-        // GET: api/courses/{courseId}/modules
+        // GET: api/Modules
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ModuleDTO>>> GetModules(int courseId, bool includeActivities)
+        public async Task<ActionResult> GetModules(
+            int courseId, 
+            bool includeActivities = false,
+            int pageNr = 1,
+            int pageSize = 10,
+            string? sortBy = null,
+            bool isAscending = true,
+            string? filteringValue = null
+            )
         {
-            var modules = await _serviceManager.ModuleService.GetModulesAsync(courseId, includeActivities);
-            var modulesDTO = _mapper.Map<IEnumerable<ModuleDTO>>(modules);
-            return Ok(modulesDTO);
+            var (modules, totalCount )= await _serviceManager.ModuleService.GetModulesAsync(
+                courseId: courseId,
+                includeActivities: includeActivities,
+                pageNr: pageNr,
+                pageSize: pageSize,
+                sortBy: sortBy,
+                isAscending: isAscending,
+                filteringValue: filteringValue
+                );
+
+            var metadata = new
+            {
+                TotalItems = totalCount,
+                PageSize = pageSize,
+                CurrentPage = pageNr,
+                TotalPages = (totalCount / pageSize)
+            };
+
+            Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(metadata));
+
+            return Ok(modules);
+
         }
 
-        // GET: api/courses/{courseId}/modules/{id}
+
+        // GET: api/modules/22
         [HttpGet("{id}")]
-        public async Task<ActionResult<ModuleDTO>> GetModule(int id, int courseId, bool includeActivities)
+        public async Task<ActionResult> GetModule(int id, bool includeActivities = false)
         {
-            var module = await _serviceManager.ModuleService.GetModuleByIdAsync(id, courseId, includeActivities);
-            if (module == null)
-            {
-                return NotFound();
-            }
-
-            var moduleDTO = _mapper.Map<ModuleDTO>(module);
-            return Ok(moduleDTO);
-        }
-
-        // PUT: api/courses/{courseId}/modules/{id}
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutModule(int id, ModuleUpdateDTO moduleDto)
-        {
-            var result = await _serviceManager.ModuleService.UpdateModuleAsync(id, moduleDto);
-            if (!result)
-            {
-                return NotFound("Module not found");
-            }
-
-            return NoContent();
+            ModuleDTO module = await _serviceManager.ModuleService.GetModuleByIdAsync(id, includeActivities);
+            if (module == null) return NotFound($"Module with ID {id} not found.");
+            return Ok(module);
         }
 
 
-        //// PATCH: api/courses/{courseId}/modules/{id}
-        //[HttpPatch("{id}")]
-        //public async Task<ActionResult<ModuleDTO>> PatchModule(int id, int courseId, JsonPatchDocument<ModuleUpdateDTO> patchDocument)
-        //{
-        //    if (_serviceManager.CourseService.GetCourseByIdAsync(courseId) == null) return NotFound("Course not found.");
-
-        //    var moduleEntity = await _context.Modules.FirstOrDefaultAsync(a => a.ModuleId == id);
-        //    if (moduleEntity == null) return NotFound("Activity not found");
-
-        //    var ModuleToPatch = _mapper.Map<ModuleUpdateDTO>(moduleEntity);
-
-        //    patchDocument.ApplyTo(ModuleToPatch, ModelState);
-
-        //    if (!ModelState.IsValid) return BadRequest(ModelState);
-        //    if (!TryValidateModel(ModuleToPatch)) return BadRequest(ModelState);
-
-        //    _mapper.Map(ModuleToPatch, moduleEntity);
-
-        //    await _context.SaveChangesAsync();
-
-        //    return Ok(_mapper.Map<ModuleDTO>(moduleEntity));
-        //}
-
-        // POST: api/courses/{courseId}/modules
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        // POST: api/modules
         [HttpPost]
-        public async Task<ActionResult<Module>> PostModule(ModuleCreateDTO moduleDto, int courseId)
+        public async Task<ActionResult> CreateModule([FromBody] ModuleCreateDTO moduleDto, int courseId)
         {
+            if (moduleDto == null) return BadRequest("Module info is required.");
             var createdModule = await _serviceManager.ModuleService.CreateModuleAsync(moduleDto, courseId);
             if (createdModule == null)
             {
                 return BadRequest("Invalid module data.");
             }
 
-            return CreatedAtAction("GetModule", new { courseId = courseId, id = createdModule.ModuleId }, createdModule);
+            return CreatedAtAction(nameof(GetModule), new { courseId, id = createdModule.ModuleId }, createdModule);
         }
 
-        // DELETE: api/courses/{courseId}/modules/{id}
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteModule(int id)
+
+        // PUT: api/modules/22
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateModule(int id, int courseId, [FromBody] ModuleUpdateDTO moduleDto)
         {
-            var result = await _serviceManager.ModuleService.DeleteModuleAsync(id);
-            if (!result)
-            {
-                return NotFound("Module not found");
-            }
+            if (id != moduleDto.ModuleId) return BadRequest("Mismatched module ID.");
+
+            var updated = await _serviceManager.ModuleService.UpdateModuleAsync(id, courseId, moduleDto);
+            return updated ? NoContent() : NotFound($"Module with ID {id} was not found.");
+        }
+
+
+        // PATCH: api/modules/22
+        [HttpPatch("{id}")]
+        public async Task<ActionResult> PatchModule(int id, int courseId, [FromBody] JsonPatchDocument<ModuleUpdateDTO> patchDocument)
+        {
+            if (patchDocument == null) return BadRequest("Invalid patch document.");
+
+            var moduleToPatch = await _serviceManager.ModuleService.GetModuleByIdAsync(id, false);
+            if (moduleToPatch == null) return NotFound($"Module with ID {id} not found.");
+
+            var moduleUpdateDto = _mapper.Map<ModuleUpdateDTO>(moduleToPatch);
+
+            patchDocument.ApplyTo(moduleUpdateDto, ModelState);
+
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            await _serviceManager.ModuleService.UpdateModuleAsync(id, courseId, moduleUpdateDto);
 
             return NoContent();
         }
+
+
+
+        // DELETE: api/modules/22
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteModule(int id)
+        {
+            var deleted = await _serviceManager.ModuleService.DeleteModuleAsync(id);
+            return deleted ? NoContent() : NotFound($"Module with ID {id} was not found.");
+        }
+
+
     }
 }
+
