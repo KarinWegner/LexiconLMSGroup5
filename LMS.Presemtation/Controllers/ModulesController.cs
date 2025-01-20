@@ -13,7 +13,7 @@ namespace LMS.Presemtation.Controllers
 {
     [Route("api/courses/{courseId}/modules")]
     [ApiController]
-    public class ModulesController : ControllerBase
+    public class ModulesController : ApiControllerBase
     {
         private readonly IServiceManager _serviceManager;
         private readonly IMapper _mapper;
