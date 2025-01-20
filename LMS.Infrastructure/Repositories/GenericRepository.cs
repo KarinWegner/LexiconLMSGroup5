@@ -1,14 +1,10 @@
 ﻿using Domain.Contracts;
 using LMS.Infrastructure.Data;
+using LMS.Shared.Extensions;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
-using System.Linq.Dynamic.Core;
+
 
 
 namespace LMS.Infrastructure.Repositories
@@ -33,48 +29,46 @@ namespace LMS.Infrastructure.Repositories
                 query = query.Include(include);
             }
 
-            var entityTypeName = typeof(T).Name; // Get the entity's type name (e.g., "Course", "Module")
+            var entityTypeName = typeof(T).Name; 
             var primaryKeyName = $"{entityTypeName}Id";
 
             return await query.FirstOrDefaultAsync(entity => EF.Property<int>(entity, primaryKeyName).Equals(id));
         }
 
 
-        //public async Task<T> GetByIdAsync(int id)
-        //{
-        //    return await _dbSet.FindAsync(id);
-        //}
-
         public async Task<IEnumerable<T>> GetAllAsync()
         {
             return await _dbSet.ToListAsync();
         }
 
-        public async Task<IEnumerable<T>> GetFilteredAndSortedAsync(
-        Expression<Func<T, bool>>? filter = null,
-        string? sortBy = null,
-        bool isAscending = true,
-        int pageNr = 1,
-        int pageSize = 10)
+        public async Task<int> GetTotalCountAsync()
         {
-            var query = _dbSet.AsQueryable();
+            var all = await _dbSet.ToListAsync();
+            return all.Count;
+        }
 
-            // Apply filtering
-            if (filter != null)
-            {
-                query = query.Where(filter);
-            }
+        public async Task<(IEnumerable<T> Items, int TotalCount)> GetFilteredAndSortedEntitiesAsync(
+         Expression<Func<T, bool>>? filter,
+         string? sortBy,
+         bool isAscending,
+         int? pageNr,
+         int? pageSize)
+        {
 
-            // Apply sorting
-            if (!string.IsNullOrEmpty(sortBy))
-            {
-                query = query.OrderBy($"{sortBy} {(isAscending ? "ascending" : "descending")}");
-            }
+            var query = _dbSet.AsQueryable()
+                .ApplyFiltering(filter)
+                .ApplySorting(sortBy, isAscending);
 
-            // Apply pagination
-            query = query.Skip((pageNr - 1) * pageSize).Take(pageSize);
+            // Get the total count before pagination
+            var totalCount = await query.CountAsync();
 
-            return await query.ToListAsync();
+            if (pageNr.HasValue && pageSize.HasValue)
+                {
+                    query.ApplyPagination(pageNr.Value, pageSize.Value);
+                }
+
+            var items = await query.ToListAsync();
+            return (Items: items, TotalCount: totalCount);
         }
 
         public async Task AddAsync(T entity)
