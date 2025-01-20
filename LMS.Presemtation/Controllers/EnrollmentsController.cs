@@ -127,35 +127,25 @@ namespace LMS.Presemtation.Controllers
             return NoContent();
         }
 
-        //private bool CourseExists(int id)
-        //{
-        //    return _context.Courses.Any(e => e.CourseId == id);
-        //}
 
 
-        ///// <summary>
-        ///// Gets list of all courses a user is enrolled in
-        ///// Does not function properly in swagger but works in Postman
-        ///// </summary>
-        ///// <param name="userId"></param>
-        ///// <returns></returns>
-        //[HttpGet("user/{userId}")]
-        //[ProducesResponseType(StatusCodes.Status404NotFound)]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //public async Task<ActionResult<IEnumerable<EnrollmentListDTO>>> GetUserEnrollments(string userId)
-        //{
-        //    var user = await _userManager.FindByIdAsync(userId);
-        //    if (user == null)
-        //    {
-        //        return NotFound("User not found");
-        //    }
 
-        //    var enrollmentList = await _context.Courses.Where(c => c.Enrollments.Contains(user)).ToListAsync();
+        /// <summary>
+        /// Gets list of all courses a user is enrolled in
+        /// Does not function properly in swagger but works in Postman
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        [HttpGet("user/{userId}")]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<IEnumerable<EnrollmentUserCourseListDTO>>> GetUserEnrollments(string userId)
+        {
+            var enrollmentList = await _serviceManager.EnrollmentService.GetUserEnrollments(userId);
 
-        //    if (enrollmentList.Count == 0) return Ok("User has no enrollments");
-        //    var enrollmentlist = enrollmentList.Select(c=>c.Name);
+         
 
-        //    return Ok(enrollmentList.ToList());
-        //}
+            return Ok(enrollmentList.ToList());
+        }
     }
 }

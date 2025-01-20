@@ -16,6 +16,6 @@ namespace Services.Contracts
         Task EditEnrollment(int courseId, EnrollmentUpdateDTO updateDto);
         Task AddEnrollment(int courseId, EnrollmentCreateDTO createDto);
         Task RemoveEnrollment(int courseId, string userId);
-        Task<IEnumerable<EnrollmentListDTO>> GetUserEnrollments(string userId);
+        Task<IEnumerable<EnrollmentUserCourseListDTO>> GetUserEnrollments(string userId);
     }
 }

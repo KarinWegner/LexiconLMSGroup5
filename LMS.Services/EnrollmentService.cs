@@ -120,7 +120,7 @@ namespace LMS.Services
 
         public async Task<IEnumerable<EnrolledUserDTO>> GetEnrollmentsForCourse(int courseId, bool excludeTeachers = false)
         {
-            IQueryable<ApplicationUser> enrollments = _uow.Courses.Query().Where(c => c.CourseId == courseId).Include(c=>c.Enrollments).SelectMany(c=>c.Enrollments);
+            IQueryable<ApplicationUser> enrollments =  _uow.Courses.Query().Where(c => c.CourseId == courseId).Include(c=>c.Enrollments).SelectMany(c=>c.Enrollments);
 
             if (enrollments == null)
             {
@@ -138,9 +138,36 @@ namespace LMS.Services
            
         }
 
-        public Task<IEnumerable<EnrollmentListDTO>> GetUserEnrollments(string userId)
+        public async Task<IEnumerable<EnrollmentUserCourseListDTO>> GetUserEnrollments(string userId)
         {
-            throw new NotImplementedException();
+            var user = await _uow.Enrollments.FindUserByIdAsync(userId);
+            if (user == null)
+            {
+                return null; // NotFound("User not found");
+            }
+
+            var enrollmentList = await _uow.Enrollments.GetUserEnrollments(userId);
+
+            if (enrollmentList.Count() == 0) return null; //ToDo: Add response for empty reply Ok("User has no enrollments");
+
+            var enrollmentListDTO = new List<EnrollmentUserCourseListDTO>();
+            foreach (var course in enrollmentList)
+            {
+                var teacherNames = await _uow.Courses.Query().Where(c => c.CourseId == course.CourseId).SelectMany(c => c.Enrollments).Where(u => u.Role == "Teacher").Select(u => u.Name).ToListAsync();
+                foreach (var enrollment in course.Enrollments)
+                {
+                    enrollmentListDTO.Add(new EnrollmentUserCourseListDTO
+                    {
+                        CourseName = course.Name,
+                        CourseStart = course.StartDate,
+                        CourseEnd = course.EndDate,
+                        TeacherNames = teacherNames
+                    });
+                }
+            }
+
+
+            return enrollmentListDTO;
         }
 
         public async Task RemoveEnrollment(int courseId, string userId)

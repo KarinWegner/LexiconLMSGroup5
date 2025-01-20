@@ -6,13 +6,11 @@ using System.Threading.Tasks;
 
 namespace LMS.Shared.DTOs.EnrollmentDTOs
 {
-    public record EnrollmentListDTO
+    public record EnrollmentUserCourseListDTO
     {
         public string CourseName { get; init; }
-        public string User { get; init; }
         public DateTime CourseStart { get; init; }
         public DateTime CourseEnd { get; init; }
         public List<string> TeacherNames { get; init; }
-        
     }
 }

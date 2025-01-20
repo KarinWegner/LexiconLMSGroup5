@@ -54,5 +54,12 @@ namespace LMS.Infrastructure.Repositories
             var user = await _context.Users.FindAsync(userId);
             return user;
         }
+
+        public async Task<IEnumerable<Course>> GetUserEnrollments(string userId)
+        {
+            var enrollments = await _context.Users.Where(u=>u.Id == userId).Include(u=>u.Enrollments).SelectMany(u=>u.Enrollments).ToListAsync();
+
+            return enrollments;
+        }
     }
 }
