@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Domain.Contracts;
 using Domain.Models.Entities;
+using Domain.Models.Responses;
 using LMS.Shared.DTOs.CourseDTOs;
 using Microsoft.EntityFrameworkCore;
 using Services.Contracts;
@@ -19,7 +20,7 @@ namespace LMS.Services
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<CourseDTO>> GetAllCoursesAsync(
+        public async Task<ApiBaseResponse> GetAllCoursesAsync(
             bool includeModules = false,
             bool includeEnrollments = false,
             int pageNr = 1,
@@ -37,10 +38,11 @@ namespace LMS.Services
                 .Take(pageSize)
                 .ToListAsync();
 
-            return _mapper.Map<IEnumerable<CourseDTO>>(courses);
+            var courseDtos = _mapper.Map<IEnumerable<CourseDTO>>(courses);
+            return new ApiOkResponse<IEnumerable<CourseDTO>>(courseDtos);
         }
 
-        public async Task<CourseDTO> GetCourseByIdAsync(int id, bool includeModules = false, bool includeEnrollments = false)
+        public async Task<ApiBaseResponse> GetCourseByIdAsync(int id, bool includeModules = false, bool includeEnrollments = false)
         {
             IQueryable<Course> query = _uow.Courses.Query().Where(c => c.CourseId == id);
 
@@ -48,9 +50,11 @@ namespace LMS.Services
 
             var course = await query.FirstOrDefaultAsync();
 
-            if (course == null) return null;
+            if (course == null) return new CourseNotFoundResponse(id);
 
-            return _mapper.Map<CourseDTO>(course);
+            var courseDto = _mapper.Map<CourseDTO>(course);
+
+            return new ApiOkResponse<CourseDTO>(courseDto);
         }
 
         public async Task<CourseDTO> CreateCourseAsync(CourseCreateDTO courseDto)

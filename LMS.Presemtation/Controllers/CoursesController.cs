@@ -3,6 +3,8 @@ using LMS.Shared.DTOs.CourseDTOs;
 using Microsoft.AspNetCore.JsonPatch;
 using Services.Contracts;
 using AutoMapper;
+using Azure;
+using Domain.Models.Responses;
 
 namespace LMS.Presemtation.Controllers
 {
@@ -23,8 +25,11 @@ namespace LMS.Presemtation.Controllers
         [HttpGet]
         public async Task<ActionResult> GetCourses(bool includeModules = false, bool includeEnrollments = false)
         {
-            var courses = await _serviceManager.CourseService.GetAllCoursesAsync(includeModules, includeEnrollments);
-            return Ok(courses);
+            ApiBaseResponse response = await _serviceManager.CourseService.GetAllCoursesAsync(includeModules, includeEnrollments);
+           
+            return response.Success ?
+               Ok(response.GetOkResult<IEnumerable<CourseDTO>>()) :
+               ProcessError(response);
         }
 
 
@@ -32,9 +37,11 @@ namespace LMS.Presemtation.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult> GetCourse(int id, bool includeModules = false, bool includeEnrollments = false)
         {
-            var course = await _serviceManager.CourseService.GetCourseByIdAsync(id, includeModules, includeEnrollments);
-            if (course == null) return NotFound($"Course with ID {id} not found.");
-            return Ok(course);
+            ApiBaseResponse response = await _serviceManager.CourseService.GetCourseByIdAsync(id, includeModules, includeEnrollments);
+
+            return response.Success ?
+               Ok(response.GetOkResult<CourseDTO>()) :
+               ProcessError(response);
         }
 
         // POST: api/Courses
