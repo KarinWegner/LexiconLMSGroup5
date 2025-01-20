@@ -22,7 +22,6 @@ public class AutoMapperProfile : Profile
         CreateMap<ModuleCreateDTO, Module>();
         CreateMap<ModuleUpdateDTO, Module>().ReverseMap();
         CreateMap<ModuleDTO, ModuleUpdateDTO>();
-        CreateMap<ModuleUpdateDTO, ModuleDTO>();
 
         CreateMap<Activity, ActivityDTO>();
         CreateMap<ActivityCreateDTO, Activity>();
