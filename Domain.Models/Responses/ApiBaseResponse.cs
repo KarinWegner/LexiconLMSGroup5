@@ -27,6 +27,7 @@ namespace Domain.Models.Responses
             }
             throw new InvalidOperationException($"Response type {this.GetType().Name} is not ApiCreatedAtResponse");
         }
+        
 
     }
     public sealed class ApiOkResponse<TResult> : ApiBaseResponse
@@ -46,6 +47,15 @@ namespace Domain.Models.Responses
             Result = result;
         }
     }
+    public sealed class ApiNoContentResponse : ApiBaseResponse
+    {
+        
+        public ApiNoContentResponse() : base(true)
+        {
+
+        }
+    }
+
     public abstract class ApiNotFoundResponse : ApiBaseResponse
     {
         public string Message { get; set; }
@@ -53,6 +63,36 @@ namespace Domain.Models.Responses
         {
             Message = message;
         }
+    }
+    //public abstract class ApiInternalServerErrorResponse : ApiBaseResponse
+    //{
+    //    public string Message { get; set; }
+    //    public ApiInternalServerErrorResponse(string message) : base(false)
+    //    {
+    //        Message = message;
+    //    }
+    //}
+    public abstract class ApiBadRequestResponse : ApiBaseResponse
+    {
+        public string Message { get; set; }
+        public ApiBadRequestResponse(string message) : base(false)
+        {
+            Message = message;
+        }
+    }
+
+    public class BadCourseRequestResponse : ApiBadRequestResponse
+    {
+        
+        public BadCourseRequestResponse(string message) : base(message)
+        {
+            
+        }
+    }
+
+    public class BadPatchRequestResponse : ApiBadRequestResponse
+    {
+        public BadPatchRequestResponse(string? message) : base(message ="Patch document could not be read") { }
     }
 
     public class CourseNotFoundResponse : ApiNotFoundResponse
@@ -85,6 +125,14 @@ namespace Domain.Models.Responses
         public UserNotFoundResponse(string id) : base($"The User with id {id} was not found")
         {
 
+        }
+    }
+   
+    public class BadDateSequenceRequestResponse : ApiBadRequestResponse
+    {
+
+        public BadDateSequenceRequestResponse(DateTime startDate, DateTime endDate) : base($"Start date {startDate} cannot be after end date {endDate}") 
+        {
         }
     }
 }

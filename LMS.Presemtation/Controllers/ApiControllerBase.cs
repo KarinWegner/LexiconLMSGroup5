@@ -1,5 +1,6 @@
 ﻿using Domain.Models.Responses;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LMS.Presemtation.Controllers
@@ -19,6 +20,16 @@ namespace LMS.Presemtation.Controllers
                     Title: "Not Found",
                     Instance: HttpContext.Request.Path
                 )),
+
+                ApiBadRequestResponse => BadRequest(
+                (
+                    Detail: ((ApiBadRequestResponse)baseResponse).Message,
+                    StatusCode: StatusCodes.Status400BadRequest,
+                    Title: "Bad Request",
+                    Instance: HttpContext.Request.Path
+                )),
+
+
                 _ => throw new NotImplementedException()
             };
         }

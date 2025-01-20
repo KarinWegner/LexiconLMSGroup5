@@ -8,9 +8,9 @@ namespace Services.Contracts
     {
         Task<ApiBaseResponse> GetAllCoursesAsync(bool includeModules = false, bool includeEnrollments = false, int pageNr = 1, int pageSize = 10);
         Task<ApiBaseResponse> GetCourseByIdAsync(int id, bool includeModules = false, bool includeEnrollments = false);
-        Task<CourseDTO> CreateCourseAsync(CourseCreateDTO courseDto);
-        Task<bool> UpdateCourseAsync(int id, CourseUpdateDTO courseDto);
-        Task<bool> DeleteCourseAsync(int id);
+        Task<ApiBaseResponse> CreateCourseAsync(CourseCreateDTO courseDto);
+        Task<ApiBaseResponse> UpdateCourseAsync(int id, CourseUpdateDTO courseDto);
+        Task<ApiBaseResponse> DeleteCourseAsync(int id);
 
     }
 }

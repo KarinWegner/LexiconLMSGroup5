@@ -1,10 +1,13 @@
 ﻿using AutoMapper;
+using Azure;
 using Domain.Contracts;
 using Domain.Models.Entities;
+using Domain.Models.Exceptions;
 using Domain.Models.Responses;
 using LMS.Shared.DTOs.CourseDTOs;
 using Microsoft.EntityFrameworkCore;
 using Services.Contracts;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace LMS.Services
 {
@@ -57,39 +60,85 @@ namespace LMS.Services
             return new ApiOkResponse<CourseDTO>(courseDto);
         }
 
-        public async Task<CourseDTO> CreateCourseAsync(CourseCreateDTO courseDto)
+        public async Task<ApiBaseResponse> CreateCourseAsync(CourseCreateDTO courseDto)
         {
-            ValidateCourseDates(courseDto);
+            try
+            {
+                ValidateCourseDates(courseDto);
+            }
+            catch (BadDateSequenceException ex)
+            {
+                return new BadDateSequenceRequestResponse(ex.StartDate, ex.EndDate);
+                throw;
+            }
+            catch(Exception ex) 
+            {
+                throw;
+            }
 
             var courseToAdd = _mapper.Map<Course>(courseDto);
             await _uow.Courses.AddAsync(courseToAdd);
 
             await _uow.CompleteASync();
 
-            return _mapper.Map<CourseDTO>(courseToAdd);
+            var createdCourseToReturn =_mapper.Map<CourseDTO>(courseToAdd);
+
+            return new ApiCreatedAtResponse<CourseDTO>(createdCourseToReturn);
         }
 
-        public async Task<bool> DeleteCourseAsync(int id)
+        public async Task<ApiBaseResponse> DeleteCourseAsync(int id)
         {
+            try
+            {
             var course = await GetCourseIfExists(id);
-
             await _uow.Courses.DeleteAsync(course);
             await _uow.CompleteASync();
-            return true;
+
+            }
+            catch (CourseNotFoundException)
+            {
+                return new CourseNotFoundResponse(id);
+            }
+            catch(Exception ex)
+            {
+                throw;
+            }
+            
+                return new ApiNoContentResponse();
+            
         }
 
-        public async Task<bool> UpdateCourseAsync(int id, CourseUpdateDTO courseDto)
+        public async Task<ApiBaseResponse> UpdateCourseAsync(int id, CourseUpdateDTO courseDto)
         {
-            ValidateCourseDates(courseDto);
-            var existingCourse = await GetCourseIfExists(id);
 
-            _mapper.Map(courseDto, existingCourse);
+            try
+            {
+                ValidateCourseDates(courseDto);
+                var existingCourse = await GetCourseIfExists(id);
+                _mapper.Map(courseDto, existingCourse);
+
+            }
+            catch (BadDateSequenceException ex)
+            {
+                return new BadDateSequenceRequestResponse(ex.StartDate, ex.EndDate);
+            }
+            catch (CourseNotFoundException )
+            {
+                return new CourseNotFoundResponse(id);
+            }           
+            catch(Exception ex)
+            {
+                throw new NotImplementedException(ex.Message);
+            }
+
+
+
 
             await _uow.CompleteASync();
-            return true;
+            return new ApiNoContentResponse();
         }
 
-
+      
         private IQueryable<Course> IncludeRelatedEntities(
         IQueryable<Course> query, 
         bool includeModules, 
@@ -106,7 +155,7 @@ namespace LMS.Services
         {
             if (courseDto.EndDate < courseDto.StartDate)
             {
-                throw new ArgumentException("The course cannot end before the start date.");
+                throw new BadDateSequenceException(courseDto.StartDate, courseDto.EndDate);
             }
         }
 
@@ -115,7 +164,7 @@ namespace LMS.Services
             var existingCourse = await _uow.Courses.GetByIdAsync(id);
             if (existingCourse == null)
             {
-                throw new KeyNotFoundException($"Course with ID {id} not found.");
+                throw new CourseNotFoundException(id);
             }
             return existingCourse;
         }
