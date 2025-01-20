@@ -35,4 +35,18 @@ namespace Domain.Models.Exceptions
 
         }
     }
+    public class ActivityTypeNotFoundException : NotFoundException
+    {
+        public ActivityTypeNotFoundException(int id) : base($"The Activity Type with id {id} is not found")
+        {
+
+        }
+    }
+    public class UserNotFoundException : NotFoundException
+    {
+        public UserNotFoundException(string id) : base($"The User with id {id} is not found")
+        {
+
+        }
+    }
 }

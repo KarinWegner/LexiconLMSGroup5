@@ -55,6 +55,20 @@ namespace LMS.API.Extensions
                     detail: activityNotFoundException.Message,
                     instance: context.Request.Path),
 
+                ActivityTypeNotFoundException activityTypeNotFoundException => problemDetailsFactory.CreateProblemDetails(
+               context,
+               StatusCodes.Status404NotFound,
+               title: activityTypeNotFoundException.Title,
+               detail: activityTypeNotFoundException.Message,
+               instance: context.Request.Path),
+
+                UserNotFoundException userNotFoundException => problemDetailsFactory.CreateProblemDetails(
+               context,
+               StatusCodes.Status404NotFound,
+               title: userNotFoundException.Title,
+               detail: userNotFoundException.Message,
+               instance: context.Request.Path),
+
                 _ => problemDetailsFactory.CreateProblemDetails(
                  context,
                  StatusCodes.Status500InternalServerError,
