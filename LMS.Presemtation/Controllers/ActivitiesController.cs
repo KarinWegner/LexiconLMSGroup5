@@ -14,6 +14,7 @@ using Azure;
 using Microsoft.AspNetCore.JsonPatch;
 using Services.Contracts;
 using System.Reflection;
+using System.Text.Json;
 
 namespace LMS.Presemtation.Controllers
 {
@@ -33,16 +34,43 @@ namespace LMS.Presemtation.Controllers
 
         // GET: api/Activities
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ActivityDTO>>> GetActivities(int moduleId)
+        public async Task<ActionResult> GetActivities(
+            int moduleId,
+            bool includeDocuments = false,
+            int pageNr = 1,
+            int pageSize = 10,
+            string? sortBy = null,
+            bool isAscending = true,
+            string? filteringValue = null
+            )
         {
-            var activities = await _serviceManager.ActivityService.GetActivitiesAsync(moduleId);
+            var (activities, totalCount) = await _serviceManager.ActivityService.GetActivitiesAsync(
+                moduleId: moduleId,
+                includeDocuments: includeDocuments,
+                pageNr: pageNr,
+                pageSize: pageSize,
+                sortBy: sortBy,
+                isAscending: isAscending,
+                filteringValue: filteringValue
+                );
+
+            var metadata = new
+            {
+                TotalItems = totalCount,
+                PageSize = pageSize,
+                CurrentPage = pageNr,
+                TotalPages = (totalCount / pageSize)
+            };
+
+            Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(metadata));
+
             return Ok(activities);
         }
 
 
         // GET: api/Activities/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<ActivityDTO>> GetActivity(int id)
+        public async Task<ActionResult> GetActivity(int id)
         {
             var activity = await _serviceManager.ActivityService.GetActivityByIdAsync(id);
             if (activity == null) return NotFound("Activity not found");
@@ -50,35 +78,45 @@ namespace LMS.Presemtation.Controllers
         }
 
         // PUT: api/Activities/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutActivity(int id, ActivityUpdateDTO activityDto)
+        public async Task<IActionResult> UpdateActivity(int id, [FromBody] ActivityUpdateDTO activityDto)
         {
-            //if (id != activityDto.ActivityId)
-            //{
-            //    return BadRequest("Activity ID mismatch.");
-            //}
+            if (id != activityDto.ActivityId) return BadRequest("Mismatched activity ID.");
 
-            var isUpdated = await _serviceManager.ActivityService.UpdateActivityAsync(id, activityDto);
-
-            if (!isUpdated)
-            {
-                return NotFound("Activity not found");
-            }
-
-            return NoContent();
+            var updated = await _serviceManager.ActivityService.UpdateActivityAsync(id, activityDto);
+            return updated ? NoContent() : NotFound($"Activity with ID {id} was not found.");
         }
 
         // POST: api/Activities
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<ActivityDTO>> PostActivity(ActivityCreateDTO activityDto, int courseId, int moduleId)
+        public async Task<ActionResult> CreateActivity([FromBody] ActivityCreateDTO activityDto, int courseId, int moduleId)
         {
+            if(activityDto == null) return BadRequest("Activity info is required");
             var createdActivity = await _serviceManager.ActivityService.CreateActivityAsync(activityDto, moduleId);
 
-            if (createdActivity == null) return BadRequest("Invalid module or course details");
+            if (createdActivity == null) return BadRequest("Invalid module or activity details");
 
             return CreatedAtAction(nameof(GetActivity), new { courseId, moduleId, id = createdActivity.ActivityId }, createdActivity);
+        }
+
+        //PATCH: api/Activities/5
+        [HttpPatch("{id}")]
+        public async Task<ActionResult> PatchActivity(int id, int moduleId, [FromBody] JsonPatchDocument<ActivityUpdateDTO> patchDocument)
+        {
+            if (patchDocument == null) return BadRequest("Invalid patch document");
+
+            var activityToPatch = await _serviceManager.ActivityService.GetActivityByIdAsync(id);
+            if (activityToPatch == null) return NotFound($"Activity with {id} not found");
+
+            var activityUpdateDto = _mapper.Map<ActivityUpdateDTO>(activityToPatch);
+
+            patchDocument.ApplyTo(activityUpdateDto, ModelState);
+
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            await _serviceManager.ActivityService.UpdateActivityAsync(id, activityUpdateDto);
+
+            return NoContent();
         }
 
         // DELETE: api/Activities/5
@@ -86,20 +124,8 @@ namespace LMS.Presemtation.Controllers
         public async Task<IActionResult> DeleteActivity(int id)
         {
             var isDeleted = await _serviceManager.ActivityService.DeleteActivityAsync(id);
-            if (!isDeleted) return NotFound("Activity not found");
-            return NoContent();
+            return isDeleted ? NoContent() : NotFound($"Activity with ID {id} not found");
         }
-
-        //[HttpPatch("{id}")]
-        //public async Task<ActionResult<ActivityDTO>> PatchActivity(int id, int moduleId, JsonPatchDocument<ActivityUpdateDTO> patchDocument)
-        //{
-        //    if (patchDocument == null) return BadRequest("Invalid patch document");
-
-        //    var updatedActivity = await _serviceManager.ActivityService.PatchActivityAsync(id, patchDocument);
-        //    if (updatedActivity == null) return NotFound("Activity not found");
-
-        //    return Ok(updatedActivity);
-        //}
 
     }
 }

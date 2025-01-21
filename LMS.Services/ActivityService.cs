@@ -2,12 +2,14 @@
 using Domain.Contracts;
 using Domain.Models.Entities;
 using LMS.Shared.DTOs.ActivityDTOs;
+using LMS.Shared.DTOs.ModuleDTOs;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.EntityFrameworkCore;
 using Services.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -24,22 +26,49 @@ namespace LMS.Services
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<ActivityDTO>> GetActivitiesAsync(int moduleId)
+        public async Task<(IEnumerable<ActivityDTO> Activities, int TotalCount)> GetActivitiesAsync(
+                int moduleId,
+                bool includeDocuments = false,
+                int? pageNr = null,
+                int? pageSize = null,
+                string? sortBy = null,
+                bool isAscending = true,
+                string? filteringValue = null
+                )
         {
-            var activities = await _uow.Activities
-                .Query()
-                .Where(a => a.ModuleId == moduleId)
-                .ToListAsync();
-            return _mapper.Map<IEnumerable<ActivityDTO>>(activities);
+            Expression<Func<Activity, bool>> filter = m =>
+                m.ModuleId == moduleId &&
+                (string.IsNullOrEmpty(filteringValue) || m.Name.Contains(filteringValue)); //expand to cover all properties
+
+            var query = _uow.Modules.Query();
+
+            if (includeDocuments)
+            {
+                query = query.Include(m => m.Documents);
+            }
+
+            var (activities, totalCount) = await _uow.Activities.GetFilteredAndSortedEntitiesAsync(
+                filter: filter,
+                sortBy: sortBy,
+                isAscending: isAscending,
+                pageNr: pageNr,
+                pageSize: pageSize
+            );
+
+            var activityDTOs = _mapper.Map<IEnumerable<ActivityDTO>>(activities);
+
+            return (activityDTOs, totalCount);
         }
 
+
         
-        public async Task<ActivityDTO> GetActivityByIdAsync(int id)
+        public async Task<ActivityDTO> GetActivityByIdAsync(int id, bool includeDocuments = false)
         {
-            var activity = await _uow.Activities
-                .Query()
-                .Where(a => a.ActivityId == id)
-                .FirstOrDefaultAsync();
+            IQueryable<Activity> query = _uow.Activities.Query().Where(m => m.ActivityId == id);
+
+            if (includeDocuments) query = query.Include(m => m.Documents);
+
+            var activity = await query.FirstOrDefaultAsync();
 
             if (activity == null) return null;
 
@@ -51,23 +80,10 @@ namespace LMS.Services
             var module = await _uow.Modules.GetByIdAsync(moduleId);
             if (module == null) return null;
 
-            // Check module constraints
-            if (activityDto.StartDate < module.StartDate || activityDto.EndDate > module.EndDate)
-            {
-                throw new ArgumentException("Activity dates must be within the module timeframe.");
-            }
 
-            // Check for overlapping activities
-            var overlappingActivity = await _uow.Activities
-                .Query()
-                .Where(a => a.ModuleId == moduleId &&
-                            ((activityDto.StartDate < a.EndDate && activityDto.EndDate > a.StartDate)))
-                .FirstOrDefaultAsync();
-
-            if (overlappingActivity != null)
-            {
-                throw new ArgumentException("Activity times overlap with another activity.");
-            }
+            ValidateActivityDates(activityDto);
+            if (!ValidateActivityFitsModuleDate(activityDto, module)) throw new ArgumentException("The activity date must fit into the module timeline.");
+            if (!ValidateActivitiesDoNotOverlapOnCreate(activityDto, module)) throw new ArgumentException("The activity dates can't overlap.");
 
             var activity = _mapper.Map<Activity>(activityDto);
             activity.ModuleId = moduleId; // Ensure that the moduleId is set
@@ -87,28 +103,13 @@ namespace LMS.Services
             var module = await _uow.Modules.GetByIdAsync(activity.ModuleId);
             if (module == null) return false;
 
-            // Validate module timeframe
-            if (activityDto.StartDate < module.StartDate || activityDto.EndDate > module.EndDate)
-            {
-                throw new ArgumentException("Activity dates must be within the module timeframe.");
-            }
-
-            // Check for overlapping activities
-            var overlappingActivity = await _uow.Activities
-                .Query()
-                .Where(a => a.ModuleId == activity.ModuleId &&
-                            a.ActivityId != id && // Exclude the current activity
-                            ((activityDto.StartDate < a.EndDate && activityDto.EndDate > a.StartDate)))
-                .FirstOrDefaultAsync();
-
-            if (overlappingActivity != null)
-            {
-                throw new ArgumentException("Activity times overlap with another activity.");
-            }
+            // Validate activity timeframe
+            ValidateActivityDates(activityDto);
+            if (!ValidateActivityFitsModuleDate(activityDto, module)) throw new ArgumentException("The activity date must fit into the module timeline.");
+            if(!ValidateActivitiesDoNotOverlapOnUpdate(activityDto, module)) throw new ArgumentException("The activity dates can't overlap.");
 
             _mapper.Map(activityDto, activity);
 
-            await _uow.Activities.UpdateAsync(activity);
             await _uow.CompleteASync();
 
             return true;
@@ -117,41 +118,92 @@ namespace LMS.Services
 
         public async Task<bool> DeleteActivityAsync(int id)
         {
-            var activity = await _uow.Activities.GetByIdAsync(id);
+            var activity = await GetActivityIfExists(id);
             if (activity == null) return false;
 
             await _uow.Activities.DeleteAsync(activity);
             await _uow.CompleteASync();
+            return true;
+        }
+
+        private async Task<Activity> GetActivityIfExists(int id)
+        {
+            var activity = await _uow.Activities.GetByIdAsync(id);
+            if (activity == null)
+            {
+                throw new KeyNotFoundException($"Activity with ID {id} not found.");
+            }
+            return activity;
+        }
+
+
+        private void ValidateActivityDates(dynamic activityDto)
+        {
+            if (activityDto.EndDate < activityDto.StartDate)
+            {
+                throw new ArgumentException("The activity cannot end before the start date.");
+            }
+        }
+
+        private bool ValidateActivityFitsModuleDate(dynamic activityDto, Module module)
+        {
+            DateTime activityStartDate = activityDto.StartDate;
+            DateTime activityEndDate = activityDto.EndDate;
+            DateTime moduleStartDate = module.StartDate;
+            DateTime moduleEndDate = module.EndDate;
+
+            return activityStartDate.Date >= moduleStartDate.Date && activityEndDate.Date <= moduleEndDate.Date;
+        }
+
+        private bool ValidateActivitiesDoNotOverlapOnCreate(ActivityCreateDTO activityDto, Module module)
+        {
+            DateTime activityStartDate = activityDto.StartDate;
+            DateTime activityEndDate = activityDto.EndDate;
+            var existingActivities = module.Activities;
+
+            if (existingActivities == null || !existingActivities.Any()) return true;
+
+            var existingActivitiesList = existingActivities.ToList();
+
+            foreach (var existingActivity in existingActivitiesList)
+            {
+                if (activityStartDate.Date == existingActivity.StartDate.Date ||
+                    activityEndDate.Date == existingActivity.EndDate.Date ||
+                    activityStartDate.Date == existingActivity.EndDate.Date ||
+                    activityEndDate.Date == existingActivity.StartDate.Date) return false;
+                if (activityStartDate.Date > existingActivity.StartDate.Date && activityEndDate.Date < existingActivity.EndDate.Date) return false;
+                if (activityStartDate.Date < existingActivity.StartDate.Date && activityEndDate.Date > existingActivity.EndDate.Date) return false;
+                if (activityStartDate.Date < existingActivity.EndDate.Date && activityEndDate.Date > existingActivity.StartDate.Date) return false;
+            }
 
             return true;
         }
 
-
-        public async Task<ActivityDTO> PatchActivityAsync(int id, JsonPatchDocument<ActivityUpdateDTO> patchDocument)
+        private bool ValidateActivitiesDoNotOverlapOnUpdate(ActivityUpdateDTO activityDto, Module module)
         {
-            var activity = await _uow.Activities.GetByIdAsync(id);
-            if (activity == null) return null;
+            DateTime activityStartDate = activityDto.StartDate;
+            DateTime activityEndDate = activityDto.EndDate;
+            var existingActivities = module.Activities;
 
-            var activityToPatch = _mapper.Map<ActivityUpdateDTO>(activity);
-            patchDocument.ApplyTo(activityToPatch);
+            if (existingActivities == null || !existingActivities.Any()) return true;
 
-            _mapper.Map(activityToPatch, activity);
-            await _uow.Activities.UpdateAsync(activity);
-            await _uow.CompleteASync();
+            var existingActivitiesList = existingActivities.ToList();
 
-            return _mapper.Map<ActivityDTO>(activity);
+            foreach (var existingActivity in existingActivitiesList)
+            {
+                // Skip comparison on itself
+                if (activityDto.ActivityId == existingActivity.ActivityId) continue;
+                if (activityStartDate.Date == existingActivity.StartDate.Date ||
+                    activityEndDate.Date == existingActivity.EndDate.Date ||
+                    activityStartDate.Date == existingActivity.EndDate.Date ||
+                    activityEndDate.Date == existingActivity.StartDate.Date) return false;
+                if (activityStartDate.Date > existingActivity.StartDate.Date && activityEndDate.Date < existingActivity.EndDate.Date) return false;
+                if (activityStartDate.Date < existingActivity.StartDate.Date && activityEndDate.Date > existingActivity.EndDate.Date) return false;
+                if (activityStartDate.Date < existingActivity.EndDate.Date && activityEndDate.Date > existingActivity.StartDate.Date) return false;
+            }
+
+            return true;
         }
-
-        //private async Task<bool> IsOverlappingActivityAsync(int moduleId, int? activityId, DateTime startDate, DateTime endDate)
-        //{
-        //    return await _uow.Activities
-        //        .Query()
-        //        .Where(a => a.ModuleId == moduleId &&
-        //                    a.ActivityId != activityId && // Exclude the current activity (for updates)
-        //                    !(endDate < a.StartDate || startDate > a.EndDate)) // No overlap condition
-        //        .AnyAsync();
-        //}
-
 
     }
 }

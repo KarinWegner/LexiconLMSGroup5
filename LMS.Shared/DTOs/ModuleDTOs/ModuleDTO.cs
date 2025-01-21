@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Domain.Models.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,5 +15,8 @@ namespace LMS.Shared.DTOs.ModuleDTOs
         public DateTime StartDate { get; init; }
         public DateTime EndDate { get; init; }
         public int CourseId { get; init; }
+
+        public ICollection<Activity> Activities { get; init; }
+       = new List<Activity>();
     }
 }

@@ -12,6 +12,8 @@ using Services.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -28,107 +30,190 @@ namespace LMS.Services
             _mapper = mapper;
         }
 
-        public async Task<ApiBaseResponse> GetModulesAsync(int courseId, bool includeActivities)
+        public async Task<(IEnumerable<ModuleDTO> Modules, int TotalCount)> GetModulesAsync(
+                int courseId,
+                bool includeActivities = false,
+                bool includeDocuments = false,
+                int? pageNr = null,
+                int? pageSize = null,
+                string? sortBy = null,
+                bool isAscending = true,
+                string? filteringValue = null
+                )
         {
-            IQueryable<Module> query = _uow.Modules.Query();
+            Expression<Func<Domain.Models.Entities.Module, bool>> filter = m =>
+                m.CourseId == courseId &&
+                (string.IsNullOrEmpty(filteringValue) || m.Name.Contains(filteringValue));
+
+            var query = _uow.Modules.Query();
 
             if (includeActivities)
             {
                 query = query.Include(m => m.Activities);
             }
-            var modules = await query.Where(m => m.CourseId == courseId).ToListAsync();
-            var moduleDtos = _mapper.Map<IEnumerable<ModuleDTO>>(modules);
 
-            return new ApiOkResponse<IEnumerable<ModuleDTO>>(moduleDtos);
+            if (includeDocuments)
+            {
+                query = query.Include(m => m.Documents);
+            }
+
+            var (modules, totalCount) = await _uow.Modules.GetFilteredAndSortedEntitiesAsync(
+                filter: filter,
+                sortBy: sortBy,
+                isAscending: isAscending,
+                pageNr: pageNr,
+                pageSize: pageSize
+            );
+
+            var moduleDTOs = _mapper.Map<IEnumerable<ModuleDTO>>(modules);
+
+            return (moduleDTOs, totalCount);
         }
 
-        public async Task<ApiBaseResponse> GetModuleByIdAsync(int id, int courseId, bool includeActivities)
+        public async Task<ModuleDTO> GetModuleByIdAsync(int id, bool includeActivities = false, bool includeDocuments = false)
         {
-            IQueryable<Module> query = _uow.Modules.Query().Where(m => m.CourseId == courseId);
+            IQueryable<Domain.Models.Entities.Module> query = _uow.Modules.Query().Where(m => m.ModuleId == id);
 
-            if (includeActivities)
-            {
-                query = query.Include(m => m.Activities);
-            }
+            if (includeActivities) query = query.Include(m => m.Activities);
+            if (includeDocuments) query = query.Include(m => m.Documents);
 
             var module = await query.FirstOrDefaultAsync();
 
-            if (module == null)
-            {
-                return new ModuleNotFoundResponse(id);
-            }
+            if (module == null) return null;
 
             var moduleDto =  _mapper.Map<ModuleDTO>(module);
-            return new ApiOkResponse<ModuleDTO>(moduleDto);
+            return moduleDto;
         }
 
 
-        //public async Task<ModuleDTO> PatchModuleAsync(int id, int courseId, JsonPatchDocument<ModuleUpdateDTO> patchDocument)
-        //{
-        //    var moduleEntity = await _context.Modules.FirstOrDefaultAsync(m => m.ModuleId == id && m.CourseId == courseId);
-        //    if (moduleEntity == null) return null;
-
-        //    var moduleToPatch = _mapper.Map<ModuleUpdateDTO>(moduleEntity);
-        //    //patchDocument.ApplyTo(moduleToPatch);
-
-        //    //if (!TryValidateModel(moduleToPatch)) return null;
-
-        //    //_mapper.Map(moduleToPatch, moduleEntity);
-        //    //await _context.SaveChangesAsync();
-
-        //    return _mapper.Map<ModuleDTO>(moduleEntity);
-        //}
-
-        public async Task<ApiBaseResponse> UpdateModuleAsync(int id, ModuleUpdateDTO moduleDto)
+        public async Task<ModuleDTO> CreateModuleAsync(ModuleCreateDTO moduleDto, int courseId)
         {
+            var course = await _uow.Courses.GetByIdAsync(courseId, c => c.Modules); 
+            if (course == null) return null;
 
-            try
-            {
-            var existingModule = await _uow.Modules.GetByIdAsync(id);
-            if (existingModule == null) return new ModuleNotFoundResponse(id);
+            //Check dates - does it end before it starts, does it fit into the course timeline, does it overlap with other modules
+            ValidateModuleDates(moduleDto);
+            if (!ValidateModuleFitsCourseDate(moduleDto, course)) throw new ArgumentException("The module date must fit into the course timeline.");
+            if (!ValidateModulesDoNotOverlapOnCreate(moduleDto, course)) throw new ArgumentException("The module dates can't overlap.");
 
-            _mapper.Map(moduleDto, existingModule);
-
-            await _uow.Modules.UpdateAsync(existingModule);
-            await _uow.CompleteASync();
-
-            }
-            catch (ModuleNotFoundException)
-            {
-                return new ModuleNotFoundResponse(id);
-
-            }
-            catch (Exception ex) 
-            {
-                throw;
-            }
-
-            return new ApiNoContentResponse();
-            
-        }
-
-        public async Task<ApiBaseResponse> CreateModuleAsync(ModuleCreateDTO moduleDto, int courseId)
-        {
-            var course = await _uow.Courses.GetByIdAsync(courseId);
-            if (course == null) return new CourseNotFoundResponse(courseId);
-
-            var moduleToAdd = _mapper.Map<Module>(moduleDto);
+            var moduleToAdd = _mapper.Map<Domain.Models.Entities.Module>(moduleDto);
             moduleToAdd.CourseId = courseId;
             await _uow.Modules.AddAsync(moduleToAdd);
 
             await _uow.CompleteASync();
-            var moduleToReturn = _mapper.Map<ModuleDTO>(moduleToAdd);
-            return new ApiCreatedAtResponse<ModuleDTO>(moduleToReturn);
+
+            return _mapper.Map<ModuleDTO>(moduleToAdd);
         }
 
-        public async Task<ApiBaseResponse> DeleteModuleAsync(int id)
+        public async Task<bool> UpdateModuleAsync(int id, int courseId, ModuleUpdateDTO moduleDto)
         {
-            var module = await _uow.Modules.GetByIdAsync(id);
-            if (module == null) return new ModuleNotFoundResponse(id);
+            var existingModule = await GetModuleIfExists(id);
+            if (existingModule == null) return false;
+
+            var course = await _uow.Courses.GetByIdAsync(courseId);
+            if (course == null) return false;
+
+            //Validate dates
+            ValidateModuleDates(moduleDto);
+            if (!ValidateModuleFitsCourseDate(moduleDto, course)) throw new ArgumentException("The module date must fit into the course timeline.");
+            if (!ValidateModulesDoNotOverlapOnUpdate(moduleDto, course)) throw new ArgumentException("The module dates can't overlap.");
+
+            _mapper.Map(moduleDto, existingModule);
+
+            await _uow.CompleteASync();
+            return true;
+        }
+
+
+        public async Task<bool> DeleteModuleAsync(int id)
+        {
+            var module = await GetModuleIfExists(id);
 
             await _uow.Modules.DeleteAsync(module);
             await _uow.CompleteASync();
-            return new ApiNoContentResponse();
+            return true;
+        }
+
+
+        private async Task<Domain.Models.Entities.Module> GetModuleIfExists(int id)
+        {
+            var existingModule = await _uow.Modules.GetByIdAsync(id);
+            if (existingModule == null)
+            {
+                throw new KeyNotFoundException($"Module with ID {id} not found.");
+            }
+            return existingModule;
+        }
+
+
+        private void ValidateModuleDates(dynamic moduleDto)
+        {
+            if (moduleDto.EndDate < moduleDto.StartDate)
+            {
+                throw new ArgumentException("The module cannot end before the start date.");
+            }
+        }
+
+        private bool ValidateModuleFitsCourseDate(dynamic moduleDto, Course course)
+        {
+            DateTime moduleStartDate = moduleDto.StartDate;
+            DateTime moduleEndDate = moduleDto.EndDate;
+            DateTime courseStartDate = course.StartDate;
+            DateTime courseEndDate = course.EndDate;
+
+            return moduleStartDate.Date >= courseStartDate.Date && moduleEndDate.Date <= courseEndDate.Date;
+        }
+
+        private bool ValidateModulesDoNotOverlapOnCreate(ModuleCreateDTO moduleDto, Course course)
+        {
+            DateTime moduleStartDate = moduleDto.StartDate;
+            DateTime moduleEndDate = moduleDto.EndDate;
+            var existingModules = course.Modules;
+
+            if (existingModules == null || !existingModules.Any()) return true;
+
+            var existingModulesList = existingModules.ToList();
+
+            foreach (var existingModule in existingModulesList)
+            {
+                if (moduleStartDate.Date == existingModule.StartDate.Date ||
+                    moduleEndDate.Date == existingModule.EndDate.Date ||
+                    moduleStartDate.Date == existingModule.EndDate.Date ||
+                    moduleEndDate.Date == existingModule.StartDate.Date) return false;
+                if (moduleStartDate.Date > existingModule.StartDate.Date && moduleEndDate.Date < existingModule.EndDate.Date) return false;
+                if (moduleStartDate.Date < existingModule.StartDate.Date && moduleEndDate.Date > existingModule.EndDate.Date) return false;
+                if (moduleStartDate.Date < existingModule.EndDate.Date && moduleEndDate.Date > existingModule.StartDate.Date) return false;
+            }
+
+            return true;
+        }
+
+
+        private bool ValidateModulesDoNotOverlapOnUpdate(ModuleUpdateDTO moduleDto, Course course)
+        {
+            DateTime moduleStartDate = moduleDto.StartDate;
+            DateTime moduleEndDate = moduleDto.EndDate;
+            var existingModules = course.Modules;
+
+            if (existingModules == null || !existingModules.Any()) return true;
+
+            var existingModulesList = existingModules.ToList();
+
+            foreach (var existingModule in existingModulesList)
+            {
+                // Skip comparison on itself
+                if (moduleDto.ModuleId == existingModule.ModuleId) continue;
+
+                if (moduleStartDate.Date == existingModule.StartDate.Date ||
+                     moduleEndDate.Date == existingModule.EndDate.Date ||
+                     moduleStartDate.Date == existingModule.EndDate.Date ||
+                     moduleEndDate.Date == existingModule.StartDate.Date) return false;
+                if (moduleStartDate.Date > existingModule.StartDate.Date && moduleEndDate.Date < existingModule.EndDate.Date) return false;
+                if (moduleStartDate.Date < existingModule.StartDate.Date && moduleEndDate.Date > existingModule.EndDate.Date) return false;
+                if (moduleStartDate.Date < existingModule.EndDate.Date && moduleEndDate.Date > existingModule.StartDate.Date) return false;
+            }
+
+            return true;
         }
 
     }
