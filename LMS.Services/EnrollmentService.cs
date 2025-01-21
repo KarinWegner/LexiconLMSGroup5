@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Domain.Contracts;
 using Domain.Models.Entities;
+using LMS.Shared.DTOs.ApplicationUserDTOs;
 using LMS.Shared.DTOs.EnrollmentDTOs;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -167,6 +168,15 @@ namespace LMS.Services
 
 
             return enrollmentListDTO;
+        }
+
+        public async Task<IEnumerable<ApplicationUserListDTO>> GetUsers(string? roleFilter)
+        {
+           var userList = await _uow.Enrollments.GetAllUsersAsync(roleFilter);
+
+            var userListDto = _mapper.Map<IEnumerable<ApplicationUserListDTO>>(userList);
+
+            return userListDto;
         }
 
         public async Task RemoveEnrollment(int courseId, string userId)

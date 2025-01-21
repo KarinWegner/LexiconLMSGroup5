@@ -12,6 +12,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Services.Contracts;
 using LMS.Shared.DTOs.EnrollmentDTOs;
+using LMS.Shared.DTOs.ApplicationUserDTOs;
 
 namespace LMS.Presemtation.Controllers
 {
@@ -146,6 +147,14 @@ namespace LMS.Presemtation.Controllers
          
 
             return Ok(enrollmentList.ToList());
+        }
+
+        [HttpGet("user/")]
+        public async Task<ActionResult<IEnumerable<ApplicationUserDTO>>> GetUsers(string? roleFilter)
+        {
+            var userList = _serviceManager.EnrollmentService.GetUsers(roleFilter);
+
+            return Ok(userList);
         }
     }
 }

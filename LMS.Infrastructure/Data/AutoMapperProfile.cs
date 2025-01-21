@@ -6,7 +6,9 @@ using LMS.Shared.DTOs.ModuleDTOs;
 using LMS.Shared.DTOs.ActivityDTOs;
 using LMS.Shared.DTOs.ActivityTypeDTOs;
 using LMS.Shared.DTOs.EnrollmentDTOs;
+using LMS.Shared.DTOs.ApplicationUserDTOs;
 using LMS.Shared.DTOs.DocumentDTOs;
+
 namespace LMS.Infrastructure.Data;
 
 public class AutoMapperProfile : Profile
@@ -50,6 +52,7 @@ public class AutoMapperProfile : Profile
 
 
         CreateMap<ApplicationUserDTO, ApplicationUser>().ReverseMap();
+        CreateMap<ApplicationUser, ApplicationUserListDTO>();
 
         CreateMap<ApplicationUser , EnrolledUserDTO > ();
         

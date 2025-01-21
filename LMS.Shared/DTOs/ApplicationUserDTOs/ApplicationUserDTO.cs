@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LMS.Shared.DTOs
+namespace LMS.Shared.DTOs.ApplicationUserDTOs
 {
     public record ApplicationUserDTO
     {

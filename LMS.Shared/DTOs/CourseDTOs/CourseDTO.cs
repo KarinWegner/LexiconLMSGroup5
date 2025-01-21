@@ -1,4 +1,5 @@
 ﻿using Domain.Models.Entities;
+using LMS.Shared.DTOs.ApplicationUserDTOs;
 using LMS.Shared.DTOs.DocumentDTOs;
 using LMS.Shared.DTOs.ModuleDTOs;
 using System;
