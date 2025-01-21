@@ -33,4 +33,7 @@ namespace LMS.Blazor.Components.Layout
             NavigationManager.LocationChanged -= OnLocationChanged;
         }
     }
+        private string CourseOverviewRoute => VBRoutes.Student.LinkToOverview;
+		private string AdministrationAccountRoute => VBRoutes.Student.LinkToAdministrationAccount;
+	}
 }
