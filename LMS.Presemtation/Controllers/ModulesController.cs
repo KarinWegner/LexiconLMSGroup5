@@ -25,11 +25,12 @@ namespace LMS.Presemtation.Controllers
             _mapper = mapper;
         }
 
-        // GET: api/Modules
-        [HttpGet]
+        // GET: api/Modules/course/{courseId}
+        [HttpGet("course/{courseId}")]
         public async Task<ActionResult> GetModules(
             int courseId, 
             bool includeActivities = false,
+            bool includeDocuments = false,
             int pageNr = 1,
             int pageSize = 10,
             string? sortBy = null,
@@ -40,6 +41,7 @@ namespace LMS.Presemtation.Controllers
             var response = await _serviceManager.ModuleService.GetModulesAsync(
                 courseId: courseId,
                 includeActivities: includeActivities,
+                includeDocuments: includeDocuments,
                 pageNr: pageNr,
                 pageSize: pageSize,
                 sortBy: sortBy,

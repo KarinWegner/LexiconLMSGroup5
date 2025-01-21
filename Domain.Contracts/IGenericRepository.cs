@@ -20,7 +20,8 @@ namespace Domain.Contracts
             string? sortBy,
             bool isAscending,
             int? pageNr,
-            int? pageSize);
+            int? pageSize,
+            params Expression<Func<T, object>>[] includes);
 
         Task AddAsync(T entity);
         Task DeleteAsync(T entity);
