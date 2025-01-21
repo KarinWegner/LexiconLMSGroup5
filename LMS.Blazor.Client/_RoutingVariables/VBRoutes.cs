@@ -20,7 +20,7 @@
             public static string LinkToModule(int CourseId, int ModuleId) => $"{LinkToCourse(CourseId)}/{RoutingVariables.Modules}/{ModuleId}";
             public static string LinkToActivity(int CourseId, int ModuleId, int ActivityId) => $"{LinkToModule(CourseId, ModuleId)}/{ActivityId}";
             public static string LinkToCourseParticipant(int CourseId, string id) => $"{DLinkToCourseParticipants(CourseId)}/{id}";
-
+            public const string LinkToAdministrationAccount = $"/{RoutingVariables.AdminAccount}";
         }
 
         public record Administration
