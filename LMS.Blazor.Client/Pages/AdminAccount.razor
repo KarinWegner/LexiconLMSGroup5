@@ -17,18 +17,18 @@
 		<h2 class="text-center p-3">Manage Users</h2>
 		<nav>
 			<div class="nav nav-tabs mb-3" id="nav-tab" role="tablist">
-			<button @onclick="ShowStudentsTab"  class="nav-link @(isStudentsTabActive ? "active" : "")" id="students-tab" data-bs-toggle="tab" data-bs-target="#nav-student" type="button" role="tab" aria-controls="nav-student" aria-selected="true">Students</button>
-			<button @onclick="ShowTeachersTab" class="nav-link @(isTeachersTabActive ? "active" : "")" id="teachers-tab" data-bs-toggle="tab" data-bs-target="#nav-teacher" type="button" role="tab" aria-controls="nav-teacher" aria-selected="false">Teachers</button>
+			<button  @onclick="@(e => SwitchTab("Students"))"   class="nav-link  @(activeTab == "Students" ? "active" : "")" id="students-tab" data-bs-toggle="tab" data-bs-target="#nav-student" type="button" role="tab" aria-controls="nav-student" aria-selected="true">Students</button>
+			<button @onclick="@(e => SwitchTab("Teachers"))" class="nav-link @(activeTab == "Teachers" ? "active" : "")" id="teachers-tab" data-bs-toggle="tab" data-bs-target="#nav-teacher" type="button" role="tab" aria-controls="nav-teacher" aria-selected="false">Teachers</button>
 				
 			</div>
 		</nav
 
 	<Search SearchString="@searchTerm" OnSearch="HandleSearch" />
 		<div class="tab-content p-3 border bg-light">
-        <div class="tab-pane @(isStudentsTabActive ? "active" : "")">
+        <div class="tab-pane @(activeTab == "Students" ? "active" : "")">
             <UserTable Items="searchResults" />
         </div>
-        <div class="tab-pane @(isTeachersTabActive ? "active" : "")">
+        <div class="tab-pane @(activeTab == "Teachers" ? "active" : "")">
             <p>This is the content for the Teachers tab.</p>
         </div>
     </div>
@@ -37,19 +37,12 @@
 
 @code {
 	private string searchTerm = string.Empty;
-	private bool isStudentsTabActive = true;
-    private bool isTeachersTabActive = false;
 
-    private void ShowStudentsTab()
-    {
-        isStudentsTabActive = true;
-        isTeachersTabActive = false;
-    }
+	private string activeTab = "Students";
 
-    private void ShowTeachersTab()
+    private void SwitchTab(string tabName)
     {
-        isStudentsTabActive = false;
-        isTeachersTabActive = true;
+        activeTab = tabName;
     }
 
 	private List<UserDto> data = new List<UserDto>
