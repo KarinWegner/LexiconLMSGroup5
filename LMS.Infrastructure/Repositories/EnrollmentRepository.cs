@@ -62,17 +62,10 @@ namespace LMS.Infrastructure.Repositories
             return enrollments;
         }
 
-        public async Task<IEnumerable<ApplicationUser>> GetAllUsersAsync(bool onlyTeachers, bool onlyStudents)
+        public async Task<IEnumerable<ApplicationUser>> GetAllUsersAsync(string? roleFilter)
         {
-            IEnumerable<ApplicationUser> users;
-
-            if (onlyTeachers)
-                users = _context.Users.Where(u => u.Role == "Teacher");
-            else if (onlyStudents)
-                users =  _context.Users.Where(u => u.Role == "Student");
-            else
-                users = _context.Users;
-
+            IEnumerable<ApplicationUser> users = UserQuery().Where(u => u.Role == roleFilter);
+                     
             return users;
         }
 

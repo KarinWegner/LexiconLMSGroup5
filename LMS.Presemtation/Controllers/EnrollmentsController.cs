@@ -12,7 +12,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Services.Contracts;
 using LMS.Shared.DTOs.EnrollmentDTOs;
-using LMS.Shared.DTOs;
+using LMS.Shared.DTOs.ApplicationUserDTOs;
 
 namespace LMS.Presemtation.Controllers
 {
@@ -150,10 +150,9 @@ namespace LMS.Presemtation.Controllers
         }
 
         [HttpGet("user/")]
-        public async Task<ActionResult<IEnumerable<ApplicationUserDTO>>> GetUsers(bool onlyTeachers, bool onlyStudents)
+        public async Task<ActionResult<IEnumerable<ApplicationUserDTO>>> GetUsers(string? roleFilter)
         {
-            if (onlyTeachers && onlyStudents) onlyStudents = onlyTeachers = false;
-            var userList = _serviceManager.EnrollmentService.GetUsers(onlyTeachers, onlyStudents);
+            var userList = _serviceManager.EnrollmentService.GetUsers(roleFilter);
 
             return Ok(userList);
         }

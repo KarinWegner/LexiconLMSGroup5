@@ -1,5 +1,5 @@
 ﻿using Domain.Models.Entities;
-using LMS.Shared.DTOs;
+using LMS.Shared.DTOs.ApplicationUserDTOs;
 using LMS.Shared.DTOs.EnrollmentDTOs;
 using System;
 using System.Collections.Generic;
@@ -18,6 +18,6 @@ namespace Services.Contracts
         Task AddEnrollment(int courseId, EnrollmentCreateDTO createDto);
         Task RemoveEnrollment(int courseId, string userId);
         Task<IEnumerable<EnrollmentUserCourseListDTO>> GetUserEnrollments(string userId);
-        Task<IEnumerable<ApplicationUserDTO>> GetUsers(bool onlyTeachers, bool onlyStudents);
+        Task<IEnumerable<ApplicationUserListDTO>> GetUsers(string? roleFilter);
     }
 }
