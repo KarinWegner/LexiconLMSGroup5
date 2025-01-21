@@ -53,5 +53,6 @@
                 public static string ActivityAtId(int id) => $"{RoutingVariables.APIActivity}/{id}";
             }
         }
+        public const string AccessDenied = RoutingVariables.AccessDenied;
     }
 }
