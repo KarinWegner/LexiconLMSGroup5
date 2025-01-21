@@ -44,8 +44,8 @@ namespace LMS.Presemtation.Controllers
             string? filteringValue = null
             )
         {
-            var (activities, totalCount) = await _serviceManager.ActivityService.GetActivitiesAsync(
-                moduleId: moduleId,
+
+               var response = await _serviceManager.ActivityService.GetActivitiesAsync(moduleId: moduleId,
                 includeDocuments: includeDocuments,
                 pageNr: pageNr,
                 pageSize: pageSize,
@@ -53,6 +53,9 @@ namespace LMS.Presemtation.Controllers
                 isAscending: isAscending,
                 filteringValue: filteringValue
                 );
+
+            var (activities, totalCount) = response.GetOkResult<(IEnumerable<ActivityDTO>, int)>();
+                
 
             var metadata = new
             {
@@ -64,7 +67,8 @@ namespace LMS.Presemtation.Controllers
 
             Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(metadata));
 
-            return Ok(activities);
+            return response.Success ? Ok(response.GetOkResult<IEnumerable<ActivityDTO>>()) :
+                ProcessError(response);
         }
 
 
@@ -72,9 +76,10 @@ namespace LMS.Presemtation.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult> GetActivity(int id, bool includeDocuments = false)
         {
-            var activity = await _serviceManager.ActivityService.GetActivityByIdAsync(id, includeDocuments);
-            if (activity == null) return NotFound("Activity not found");
-            return Ok(activity);
+            var response = await _serviceManager.ActivityService.GetActivityByIdAsync(id, includeDocuments);
+
+            return response.Success ? Ok(response.GetOkResult<ActivityDTO>()):
+            ProcessError(response);
         }
 
         // PUT: api/Activities/5
@@ -83,8 +88,9 @@ namespace LMS.Presemtation.Controllers
         {
             if (id != activityDto.ActivityId) return BadRequest("Mismatched activity ID.");
 
-            var updated = await _serviceManager.ActivityService.UpdateActivityAsync(id, activityDto);
-            return updated ? NoContent() : NotFound($"Activity with ID {id} was not found.");
+
+            var response = await _serviceManager.ActivityService.UpdateActivityAsync(id, activityDto);
+            return response.Success ? NoContent() : ProcessError(response);
         }
 
         // POST: api/Activities

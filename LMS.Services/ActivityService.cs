@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Domain.Contracts;
 using Domain.Models.Entities;
+using Domain.Models.Responses;
 using LMS.Shared.DTOs.ActivityDTOs;
 using LMS.Shared.DTOs.ModuleDTOs;
 using Microsoft.AspNetCore.JsonPatch;
@@ -26,7 +27,7 @@ namespace LMS.Services
             _mapper = mapper;
         }
 
-        public async Task<(IEnumerable<ActivityDTO> Activities, int TotalCount)> GetActivitiesAsync(
+        public async Task<ApiBaseResponse> GetActivitiesAsync(
                 int moduleId,
                 bool includeDocuments = false,
                 int? pageNr = null,
@@ -55,12 +56,12 @@ namespace LMS.Services
 
             var activityDTOs = _mapper.Map<IEnumerable<ActivityDTO>>(activities);
 
-            return (activityDTOs, totalCount);
+            return new ApiOkResponse<(IEnumerable<ActivityDTO>, int)>((activityDTOs, totalCount));
         }
 
 
         
-        public async Task<ActivityDTO> GetActivityByIdAsync(int id, bool includeDocuments = false)
+        public async Task<ApiBaseResponse> GetActivityByIdAsync(int id, bool includeDocuments = false)
         {
             IQueryable<Activity> query = _uow.Activities.Query().Where(m => m.ActivityId == id);
 
@@ -70,7 +71,8 @@ namespace LMS.Services
 
             if (activity == null) return null;
 
-            return _mapper.Map<ActivityDTO>(activity);
+            var activityDto =_mapper.Map<ActivityDTO>(activity);
+            return new ApiOkResponse<ActivityDTO>(activityDto);
         }
 
         public async Task<ActivityDTO> CreateActivityAsync(ActivityCreateDTO activityDto, int moduleId)
@@ -93,13 +95,13 @@ namespace LMS.Services
         }
 
 
-        public async Task<bool> UpdateActivityAsync(int id, ActivityUpdateDTO activityDto)
+        public async Task<ApiBaseResponse> UpdateActivityAsync(int id, ActivityUpdateDTO activityDto)
         {
             var activity = await _uow.Activities.GetByIdAsync(id);
-            if (activity == null) return false;
+            if (activity == null) return new ActivityNotFoundResponse(id);
 
             var module = await _uow.Modules.GetByIdAsync(activity.ModuleId);
-            if (module == null) return false;
+            if (module == null) return new ModuleNotFoundResponse(activity.ModuleId);
 
             // Validate activity timeframe
             ValidateActivityDates(activityDto);
@@ -110,7 +112,7 @@ namespace LMS.Services
 
             await _uow.CompleteASync();
 
-            return true;
+            return new ApiNoContentResponse();
         }
 
 
