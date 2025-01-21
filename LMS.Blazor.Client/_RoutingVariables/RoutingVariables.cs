@@ -9,8 +9,10 @@
         //Adminstration route
         public const string AdministrationDashboard = "AdministrationDashboard", CourseDashboard = "CourseDashboard", StudentDashboard = "StudentDashboard";
         //API Endpoints
-        public const string APIModules = "api/modules", APICourses = "api/Courses";
-        //APIQueries
+        public const string APIModules = "api/modules", APICourses = "api/Courses", APIActivity = "api/activities";
+        //API Course Queries
         public const string APICoursesIncludeModules = "includeModules=true", APICoursesIncludeEnrollments = "includeEnrollments=true";
+        //API Module Queries
+        public const string APIModulesIncludeActivities = "includeActivities=true";
     }
 }

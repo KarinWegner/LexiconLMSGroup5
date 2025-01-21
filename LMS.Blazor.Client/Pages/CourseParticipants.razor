@@ -1,7 +1,10 @@
 ﻿@attribute [Route(VBRoutes.Student.LinkToCourseParticipants)]
+@rendermode InteractiveWebAssembly
 
 <h3>Course Participants</h3>
 
 <CourseNavbar ActiveNav="ECourseNav.CourseParticipants"></CourseNavbar>
-
-<CourseParticipantList ListEntries="@Participants"></CourseParticipantList>
+@if (Participants != null && Participants.Count() != 0)
+{
+    <CourseParticipantList ListEntries="@Participants"></CourseParticipantList>
+}

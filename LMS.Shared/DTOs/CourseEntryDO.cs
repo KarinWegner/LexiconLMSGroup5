@@ -1,5 +1,6 @@
 ﻿using LMS.Shared.DTOs.CourseDTOs;
 using LMS.Shared.DTOs.ModuleDTOs;
+using LMS.Shared.DTOs.ActivityDTOs;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -84,6 +85,26 @@ namespace LMS.Shared.DTOs
             StartTime = from.StartDate;
             EndTime = from.EndDate;
         }
+        public CourseEntryDO(ActivityDTO from)
+        {
+            Id = from.ActivityId;
+            ParentId = from.ModuleId;
+            Name = from.Name!;
+            Description = from.Description!;
+            StartTime = from.StartDate;
+            EndTime = from.EndDate;
+            //ActivityType = from.ActivityTypeId.ToString();
+        }
 
+        public CourseEntryDO(Domain.Models.Entities.Activity from)
+        {
+            Id = from.ActivityId;
+            ParentId = from.ModuleId;
+            Name = from.Name!;
+            Description = from.Description!;
+            StartTime = from.StartDate;
+            EndTime = from.EndDate;
+            //ActivityType = from.ActivityType.Name;
+        }
     }
 }

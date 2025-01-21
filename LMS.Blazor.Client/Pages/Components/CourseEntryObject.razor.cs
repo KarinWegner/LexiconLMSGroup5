@@ -12,8 +12,8 @@ namespace LMS.Blazor.Client.Pages.Components
         [Parameter]
         public CourseEntryDO Model { get; set; } = null!;
         public string ThisNavLink => CourseEntryType == ECourseEntryType.Module ?
-            $"{VBRoutes.Student.LinkToModules}/{Model.Id}" : 
-            $"{VBRoutes.Student.LinkToModules}/{Model.ParentId}/{Model.Id}";
+            VBRoutes.Student.LinkToModule(Model.Id) :
+            VBRoutes.Student.LinkToActivity(Model.ParentId, Model.Id);
 
 
     }

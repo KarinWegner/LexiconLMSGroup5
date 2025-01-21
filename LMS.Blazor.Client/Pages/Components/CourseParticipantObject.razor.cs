@@ -8,7 +8,7 @@ namespace LMS.Blazor.Client.Pages.Components
     {
         [Parameter]
         public CourseParticipantDO Model { get; set; } = null!;
-        public string ThisNavLink => $"{VBRoutes.Student.LinkToCourseParticipants}/{Model.Id}";
+        public string ThisNavLink => VBRoutes.Student.LinkToCourseParticipant(Model.Id!);
 
 
     }

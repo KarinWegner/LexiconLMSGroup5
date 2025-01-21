@@ -23,6 +23,12 @@ namespace LMS.Shared.DTOs
             Name = name;
             Email = email;
         }
-
+        public ApplicationUserDTO(ApplicationUserDTO user)
+        {
+            Id = user.Id;
+            UserName = user.UserName;
+            Name = user.Name;
+            Email = user.Email;
+        }
     }
 }

@@ -13,6 +13,10 @@
             public const string LinkToSpecificModule = $"/{RoutingVariables.CourseOverview}/{RoutingVariables.Modules}/{RoutingVariables.WithIntId}";
             public const string LinkToActivityDetails = $"/{RoutingVariables.CourseOverview}/{RoutingVariables.Modules}/{RoutingVariables.WithIntIdAndIntParentId}";
             public const string LinkToCourseParticipantDetails = $"/{RoutingVariables.CourseOverview}/{RoutingVariables.CourseParticipants}/{RoutingVariables.WithStringId}";
+            public static string LinkToModule(int id) => $"{LinkToModules}/{id}";
+            public static string LinkToActivity(int parentId, int id) => $"{LinkToModule(parentId)}/{id}";
+            public static string LinkToCourseParticipant(string id) => $"{LinkToCourseParticipants}/{id}";
+
         }
 
         public record Administration
@@ -27,12 +31,22 @@
             public record Module
             {
                 public const string Modules = RoutingVariables.APIModules;
+                public static string ModuleAtIdWithActivities(int id) => $"{RoutingVariables.APIModules}/{id}?{RoutingVariables.APIModulesIncludeActivities}";
+
             }
             public record Course
             {
                 public const string Courses = RoutingVariables.APICourses;
                 public const string CoursesWithModulesAndEnrollments = $"{RoutingVariables.APICourses}?{RoutingVariables.APICoursesIncludeModules}&{RoutingVariables.APICoursesIncludeEnrollments}";
+                public static string CourseAtIdWithModules (int id) => $"{RoutingVariables.APICourses}/{id}?{RoutingVariables.APICoursesIncludeModules}";
+                public static string CourseAtIdWithEnrollments(int id) => $"{RoutingVariables.APICourses}/{id}?{RoutingVariables.APICoursesIncludeEnrollments}";
 
+                public static string CourseAtId(int id) => $"{RoutingVariables.APICourses}/{id}";
+            }
+            public record Activity
+            {
+                public const string Activities = RoutingVariables.APIActivity;
+                public static string ActivityAtId(int id) => $"{RoutingVariables.APIActivity}/{id}";
             }
         }
     }

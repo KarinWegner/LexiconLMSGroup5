@@ -1,5 +1,8 @@
-﻿using LMS.Blazor.Client.Services;
+﻿using LMS.Blazor.Client._RoutingVariables;
+using LMS.Blazor.Client.Services;
 using LMS.Shared.DTOs;
+using LMS.Shared.DTOs.CourseDTOs;
+using Microsoft.AspNetCore.Components;
 
 namespace LMS.Blazor.Client.Pages
 {
@@ -7,12 +10,20 @@ namespace LMS.Blazor.Client.Pages
     {
         public IEnumerable<CourseParticipantDO> Participants { get; set; }
 
-        protected async override Task OnInitializedAsync()
+        [Inject]
+        private IApiService apiService { get; set; }
+
+
+        protected async override Task OnAfterRenderAsync(bool firstRender)
         {
-
-            Participants = FakeDataService.GetCourseParticipants();
-
-            await base.OnInitializedAsync();
+            if (firstRender)
+            {
+                //TODO: PICK THE ACTUAL COURSE
+                var res = await apiService.GetAsync<CourseDTO>(VBRoutes.API.Course.CourseAtIdWithEnrollments(1));
+                Participants = res.Enrollments.Select(x => new CourseParticipantDO(x));
+                StateHasChanged();
+            }
+            await base.OnAfterRenderAsync(firstRender);
         }
 
     }

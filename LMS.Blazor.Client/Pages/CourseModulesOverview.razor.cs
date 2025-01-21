@@ -2,10 +2,12 @@
 using LMS.Blazor.Client.Models;
 using LMS.Blazor.Client.Models.Enums;
 using LMS.Blazor.Client.Services;
-using LMS.Shared.DTOs;
+using LMS.Shared.DTOs.CourseDTOs;
 using LMS.Shared.DTOs.ModuleDTOs;
+using LMS.Shared.DTOs;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using System.Linq;
 
 namespace LMS.Blazor.Client.Pages
 {
@@ -18,19 +20,16 @@ namespace LMS.Blazor.Client.Pages
         [Inject]
         private AuthenticationStateProvider AuthenticationStateProvider { get; set; } = default!;
 
-        //protected async override Task OnInitializedAsync()
-        //{
-        //    //Entries = new CourseEntryModel(ECourseEntryType.Module, FakeDataService.GetModules()); 
-        //    var res = (await apiService.GetAsync<IEnumerable<ModuleDTO>>(VBRoutes.API.Module.Modules))?.ToList() ?? [];
-        //    Entries = new CourseEntryModel(ECourseEntryType.Module, res.Select(x => new CourseEntryDO(x)).ToList());
-        //    await base.OnInitializedAsync();
-        //}
-
-        public async Task getload()
+        protected async override Task OnAfterRenderAsync(bool firstRender)
         {
-            var res = await apiService.GetAsync<IEnumerable<ModuleDTO>>(VBRoutes.API.Module.Modules);
-            Entries = new CourseEntryModel(ECourseEntryType.Module, res.Select(x => new CourseEntryDO(x)).ToList());
-            StateHasChanged();
+            if(firstRender)
+            {
+                //TODO: PICK THE ACTUAL COURSE
+                var res = await apiService.GetAsync<CourseDTO>(VBRoutes.API.Course.CourseAtIdWithModules(1));
+                Entries = new CourseEntryModel(ECourseEntryType.Module, res.Modules.Select(x=> new CourseEntryDO(x)));
+                StateHasChanged();
+            }
+            await base.OnAfterRenderAsync(firstRender);
         }
     }
 }
