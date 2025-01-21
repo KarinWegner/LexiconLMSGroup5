@@ -25,8 +25,8 @@ namespace LMS.Presemtation.Controllers
             _mapper = mapper;
         }
 
-        // GET: api/Modules
-        [HttpGet]
+        // GET: api/Modules/{courseId}
+        [HttpGet("course/{courseId}")]
         public async Task<ActionResult> GetModules(
             int courseId, 
             bool includeActivities = false,
