@@ -12,7 +12,7 @@ namespace Services.Contracts
 {
     public interface IModuleService
     {
-        Task<(IEnumerable<ModuleDTO> Modules, int TotalCount)> GetModulesAsync(int courseId,
+        Task<ApiBaseResponse> GetModulesAsync(int courseId,
                 bool includeActivities = false,
                 bool includeDocuments = false,
                 int? pageNr = null,
@@ -20,10 +20,10 @@ namespace Services.Contracts
                 string? sortBy = null,
                 bool isAscending = true,
                 string? filteringValue = null);
-        Task<ModuleDTO> GetModuleByIdAsync(int id, bool includeActivities = false, bool includeDocuments = false);
-        Task<bool> UpdateModuleAsync(int id, int courseId, ModuleUpdateDTO moduleDto);
-        Task<ModuleDTO> CreateModuleAsync(ModuleCreateDTO moduleDto, int courseId);
-        Task<bool> DeleteModuleAsync(int id);
+        Task<ApiBaseResponse> GetModuleByIdAsync(int id, bool includeActivities = false, bool includeDocuments = false);
+        Task<ApiBaseResponse> UpdateModuleAsync(int id, int courseId, ModuleUpdateDTO moduleDto);
+        Task<ApiBaseResponse> CreateModuleAsync(ModuleCreateDTO moduleDto, int courseId);
+        Task<ApiBaseResponse> DeleteModuleAsync(int id);
 
     }
 
