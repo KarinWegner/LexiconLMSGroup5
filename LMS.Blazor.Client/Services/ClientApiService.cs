@@ -1,6 +1,9 @@
-﻿using LMS.Shared.DTOs;
+﻿using LMS.Blazor.Client.Models;
+using LMS.Shared.DTOs;
 using Microsoft.AspNetCore.Components;
+using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using System.Text.Json;
 
 namespace LMS.Blazor.Client.Services;
@@ -37,8 +40,9 @@ public class ClientApiService(IHttpClientFactory httpClientFactory, NavigationMa
     {
         var request = new HttpRequestMessage(httpMethod, $"proxy-endpoint/{endpoint}");
         request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
         if (httpMethod != HttpMethod.Get && dto is not null)
-        { 
+        {
             var serialized = JsonSerializer.Serialize(dto);
             request.Content = new StringContent(serialized);
             request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
@@ -67,11 +71,11 @@ public class ClientApiService(IHttpClientFactory httpClientFactory, NavigationMa
         var serialized = JsonSerializer.Serialize(dto);
         request.Content = new StringContent(serialized);
         request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-        
+
 
         var response = await httpClient.SendAsync(request);
 
-        
+
 
         response.EnsureSuccessStatusCode();
 
