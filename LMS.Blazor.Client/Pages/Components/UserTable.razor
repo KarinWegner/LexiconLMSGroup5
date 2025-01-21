@@ -1,0 +1,42 @@
+﻿@using LMS.Shared.DTOs
+@if (Items != null && Items.Any())
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Profile</th>
+                <th>Username</th>
+                <th>Id</th>
+                <th>Course</th>
+                <th>Enrolled</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Items)
+            {
+                <tr>
+                    <td>
+                        <img src="@user.ProfilePictureLink"
+                             class="profilePicture rounded-circle"
+                             alt="@($"{user.Username} profile picture")"
+                             style="width: 50px; height: 50px;">
+                    </td>
+                    <td>@user.Username</td>
+                    <td>@user.UserId</td>
+                    <td>@user.Course</td>
+                    <td>@user.Enrolled.ToShortDateString()</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No results found.</p>
+}
+
+@code {
+    [Parameter]
+    public IEnumerable<UserDto> Items { get; set; } = Enumerable.Empty<UserDto>();
+}
+

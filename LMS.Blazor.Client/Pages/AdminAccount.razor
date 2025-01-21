@@ -1,4 +1,5 @@
-﻿@attribute [Route(VBRoutes.Student.LinkToAdministrationAccount)]
+﻿@using LMS.Shared.DTOs
+@attribute [Route(VBRoutes.Student.LinkToAdministrationAccount)]
 @rendermode InteractiveWebAssembly
 
 <PageTitle>Account Administration</PageTitle>
@@ -26,43 +27,7 @@
 		
 
 			<div class="tab-pane fade active show" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
-			@if (searchResults.Any())
-				@if (searchResults.Any())
-				{
-					<table class="table table-striped">
-						<thead>
-							<tr>
-								<th>Profile</th>
-								<th>Username</th>
-								<th>Id</th>
-								<th>Course</th>
-								<th>Enrolled</th>
-							</tr>
-						</thead>
-						<tbody>
-							@foreach (var user in searchResults)
-							{
-								<tr>
-									<td>
-										<img src="@user.ProfilePictureLink"
-											 class="profilePicture rounded-circle"
-											 alt="@($"{user.Username} profile picture")"
-											 style="width: 50px; height: 50px;">
-									</td>
-									<td>@user.Username</td>
-									<td>@user.UserId</td>
-									<td>@user.Course</td>
-									<td>@user.Enrolled.ToShortDateString()</td>
-								</tr>
-							}
-						</tbody>
-					</table>
-				}
-			else
-			{
-				<p>No results found.</p>
-			}
-
+			<UserTable Items="searchResults" />
 			</div>
 			<div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
 				<p><strong>This is some placeholder content the TEACHERS tab's associated content.</strong>
@@ -78,18 +43,18 @@
 @code {
 	private string searchTerm = string.Empty;
 
-	private List<User> data = new List<User>
+	private List<UserDto> data = new List<UserDto>
 	{
-		new User { Username = "Alice", UserId = 1, Course = "Math", Enrolled = new DateTime(2023, 9, 15) },
-		new User { Username = "Bob", UserId = 2, Course = "Science", Enrolled = new DateTime(2023, 9, 15) },
-		new User { Username = "Charlie", UserId = 3, Course = "History", Enrolled = new DateTime(2023, 9, 15) },
-		new User { Username = "Diana", UserId = 4, Course = "Art", Enrolled = new DateTime(2023, 9, 15) },
-		new User { Username = "Eve", UserId = 5, Course = "Music", Enrolled = new DateTime(2023, 9, 15) },
-		new User { Username = "Frank", UserId = 6, Course = "Physics", Enrolled = new DateTime(2023, 9, 15) },
-		new User { Username = "Grace", UserId = 7, Course = "Chemistry", Enrolled = new DateTime(2023, 9, 15) }
+		new UserDto { Username = "Alice", UserId = 1, Course = "Math", Enrolled = new DateTime(2023, 9, 15) },
+		new UserDto { Username = "Bob", UserId = 2, Course = "Science", Enrolled = new DateTime(2023, 9, 15) },
+		new UserDto { Username = "Charlie", UserId = 3, Course = "History", Enrolled = new DateTime(2023, 9, 15) },
+		new UserDto { Username = "Diana", UserId = 4, Course = "Art", Enrolled = new DateTime(2023, 9, 15) },
+		new UserDto { Username = "Eve", UserId = 5, Course = "Music", Enrolled = new DateTime(2023, 9, 15) },
+		new UserDto { Username = "Frank", UserId = 6, Course = "Physics", Enrolled = new DateTime(2023, 9, 15) },
+		new UserDto { Username = "Grace", UserId = 7, Course = "Chemistry", Enrolled = new DateTime(2023, 9, 15) }
 	};
 
-	private List<User> searchResults = new();
+	private List<UserDto> searchResults = new();
 
 	private void HandleSearch(string searchString)
 	{
@@ -117,13 +82,3 @@
 
 }
 
-@code {
-	public class User
-	{
-		public string Username { get; set; }
-		public int UserId { get; set; }
-		public string Course { get; set; }
-		public DateTime Enrolled { get; set; }
-		public string ProfilePictureLink { get; set; } = "https://tse4.mm.bing.net/th?id=OIP.4Q7-yMnrlnqwR4ORH7c06AHaHa&pid=Api&P=0&h=180";
-	}
-}
