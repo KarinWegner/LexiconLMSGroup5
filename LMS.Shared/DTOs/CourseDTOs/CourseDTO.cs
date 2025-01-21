@@ -1,5 +1,6 @@
 ﻿using Domain.Models.Entities;
 using LMS.Shared.DTOs.ApplicationUserDTOs;
+using LMS.Shared.DTOs.DocumentDTOs;
 using LMS.Shared.DTOs.ModuleDTOs;
 using System;
 using System.Collections.Generic;
@@ -20,5 +21,7 @@ namespace LMS.Shared.DTOs.CourseDTOs
         = new List<ApplicationUserDTO>();
         public IEnumerable<ModuleDTO> Modules { get; set; }
         = new List<ModuleDTO>();
+        public ICollection<DocumentDTO> Documents { get; init; }
+      = new List<DocumentDTO>();
     }
 }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace LMS.Shared.DTOs.DocumentDTOs
 {
-    public class DocumentUploadDto
+    public class DocumentUploadDTO
     {
         public IFormFile File { get; set; }
         public int? CourseId { get; set; }
