@@ -43,6 +43,7 @@ public class AutoMapperProfile : Profile
         CreateMap<ActivityTypeCreateDTO, ActivityType>();
         CreateMap<ActivityTypeUpdateDTO, ActivityType>();
 
+        CreateMap<Document, DocumentDTO>();
         CreateMap<DocumentCreateDTO, Document>();
         CreateMap<DocumentUploadDTO, Document>().ReverseMap();
         CreateMap<DocumentDTO, DocumentUploadDTO>();

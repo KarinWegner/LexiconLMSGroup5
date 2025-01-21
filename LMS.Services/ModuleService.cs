@@ -43,24 +43,19 @@ namespace LMS.Services
                 m.CourseId == courseId &&
                 (string.IsNullOrEmpty(filteringValue) || m.Name.Contains(filteringValue));
 
-            var query = _uow.Modules.Query();
+            var includes = new List<Expression<Func<Domain.Models.Entities.Module, object>>>();
 
-            if (includeActivities)
-            {
-                query = query.Include(m => m.Activities);
-            }
+            if (includeActivities) includes.Add(m => m.Activities);
 
-            if (includeDocuments)
-            {
-                query = query.Include(m => m.Documents);
-            }
+            if (includeDocuments) includes.Add(m => m.Documents);
 
             var (modules, totalCount) = await _uow.Modules.GetFilteredAndSortedEntitiesAsync(
                 filter: filter,
                 sortBy: sortBy,
                 isAscending: isAscending,
                 pageNr: pageNr,
-                pageSize: pageSize
+                pageSize: pageSize,
+                includes: includes.ToArray()
             );
 
             var moduleDTOs = _mapper.Map<IEnumerable<ModuleDTO>>(modules);
