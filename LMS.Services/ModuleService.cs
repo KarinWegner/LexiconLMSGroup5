@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Domain.Contracts;
 using Domain.Models.Entities;
+using Domain.Models.Exceptions;
+using Domain.Models.Responses;
 using LMS.Infrastructure.Data;
 using LMS.Shared.DTOs.CourseDTOs;
 using LMS.Shared.DTOs.ModuleDTOs;
@@ -79,7 +81,8 @@ namespace LMS.Services
 
             if (module == null) return null;
 
-            return _mapper.Map<ModuleDTO>(module);
+            var moduleDto =  _mapper.Map<ModuleDTO>(module);
+            return moduleDto;
         }
 
 

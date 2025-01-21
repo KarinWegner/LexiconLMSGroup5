@@ -3,12 +3,15 @@ using LMS.Shared.DTOs.CourseDTOs;
 using Microsoft.AspNetCore.JsonPatch;
 using Services.Contracts;
 using AutoMapper;
+using Azure;
+using Domain.Models.Responses;
+using Domain.Models.Exceptions;
 
 namespace LMS.Presemtation.Controllers
 {
     [Route("api/Courses")]
     [ApiController]
-    public class CoursesController : ControllerBase
+    public class CoursesController : ApiControllerBase
     {
         private readonly IServiceManager _serviceManager;
         private readonly IMapper _mapper;
@@ -21,20 +24,25 @@ namespace LMS.Presemtation.Controllers
 
         // GET: api/Courses
         [HttpGet]
-        public async Task<ActionResult> GetCourses(bool includeModules = false, bool includeEnrollments = false)
+        public async Task<ActionResult<IEnumerable<CourseDTO>>> GetCourses(bool includeModules = false, bool includeEnrollments = false)
         {
-            var courses = await _serviceManager.CourseService.GetAllCoursesAsync(includeModules, includeEnrollments);
-            return Ok(courses);
+            ApiBaseResponse response = await _serviceManager.CourseService.GetAllCoursesAsync(includeModules, includeEnrollments);
+           
+            return response.Success ?
+               Ok(response.GetOkResult<IEnumerable<CourseDTO>>()) :
+               ProcessError(response);
         }
 
 
         // GET: api/Courses/5
         [HttpGet("{id}")]
-        public async Task<ActionResult> GetCourse(int id, bool includeModules = false, bool includeEnrollments = false)
+        public async Task<ActionResult<CourseDTO>> GetCourse(int id, bool includeModules = false, bool includeEnrollments = false)
         {
-            var course = await _serviceManager.CourseService.GetCourseByIdAsync(id, includeModules, includeEnrollments);
-            if (course == null) return NotFound($"Course with ID {id} not found.");
-            return Ok(course);
+            ApiBaseResponse response = await _serviceManager.CourseService.GetCourseByIdAsync(id, includeModules, includeEnrollments);
+
+            return response.Success ?
+               Ok(response.GetOkResult<CourseDTO>()) :
+               ProcessError(response);
         }
 
         // POST: api/Courses
@@ -42,8 +50,15 @@ namespace LMS.Presemtation.Controllers
         public async Task<ActionResult> CreateCourse([FromBody] CourseCreateDTO courseDto)
         {
             if (courseDto == null) return BadRequest("Course info is required.");
-            var createdCourse = await _serviceManager.CourseService.CreateCourseAsync(courseDto);
+            var response = await _serviceManager.CourseService.CreateCourseAsync(courseDto);
+
+            if (response.Success) 
+            {
+            CourseDTO createdCourse = response.GetCreatedAtResult<CourseDTO>();
             return CreatedAtAction(nameof(GetCourse), new { id = createdCourse.CourseId }, createdCourse);
+            }
+
+            return ProcessError (response);
         }
 
         // PUT: api/Courses/5
@@ -52,19 +67,18 @@ namespace LMS.Presemtation.Controllers
         {
             if (id != courseDto.CourseId) return BadRequest("Mismatched Course ID.");
 
-            try
-            {
-                await _serviceManager.CourseService.UpdateCourseAsync(id, courseDto);
-                return NoContent();
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound($"Course with ID {id} not found.");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred: {ex.Message}");
-            }
+          
+              var result =  await _serviceManager.CourseService.UpdateCourseAsync(id, courseDto);
+            if (result.Success)   return NoContent();
+            return ProcessError(result);
+            //catch (CourseNotFoundException)
+            //{
+            //    return CourseNotFoundResponse($"Course with ID {id} not found.");
+            //}
+            //catch (Exception ex)
+            //{
+            //    return StatusCode(500, $"An error occurred: {ex.Message}");
+            //}
         }
 
 
@@ -72,25 +86,18 @@ namespace LMS.Presemtation.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCourse(int id)
         {
-            try
-            {
+            
                 var deleted = await _serviceManager.CourseService.DeleteCourseAsync(id);
-                return deleted ? NoContent() : NotFound($"Course with ID {id} was not found.");
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound($"Course with ID {id} not found.");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred: {ex.Message}");
-            }
+                if (deleted.Success) return NoContent();
+                return ProcessError(deleted);
+           
         }
 
 
         [HttpPatch("{id}")]
         public async Task<ActionResult> PatchCourse(int id, [FromBody] JsonPatchDocument<CourseUpdateDTO> patchDocument)
         {
+
             if (patchDocument == null) return BadRequest("Invalid patch document.");
             
             var courseToPatch = await _serviceManager.CourseService.GetCourseByIdAsync(id); //Already CourseDTO
