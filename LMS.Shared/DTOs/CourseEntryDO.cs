@@ -1,4 +1,5 @@
-﻿using LMS.Shared.DTOs.ModuleDTOs;
+﻿using LMS.Shared.DTOs.CourseDTOs;
+using LMS.Shared.DTOs.ModuleDTOs;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -74,7 +75,15 @@ namespace LMS.Shared.DTOs
             StartTime = from.StartDate;
             EndTime = from.EndDate;
         }
-
+        public CourseEntryDO(CourseDTO from)
+        {
+            Id = from.CourseId;
+            ParentId = -1;
+            Name = from.Name!;
+            Description = from.Description!;
+            StartTime = from.StartDate;
+            EndTime = from.EndDate;
+        }
 
     }
 }

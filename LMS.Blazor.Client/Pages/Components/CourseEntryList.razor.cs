@@ -13,11 +13,35 @@ namespace LMS.Blazor.Client.Pages.Components
         public CourseEntryModel UpcommingEntries { get; set; }
         public CourseEntryModel ExpiredEntries { get; set; }
 
-        protected async override Task OnInitializedAsync()
+        //protected async override Task OnInitializedAsync()
+        //{
+        //    var store = ListEntries.CourseEntries.OrderBy(x => x.EndTime);
+
+        //    List<CourseEntryDO> expired = new(), next = new();
+        //    foreach (var module in store)
+        //    {
+        //        if (module.EndTime < DateTime.Now)
+        //            expired.Add(module);
+        //        else
+        //            next.Add(module);
+        //    }
+        //    UpcommingEntries = new(ListEntries.CourseEntryType, next);
+        //    ExpiredEntries = new(ListEntries.CourseEntryType, expired);
+        //    await base.OnInitializedAsync();
+        //}
+
+        protected async override Task OnParametersSetAsync()
         {
-            var store = ListEntries.CourseEntries.OrderBy(x => x.EndTime);
+            if (ListEntries == null)
+            {
+                UpcommingEntries = new();
+                ExpiredEntries = new();
+                return;
+            }
+                var store = ListEntries.CourseEntries.OrderBy(x => x.EndTime);
 
             List<CourseEntryDO> expired = new(), next = new();
+
             foreach (var module in store)
             {
                 if (module.EndTime < DateTime.Now)
@@ -27,7 +51,7 @@ namespace LMS.Blazor.Client.Pages.Components
             }
             UpcommingEntries = new(ListEntries.CourseEntryType, next);
             ExpiredEntries = new(ListEntries.CourseEntryType, expired);
-            await base.OnInitializedAsync();
+            await base.OnParametersSetAsync();
         }
     }
 }

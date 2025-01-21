@@ -1,6 +1,9 @@
 ﻿
+using LMS.Blazor.Client._RoutingVariables;
 using LMS.Blazor.Client.Services;
 using LMS.Shared.DTOs;
+using LMS.Shared.DTOs.CourseDTOs;
+using Microsoft.AspNetCore.Components;
 
 namespace LMS.Blazor.Client.Pages.Components
 {
@@ -8,6 +11,8 @@ namespace LMS.Blazor.Client.Pages.Components
     {
         private string IsMyCoursesActive = "active", IsAllCoursesActive = "";
         List<CourseEntryDO> courseEntries;
+        [Inject]
+        private IApiService apiService { get; set; }
         private void setMyCoursesActive()
         {
             IsMyCoursesActive = "active";
@@ -19,11 +24,15 @@ namespace LMS.Blazor.Client.Pages.Components
             IsAllCoursesActive = "active";
         }
 
-        protected async override Task OnInitializedAsync()
+        protected async override Task OnAfterRenderAsync(bool firstRender)
         {
-            courseEntries = [FakeDataService.GetCourse()];
-
-            await base.OnInitializedAsync();
+            if (firstRender)
+            {
+                var res = await apiService.GetAsync<IEnumerable<CourseDTO>>(VBRoutes.API.Course.CoursesWithModulesAndEnrollments);
+                courseEntries = res.Select(x => new CourseEntryDO(x)).ToList();
+                StateHasChanged();
+            }
+            await base.OnAfterRenderAsync(firstRender);
         }
     }
 }
