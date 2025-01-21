@@ -1,4 +1,5 @@
-﻿using LMS.Shared.DTOs.CourseDTOs;
+﻿using LMS.Shared.DTOs;
+using LMS.Shared.DTOs.CourseDTOs;
 using Microsoft.AspNetCore.JsonPatch;
 
 namespace Services.Contracts
@@ -10,6 +11,5 @@ namespace Services.Contracts
         Task<CourseDTO> CreateCourseAsync(CourseCreateDTO courseDto);
         Task<bool> UpdateCourseAsync(int id, CourseUpdateDTO courseDto);
         Task<bool> DeleteCourseAsync(int id);
-
     }
 }
