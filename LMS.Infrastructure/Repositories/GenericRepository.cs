@@ -35,6 +35,37 @@ namespace LMS.Infrastructure.Repositories
             return await query.FirstOrDefaultAsync(entity => EF.Property<int>(entity, primaryKeyName).Equals(id));
         }
 
+        public async Task<(IEnumerable<T> Items, int TotalCount)> GetFilteredAndSortedEntitiesAsync(
+         Expression<Func<T, bool>>? filter,
+         string? sortBy,
+         bool isAscending,
+         int? pageNr,
+         int? pageSize,
+         params Expression<Func<T, object>>[] includes)
+        {
+
+            IQueryable<T> query = _dbSet;
+
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+
+             query = query.ApplyFiltering(filter)
+                .ApplySorting(sortBy, isAscending);
+
+            // Get the total count before pagination
+            var totalCount = await query.CountAsync();
+
+            if (pageNr.HasValue && pageSize.HasValue)
+            {
+                query = query.ApplyPagination(pageNr.Value, pageSize.Value);
+            }
+
+            var items = await query.ToListAsync();
+            return (Items: items, TotalCount: totalCount);
+        }
+
 
         public async Task<IEnumerable<T>> GetAllAsync()
         {
@@ -45,30 +76,6 @@ namespace LMS.Infrastructure.Repositories
         {
             var all = await _dbSet.ToListAsync();
             return all.Count;
-        }
-
-        public async Task<(IEnumerable<T> Items, int TotalCount)> GetFilteredAndSortedEntitiesAsync(
-         Expression<Func<T, bool>>? filter,
-         string? sortBy,
-         bool isAscending,
-         int? pageNr,
-         int? pageSize)
-        {
-
-            var query = _dbSet.AsQueryable()
-                .ApplyFiltering(filter)
-                .ApplySorting(sortBy, isAscending);
-
-            // Get the total count before pagination
-            var totalCount = await query.CountAsync();
-
-            if (pageNr.HasValue && pageSize.HasValue)
-                {
-                    query = query.ApplyPagination(pageNr.Value, pageSize.Value);
-                }
-
-            var items = await query.ToListAsync();
-            return (Items: items, TotalCount: totalCount);
         }
 
         public async Task AddAsync(T entity)

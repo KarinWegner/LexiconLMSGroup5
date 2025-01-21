@@ -1,4 +1,6 @@
 ﻿using Domain.Models.Entities;
+using LMS.Shared.DTOs.ActivityDTOs;
+using LMS.Shared.DTOs.DocumentDTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +18,10 @@ namespace LMS.Shared.DTOs.ModuleDTOs
         public DateTime EndDate { get; init; }
         public int CourseId { get; init; }
 
-        public ICollection<Activity> Activities { get; init; }
-       = new List<Activity>();
+        public ICollection<ActivityDTO> Activities { get; init; }
+       = new List<ActivityDTO>();
+
+        public ICollection<DocumentDTO> Documents { get; init; }
+      = new List<DocumentDTO>();
     }
 }

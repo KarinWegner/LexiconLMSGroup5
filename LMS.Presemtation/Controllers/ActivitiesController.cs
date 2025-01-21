@@ -32,8 +32,8 @@ namespace LMS.Presemtation.Controllers
             _mapper = mapper;
         }
 
-        // GET: api/Activities
-        [HttpGet]
+        // GET: api/Activities/module/{moduleId}
+        [HttpGet("module/{moduleId}")]
         public async Task<ActionResult> GetActivities(
             int moduleId,
             bool includeDocuments = false,
@@ -70,9 +70,9 @@ namespace LMS.Presemtation.Controllers
 
         // GET: api/Activities/5
         [HttpGet("{id}")]
-        public async Task<ActionResult> GetActivity(int id)
+        public async Task<ActionResult> GetActivity(int id, bool includeDocuments = false)
         {
-            var activity = await _serviceManager.ActivityService.GetActivityByIdAsync(id);
+            var activity = await _serviceManager.ActivityService.GetActivityByIdAsync(id, includeDocuments);
             if (activity == null) return NotFound("Activity not found");
             return Ok(activity);
         }
