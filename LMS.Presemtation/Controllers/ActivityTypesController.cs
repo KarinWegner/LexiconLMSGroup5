@@ -16,7 +16,7 @@ namespace LMS.Presemtation.Controllers
 {
     [Route("api/Activitytypes")]
     [ApiController]
-    public class ActivityTypesController : ControllerBase
+    public class ActivityTypesController : ApiControllerBase
     {
         private readonly IServiceManager _serviceManager;
         private readonly IMapper _mapper;

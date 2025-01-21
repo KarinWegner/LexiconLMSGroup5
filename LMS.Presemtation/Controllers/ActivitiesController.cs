@@ -20,7 +20,7 @@ namespace LMS.Presemtation.Controllers
 {
     [Route("api/activities")]
     [ApiController]
-    public class ActivitiesController : ControllerBase
+    public class ActivitiesController : ApiControllerBase
     {
         private readonly IMapper _mapper;
         private readonly IServiceManager _serviceManager;

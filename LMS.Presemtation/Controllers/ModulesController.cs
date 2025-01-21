@@ -14,7 +14,7 @@ namespace LMS.Presemtation.Controllers
 {
     [Route("api/Modules")]
     [ApiController]
-    public class ModulesController : ControllerBase
+    public class ModulesController : ApiControllerBase
     {
         private readonly IServiceManager _serviceManager;
         private readonly IMapper _mapper;
@@ -25,8 +25,8 @@ namespace LMS.Presemtation.Controllers
             _mapper = mapper;
         }
 
-        // GET: api/Modules
-        [HttpGet]
+        // GET: api/Modules/{courseId}
+        [HttpGet("course/{courseId}")]
         public async Task<ActionResult> GetModules(
             int courseId, 
             bool includeActivities = false,

@@ -18,7 +18,7 @@ namespace LMS.Presemtation.Controllers
 {
     [Route("api/enrollment")]
     [ApiController]
-    public class EnrollmentsController : ControllerBase
+    public class EnrollmentsController : ApiControllerBase
     {
         private readonly IServiceManager _serviceManager;
         private readonly UserManager<ApplicationUser> _userManager;

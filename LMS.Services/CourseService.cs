@@ -1,9 +1,13 @@
 ﻿using AutoMapper;
+using Azure;
 using Domain.Contracts;
 using Domain.Models.Entities;
+using Domain.Models.Exceptions;
+using Domain.Models.Responses;
 using LMS.Shared.DTOs.CourseDTOs;
 using Microsoft.EntityFrameworkCore;
 using Services.Contracts;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace LMS.Services
 {
@@ -19,7 +23,7 @@ namespace LMS.Services
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<CourseDTO>> GetAllCoursesAsync(
+        public async Task<ApiBaseResponse> GetAllCoursesAsync(
             bool includeModules = false,
             bool includeEnrollments = false,
             int pageNr = 1,
@@ -37,10 +41,11 @@ namespace LMS.Services
                 .Take(pageSize)
                 .ToListAsync();
 
-            return _mapper.Map<IEnumerable<CourseDTO>>(courses);
+            var courseDtos = _mapper.Map<IEnumerable<CourseDTO>>(courses);
+            return new ApiOkResponse<IEnumerable<CourseDTO>>(courseDtos);
         }
 
-        public async Task<CourseDTO> GetCourseByIdAsync(int id, bool includeModules = false, bool includeEnrollments = false)
+        public async Task<ApiBaseResponse> GetCourseByIdAsync(int id, bool includeModules = false, bool includeEnrollments = false)
         {
             IQueryable<Course> query = _uow.Courses.Query().Where(c => c.CourseId == id);
 
@@ -48,44 +53,92 @@ namespace LMS.Services
 
             var course = await query.FirstOrDefaultAsync();
 
-            if (course == null) return null;
+            if (course == null) return new CourseNotFoundResponse(id);
 
-            return _mapper.Map<CourseDTO>(course);
+            var courseDto = _mapper.Map<CourseDTO>(course);
+
+            return new ApiOkResponse<CourseDTO>(courseDto);
         }
 
-        public async Task<CourseDTO> CreateCourseAsync(CourseCreateDTO courseDto)
+        public async Task<ApiBaseResponse> CreateCourseAsync(CourseCreateDTO courseDto)
         {
-            ValidateCourseDates(courseDto);
+            try
+            {
+                ValidateCourseDates(courseDto);
+            }
+            catch (BadDateSequenceException ex)
+            {
+                return new BadDateSequenceRequestResponse(ex.StartDate, ex.EndDate);
+                throw;
+            }
+            catch(Exception ex) 
+            {
+                throw;
+            }
 
             var courseToAdd = _mapper.Map<Course>(courseDto);
             await _uow.Courses.AddAsync(courseToAdd);
 
             await _uow.CompleteASync();
 
-            return _mapper.Map<CourseDTO>(courseToAdd);
+            var createdCourseToReturn =_mapper.Map<CourseDTO>(courseToAdd);
+
+            return new ApiCreatedAtResponse<CourseDTO>(createdCourseToReturn);
         }
 
-        public async Task<bool> DeleteCourseAsync(int id)
+        public async Task<ApiBaseResponse> DeleteCourseAsync(int id)
         {
+            try
+            {
             var course = await GetCourseIfExists(id);
-
             await _uow.Courses.DeleteAsync(course);
             await _uow.CompleteASync();
-            return true;
+
+            }
+            catch (CourseNotFoundException)
+            {
+                return new CourseNotFoundResponse(id);
+            }
+            catch(Exception ex)
+            {
+                throw;
+            }
+            
+                return new ApiNoContentResponse();
+            
         }
 
-        public async Task<bool> UpdateCourseAsync(int id, CourseUpdateDTO courseDto)
+        public async Task<ApiBaseResponse> UpdateCourseAsync(int id, CourseUpdateDTO courseDto)
         {
-            ValidateCourseDates(courseDto);
-            var existingCourse = await GetCourseIfExists(id);
 
-            _mapper.Map(courseDto, existingCourse);
+            try
+            {
+                ValidateCourseDates(courseDto);
+                var existingCourse = await GetCourseIfExists(id);
+                _mapper.Map(courseDto, existingCourse);
+
+            }
+            catch (BadDateSequenceException ex)
+            {
+                return new BadDateSequenceRequestResponse(ex.StartDate, ex.EndDate);
+            }
+            catch (CourseNotFoundException )
+            {
+                return new CourseNotFoundResponse(id);
+            }           
+            catch(Exception ex)
+            {
+                throw new NotImplementedException(ex.Message);
+            }
+
+
+
 
             await _uow.CompleteASync();
-            return true;
+            return new ApiNoContentResponse();
         }
 
-
+      
         private IQueryable<Course> IncludeRelatedEntities(
         IQueryable<Course> query, 
         bool includeModules, 
@@ -102,7 +155,7 @@ namespace LMS.Services
         {
             if (courseDto.EndDate < courseDto.StartDate)
             {
-                throw new ArgumentException("The course cannot end before the start date.");
+                throw new BadDateSequenceException(courseDto.StartDate, courseDto.EndDate);
             }
         }
 
@@ -111,7 +164,7 @@ namespace LMS.Services
             var existingCourse = await _uow.Courses.GetByIdAsync(id);
             if (existingCourse == null)
             {
-                throw new KeyNotFoundException($"Course with ID {id} not found.");
+                throw new CourseNotFoundException(id);
             }
             return existingCourse;
         }
