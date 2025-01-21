@@ -21,7 +21,7 @@ namespace LMS.Shared.DTOs.ModuleDTOs
         public ICollection<ActivityDTO> Activities { get; init; }
        = new List<ActivityDTO>();
 
-        public ICollection<DocumentDto> Documents { get; init; }
-      = new List<DocumentDto>();
+        public ICollection<DocumentDTO> Documents { get; init; }
+      = new List<DocumentDTO>();
     }
 }

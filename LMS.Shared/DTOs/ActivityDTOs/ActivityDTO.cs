@@ -15,8 +15,8 @@ namespace LMS.Shared.DTOs.ActivityDTOs
         public DateTime StartDate { get; init; }
         public DateTime EndDate { get; init; }
 
-        public ICollection<DocumentDto> Documents { get; init; }
-      = new List<DocumentDto>();
+        public ICollection<DocumentDTO> Documents { get; init; }
+      = new List<DocumentDTO>();
 
         //Foreign Keys
         public int ActivityTypeId { get; init; }

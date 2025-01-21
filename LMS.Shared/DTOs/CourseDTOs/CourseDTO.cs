@@ -20,7 +20,7 @@ namespace LMS.Shared.DTOs.CourseDTOs
         = new List<ApplicationUserDTO>();
         public IEnumerable<ModuleDTO> Modules { get; set; }
         = new List<ModuleDTO>();
-        public ICollection<DocumentDto> Documents { get; init; }
-      = new List<DocumentDto>();
+        public ICollection<DocumentDTO> Documents { get; init; }
+      = new List<DocumentDTO>();
     }
 }
