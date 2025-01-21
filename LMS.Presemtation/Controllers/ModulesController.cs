@@ -37,7 +37,7 @@ namespace LMS.Presemtation.Controllers
             string? filteringValue = null
             )
         {
-            var (modules, totalCount )= await _serviceManager.ModuleService.GetModulesAsync(
+            var response = await _serviceManager.ModuleService.GetModulesAsync(
                 courseId: courseId,
                 includeActivities: includeActivities,
                 pageNr: pageNr,
@@ -46,6 +46,8 @@ namespace LMS.Presemtation.Controllers
                 isAscending: isAscending,
                 filteringValue: filteringValue
                 );
+            
+                var (modules, totalCount) = response.GetOkResult<(IEnumerable<ModuleDTO> modules, int totalCount)>();
 
             var metadata = new
             {
@@ -57,7 +59,8 @@ namespace LMS.Presemtation.Controllers
 
             Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(metadata));
 
-            return Ok(modules);
+            return response.Success ? Ok(response.GetOkResult<(IEnumerable<ModuleDTO> modules, int totalCount)>()) :
+                ProcessError(response);
 
         }
 
@@ -66,9 +69,10 @@ namespace LMS.Presemtation.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult> GetModule(int id, bool includeActivities = false)
         {
-            ModuleDTO module = await _serviceManager.ModuleService.GetModuleByIdAsync(id, includeActivities);
-            if (module == null) return NotFound($"Module with ID {id} not found.");
-            return Ok(module);
+                var response = await _serviceManager.ModuleService.GetModuleByIdAsync(id, includeActivities);
+
+            return response.Success ? Ok(response.GetOkResult<ModuleDTO>()) :
+                ProcessError(response);
         }
 
 
@@ -76,8 +80,8 @@ namespace LMS.Presemtation.Controllers
         [HttpPost]
         public async Task<ActionResult> CreateModule([FromBody] ModuleCreateDTO moduleDto, int courseId)
         {
-            if (moduleDto == null) return BadRequest("Module info is required.");
-            var createdModule = await _serviceManager.ModuleService.CreateModuleAsync(moduleDto, courseId);
+                var response = await _serviceManager.ModuleService.CreateModuleAsync(moduleDto, courseId);
+            var createdModule = response.GetCreatedAtResult<ModuleDTO>();
             if (createdModule == null)
             {
                 return BadRequest("Invalid module data.");
@@ -93,8 +97,9 @@ namespace LMS.Presemtation.Controllers
         {
             if (id != moduleDto.ModuleId) return BadRequest("Mismatched module ID.");
 
-            var updated = await _serviceManager.ModuleService.UpdateModuleAsync(id, courseId, moduleDto);
-            return updated ? NoContent() : NotFound($"Module with ID {id} was not found.");
+                var result = await _serviceManager.ModuleService.UpdateModuleAsync(id, courseId, moduleDto);
+             
+            return result.Success ? NoContent() : ProcessError(result);
         }
 
 
@@ -113,9 +118,9 @@ namespace LMS.Presemtation.Controllers
 
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            await _serviceManager.ModuleService.UpdateModuleAsync(id, courseId, moduleUpdateDto);
+            var response = await _serviceManager.ModuleService.UpdateModuleAsync(id, courseId, moduleUpdateDto);
 
-            return NoContent();
+            return response.Success ? NoContent() : ProcessError(response);
         }
 
 
@@ -124,8 +129,8 @@ namespace LMS.Presemtation.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteModule(int id)
         {
-            var deleted = await _serviceManager.ModuleService.DeleteModuleAsync(id);
-            return deleted ? NoContent() : NotFound($"Module with ID {id} was not found.");
+            var response = await _serviceManager.ModuleService.DeleteModuleAsync(id);
+            return response.Success ? NoContent() : ProcessError(response);
         }
 
 

@@ -29,5 +29,8 @@ namespace Domain.Models.Exceptions
     {
         public BadCourseRequestException(string message) : base(message) { }
     }
-    
+    public class BadModuleRequestException : BadRequestException
+    {
+        public BadModuleRequestException(string message) : base(message) { }
+    }
 }
