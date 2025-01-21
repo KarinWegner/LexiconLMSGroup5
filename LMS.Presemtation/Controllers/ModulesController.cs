@@ -8,6 +8,10 @@ using Bogus;
 using LMS.Shared.DTOs.ActivityDTOs;
 using Microsoft.AspNetCore.JsonPatch;
 using Services.Contracts;
+using Domain.Models.Responses;
+using System.Reflection.Metadata.Ecma335;
+using LMS.Shared.DTOs.CourseDTOs;
+using Azure;
 
 namespace LMS.Presemtation.Controllers
 {
@@ -28,23 +32,22 @@ namespace LMS.Presemtation.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ModuleDTO>>> GetModules(int courseId, bool includeActivities)
         {
-            var modules = await _serviceManager.ModuleService.GetModulesAsync(courseId, includeActivities);
-            var modulesDTO = _mapper.Map<IEnumerable<ModuleDTO>>(modules);
-            return Ok(modulesDTO);
+            ApiBaseResponse response = await _serviceManager.ModuleService.GetModulesAsync(courseId, includeActivities);
+
+            return response.Success ?
+               Ok(response.GetOkResult<IEnumerable<ModuleDTO>>()) :
+               ProcessError(response);
         }
 
         // GET: api/courses/{courseId}/modules/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<ModuleDTO>> GetModule(int id, int courseId, bool includeActivities)
         {
-            var module = await _serviceManager.ModuleService.GetModuleByIdAsync(id, courseId, includeActivities);
-            if (module == null)
-            {
-                return NotFound();
-            }
-
-            var moduleDTO = _mapper.Map<ModuleDTO>(module);
-            return Ok(moduleDTO);
+            var response = await _serviceManager.ModuleService.GetModuleByIdAsync(id, courseId, includeActivities);
+            
+            return response.Success ?
+               Ok(response.GetOkResult<ModuleDTO>()) :
+               ProcessError(response);
         }
 
         // PUT: api/courses/{courseId}/modules/{id}
@@ -52,13 +55,12 @@ namespace LMS.Presemtation.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutModule(int id, ModuleUpdateDTO moduleDto)
         {
-            var result = await _serviceManager.ModuleService.UpdateModuleAsync(id, moduleDto);
-            if (!result)
-            {
-                return NotFound("Module not found");
-            }
+            var response = await _serviceManager.ModuleService.UpdateModuleAsync(id, moduleDto);
+            
 
-            return NoContent();
+            return response.Success ?
+                NoContent():
+                ProcessError(response);
         }
 
 
@@ -90,13 +92,18 @@ namespace LMS.Presemtation.Controllers
         [HttpPost]
         public async Task<ActionResult<Module>> PostModule(ModuleCreateDTO moduleDto, int courseId)
         {
-            var createdModule = await _serviceManager.ModuleService.CreateModuleAsync(moduleDto, courseId);
+            var response = await _serviceManager.ModuleService.CreateModuleAsync(moduleDto, courseId);
+
+            var createdModule = response.GetCreatedAtResult<ModuleDTO>();
+            
             if (createdModule == null)
             {
                 return BadRequest("Invalid module data.");
             }
 
-            return CreatedAtAction("GetModule", new { courseId = courseId, id = createdModule.ModuleId }, createdModule);
+            return response.Success ?
+                CreatedAtAction("GetModule", new { courseId = courseId, id = createdModule.ModuleId }, createdModule) :
+                ProcessError(response);
         }
 
         // DELETE: api/courses/{courseId}/modules/{id}
@@ -104,12 +111,10 @@ namespace LMS.Presemtation.Controllers
         public async Task<IActionResult> DeleteModule(int id)
         {
             var result = await _serviceManager.ModuleService.DeleteModuleAsync(id);
-            if (!result)
-            {
-                return NotFound("Module not found");
-            }
-
-            return NoContent();
+            
+            
+            return result.Success? NoContent() :
+                ProcessError(result);
         }
     }
 }

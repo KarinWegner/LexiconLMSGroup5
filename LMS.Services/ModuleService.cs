@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Domain.Contracts;
 using Domain.Models.Entities;
+using Domain.Models.Exceptions;
+using Domain.Models.Responses;
 using LMS.Infrastructure.Data;
 using LMS.Shared.DTOs.CourseDTOs;
 using LMS.Shared.DTOs.ModuleDTOs;
@@ -26,7 +28,7 @@ namespace LMS.Services
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<ModuleDTO>> GetModulesAsync(int courseId, bool includeActivities)
+        public async Task<ApiBaseResponse> GetModulesAsync(int courseId, bool includeActivities)
         {
             IQueryable<Module> query = _uow.Modules.Query();
 
@@ -35,10 +37,12 @@ namespace LMS.Services
                 query = query.Include(m => m.Activities);
             }
             var modules = await query.Where(m => m.CourseId == courseId).ToListAsync();
-            return _mapper.Map<IEnumerable<ModuleDTO>>(modules);
+            var moduleDtos = _mapper.Map<IEnumerable<ModuleDTO>>(modules);
+
+            return new ApiOkResponse<IEnumerable<ModuleDTO>>(moduleDtos);
         }
 
-        public async Task<ModuleDTO> GetModuleByIdAsync(int id, int courseId, bool includeActivities)
+        public async Task<ApiBaseResponse> GetModuleByIdAsync(int id, int courseId, bool includeActivities)
         {
             IQueryable<Module> query = _uow.Modules.Query().Where(m => m.CourseId == courseId);
 
@@ -51,10 +55,11 @@ namespace LMS.Services
 
             if (module == null)
             {
-                return null;
+                return new ModuleNotFoundResponse(id);
             }
 
-            return _mapper.Map<ModuleDTO>(module);
+            var moduleDto =  _mapper.Map<ModuleDTO>(module);
+            return new ApiOkResponse<ModuleDTO>(moduleDto);
         }
 
 
@@ -74,41 +79,56 @@ namespace LMS.Services
         //    return _mapper.Map<ModuleDTO>(moduleEntity);
         //}
 
-        public async Task<bool> UpdateModuleAsync(int id, ModuleUpdateDTO moduleDto)
+        public async Task<ApiBaseResponse> UpdateModuleAsync(int id, ModuleUpdateDTO moduleDto)
         {
+
+            try
+            {
             var existingModule = await _uow.Modules.GetByIdAsync(id);
-            if (existingModule == null) return false;
+            if (existingModule == null) return new ModuleNotFoundResponse(id);
 
             _mapper.Map(moduleDto, existingModule);
 
             await _uow.Modules.UpdateAsync(existingModule);
             await _uow.CompleteASync();
-            return true;
+
+            }
+            catch (ModuleNotFoundException)
+            {
+                return new ModuleNotFoundResponse(id);
+
+            }
+            catch (Exception ex) 
+            {
+                throw;
+            }
+
+            return new ApiNoContentResponse();
             
         }
 
-        public async Task<ModuleDTO> CreateModuleAsync(ModuleCreateDTO moduleDto, int courseId)
+        public async Task<ApiBaseResponse> CreateModuleAsync(ModuleCreateDTO moduleDto, int courseId)
         {
             var course = await _uow.Courses.GetByIdAsync(courseId);
-            if (course == null) return null;
+            if (course == null) return new CourseNotFoundResponse(courseId);
 
             var moduleToAdd = _mapper.Map<Module>(moduleDto);
             moduleToAdd.CourseId = courseId;
             await _uow.Modules.AddAsync(moduleToAdd);
 
             await _uow.CompleteASync();
-
-            return _mapper.Map<ModuleDTO>(moduleToAdd);
+            var moduleToReturn = _mapper.Map<ModuleDTO>(moduleToAdd);
+            return new ApiCreatedAtResponse<ModuleDTO>(moduleToReturn);
         }
 
-        public async Task<bool> DeleteModuleAsync(int id)
+        public async Task<ApiBaseResponse> DeleteModuleAsync(int id)
         {
             var module = await _uow.Modules.GetByIdAsync(id);
-            if (module == null) return false;
+            if (module == null) return new ModuleNotFoundResponse(id);
 
             await _uow.Modules.DeleteAsync(module);
             await _uow.CompleteASync();
-            return true;
+            return new ApiNoContentResponse();
         }
 
     }

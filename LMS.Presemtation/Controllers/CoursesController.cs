@@ -24,7 +24,7 @@ namespace LMS.Presemtation.Controllers
 
         // GET: api/Courses
         [HttpGet]
-        public async Task<ActionResult> GetCourses(bool includeModules = false, bool includeEnrollments = false)
+        public async Task<ActionResult<IEnumerable<CourseDTO>>> GetCourses(bool includeModules = false, bool includeEnrollments = false)
         {
             ApiBaseResponse response = await _serviceManager.CourseService.GetAllCoursesAsync(includeModules, includeEnrollments);
            
@@ -36,7 +36,7 @@ namespace LMS.Presemtation.Controllers
 
         // GET: api/Courses/5
         [HttpGet("{id}")]
-        public async Task<ActionResult> GetCourse(int id, bool includeModules = false, bool includeEnrollments = false)
+        public async Task<ActionResult<CourseDTO>> GetCourse(int id, bool includeModules = false, bool includeEnrollments = false)
         {
             ApiBaseResponse response = await _serviceManager.CourseService.GetCourseByIdAsync(id, includeModules, includeEnrollments);
 
