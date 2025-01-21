@@ -5,17 +5,21 @@
     {
         public record Student
         {
-            public const string LinkToOverview = $"/{RoutingVariables.CourseOverview}";
-            public const string LinkToModules = $"/{RoutingVariables.CourseOverview}/{RoutingVariables.Modules}";
-            public const string LinkToCourseParticipants = $"/{RoutingVariables.CourseOverview}/{RoutingVariables.CourseParticipants}";
-            public const string LinkToSchedule = $"/{RoutingVariables.CourseOverview}/{RoutingVariables.Schedule}";
-            public const string LinkToPlanning = $"{RoutingVariables.CourseOverview}/{RoutingVariables.Planning}";
-            public const string LinkToSpecificModule = $"/{RoutingVariables.CourseOverview}/{RoutingVariables.Modules}/{RoutingVariables.WithIntId}";
-            public const string LinkToActivityDetails = $"/{RoutingVariables.CourseOverview}/{RoutingVariables.Modules}/{RoutingVariables.WithIntIdAndIntParentId}";
-            public const string LinkToCourseParticipantDetails = $"/{RoutingVariables.CourseOverview}/{RoutingVariables.CourseParticipants}/{RoutingVariables.WithStringId}";
-            public static string LinkToModule(int id) => $"{LinkToModules}/{id}";
-            public static string LinkToActivity(int parentId, int id) => $"{LinkToModule(parentId)}/{id}";
-            public static string LinkToCourseParticipant(string id) => $"{LinkToCourseParticipants}/{id}";
+            public const string LinkToMain = $"/{RoutingVariables.CourseOverview}";
+            public const string LinkToOverview = $"/{RoutingVariables.CourseOverview}/{RoutingVariables.CourseId}";
+            public const string LinkToModules = $"{LinkToOverview}/{RoutingVariables.Modules}";
+            public const string LinkToCourseParticipants = $"{LinkToOverview}/{RoutingVariables.CourseParticipants}";
+            public const string LinkToSchedule = $"{LinkToOverview}/{RoutingVariables.Schedule}";
+            public const string LinkToPlanning = $"{LinkToOverview}/{RoutingVariables.Planning}";
+            public const string LinkToSpecificModule = $"{LinkToModules}/{RoutingVariables.ModuleId}";
+            public const string LinkToActivityDetails = $"{LinkToSpecificModule}/{RoutingVariables.ActivityId}";
+            public const string LinkToCourseParticipantDetails = $"{LinkToCourseParticipants}/{RoutingVariables.WithStringId}";
+            public static string LinkToCourse(int id) => $"{LinkToMain}/{id}";
+            public static string DLinkToModules(int CourseId) => $"{LinkToCourse(CourseId)}/{RoutingVariables.Modules}";
+            public static string DLinkToCourseParticipants(int CourseId) => $"{LinkToCourse(CourseId)}/{RoutingVariables.CourseParticipants}";
+            public static string LinkToModule(int CourseId, int ModuleId) => $"{LinkToCourse(CourseId)}/{RoutingVariables.Modules}/{ModuleId}";
+            public static string LinkToActivity(int CourseId, int ModuleId, int ActivityId) => $"{LinkToModule(CourseId, ModuleId)}/{ActivityId}";
+            public static string LinkToCourseParticipant(int CourseId, string id) => $"{DLinkToCourseParticipants(CourseId)}/{id}";
 
         }
 

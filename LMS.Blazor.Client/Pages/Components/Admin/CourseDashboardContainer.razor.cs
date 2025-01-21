@@ -5,7 +5,7 @@ using LMS.Shared.DTOs;
 using LMS.Shared.DTOs.CourseDTOs;
 using Microsoft.AspNetCore.Components;
 
-namespace LMS.Blazor.Client.Pages.Components
+namespace LMS.Blazor.Client.Pages.Components.Admin
 {
     public partial class CourseDashboardContainer
     {

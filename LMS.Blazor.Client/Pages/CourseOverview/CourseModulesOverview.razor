@@ -1,0 +1,9 @@
+﻿@attribute [Route(VBRoutes.Student.LinkToModules)]
+@attribute [Authorize]
+@rendermode InteractiveWebAssembly
+
+<h3>Course Modules</h3>
+
+<CourseNavbar ActiveNav="ECourseNav.Modules" CourseId="@CourseId"></CourseNavbar>
+
+<CourseEntryList ListEntries="@Entries" CourseId="@CourseId"></CourseEntryList>

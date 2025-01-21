@@ -3,7 +3,7 @@ using LMS.Blazor.Client.Services;
 using LMS.Shared.DTOs;
 using Microsoft.AspNetCore.Components;
 
-namespace LMS.Blazor.Client.Pages.Components
+namespace LMS.Blazor.Client.Pages.Components.Admin
 {
     public partial class CourseDashboardEntryBody
     {
