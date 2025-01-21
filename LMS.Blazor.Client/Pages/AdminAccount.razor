@@ -1,0 +1,129 @@
+﻿@page "/administration-account"
+@rendermode InteractiveWebAssembly
+
+<PageTitle>Account Administration</PageTitle>
+
+<h3>Account Administration</h3>
+
+@* ToDo add the href to new user page *@
+<button>Add new user</button>
+
+<h5> Manage Users</h5>
+
+
+	<div class="card p-3 shadow">
+		<h2 class="text-center p-3">Manage Users</h2>
+		<nav>
+			<div class="nav nav-tabs mb-3" id="nav-tab" role="tablist">
+				<button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Stusents</button>
+				<button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">Teachers</button>
+				
+			</div>
+		</nav>
+
+	<Search SearchString="@searchTerm" OnSearch="HandleSearch" />
+		<div class="tab-content p-3 border bg-light" id="nav-tabContent">
+		
+
+			<div class="tab-pane fade active show" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+			@if (searchResults.Any())
+				@if (searchResults.Any())
+				{
+					<table class="table table-striped">
+						<thead>
+							<tr>
+								<th>Profile</th>
+								<th>Username</th>
+								<th>Id</th>
+								<th>Course</th>
+								<th>Enrolled</th>
+							</tr>
+						</thead>
+						<tbody>
+							@foreach (var user in searchResults)
+							{
+								<tr>
+									<td>
+										<img src="@user.ProfilePictureLink"
+											 class="profilePicture rounded-circle"
+											 alt="@($"{user.Username} profile picture")"
+											 style="width: 50px; height: 50px;">
+									</td>
+									<td>@user.Username</td>
+									<td>@user.UserId</td>
+									<td>@user.Course</td>
+									<td>@user.Enrolled.ToShortDateString()</td>
+								</tr>
+							}
+						</tbody>
+					</table>
+				}
+			else
+			{
+				<p>No results found.</p>
+			}
+
+			</div>
+			<div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
+				<p><strong>This is some placeholder content the TEACHERS tab's associated content.</strong>
+					Clicking another tab will toggle the visibility of this one for the next.
+					The tab JavaScript swaps classes to control the content visibility and styling. You can use it with
+					tabs, pills, and any other <code>.nav</code>-powered navigation.</p>
+			</div>
+			
+		</div>
+	</div>
+
+
+@code {
+	private string searchTerm = string.Empty;
+
+	private List<User> data = new List<User>
+	{
+		new User { Username = "Alice", UserId = 1, Course = "Math", Enrolled = new DateTime(2023, 9, 15) },
+		new User { Username = "Bob", UserId = 2, Course = "Science", Enrolled = new DateTime(2023, 9, 15) },
+		new User { Username = "Charlie", UserId = 3, Course = "History", Enrolled = new DateTime(2023, 9, 15) },
+		new User { Username = "Diana", UserId = 4, Course = "Art", Enrolled = new DateTime(2023, 9, 15) },
+		new User { Username = "Eve", UserId = 5, Course = "Music", Enrolled = new DateTime(2023, 9, 15) },
+		new User { Username = "Frank", UserId = 6, Course = "Physics", Enrolled = new DateTime(2023, 9, 15) },
+		new User { Username = "Grace", UserId = 7, Course = "Chemistry", Enrolled = new DateTime(2023, 9, 15) }
+	};
+
+	private List<User> searchResults = new();
+
+	private void HandleSearch(string searchString)
+	{
+		searchTerm = searchString;
+
+		if (string.IsNullOrWhiteSpace(searchString))
+		{
+			searchResults = data;
+		}
+		else
+		{
+			searchResults = data
+				.Where(user => user.Username.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+				.ToList();
+		}
+
+		Console.WriteLine($"Search Term: {searchString}");
+		Console.WriteLine($"Search Results: {string.Join(", ", searchResults.Select(u => u.Username))}");
+	}
+
+	protected override void OnInitialized()
+	{
+		searchResults = data; 
+	}
+
+}
+
+@code {
+	public class User
+	{
+		public string Username { get; set; }
+		public int UserId { get; set; }
+		public string Course { get; set; }
+		public DateTime Enrolled { get; set; }
+		public string ProfilePictureLink { get; set; } = "https://tse4.mm.bing.net/th?id=OIP.4Q7-yMnrlnqwR4ORH7c06AHaHa&pid=Api&P=0&h=180";
+	}
+}
