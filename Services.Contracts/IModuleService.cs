@@ -1,4 +1,5 @@
 ﻿using Domain.Models.Entities;
+using Domain.Models.Responses;
 using LMS.Shared.DTOs.ModuleDTOs;
 using Microsoft.AspNetCore.JsonPatch;
 using System;

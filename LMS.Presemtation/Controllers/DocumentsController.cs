@@ -12,7 +12,7 @@ namespace LMS.Presemtation.Controllers
 
     [ApiController]
     [Route("api/documents")]
-    public class DocumentsController : ControllerBase
+    public class DocumentsController : ApiControllerBase
     {
         private readonly LmsContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
