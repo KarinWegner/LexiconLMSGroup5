@@ -1,4 +1,5 @@
 ﻿@using LMS.Shared.DTOs
+@using LMS.Shared.DTOs.ApplicationUserDTOs
 @if (Items != null && Items.Any())
 {
     <table class="table table-striped">
@@ -16,15 +17,15 @@
             {
                 <tr>
                     <td>
-                        <img src="@user.ProfilePictureLink"
+                        <img src="https://tse4.mm.bing.net/th?id=OIP.4Q7-yMnrlnqwR4ORH7c06AHaHa&pid=Api&P=0&h=180"
                              class="profilePicture rounded-circle"
-                             alt="@($"{user.Username} profile picture")"
+                             alt="@($"{user.Name} profile picture")"
                              style="width: 50px; height: 50px;">
                     </td>
-                    <td>@user.Username</td>
-                    <td>@user.UserId</td>
-                    <td>@user.Course</td>
-                    <td>@user.Enrolled.ToShortDateString()</td>
+                    <td>@user.Name</td>
+                    <td>@user.Id</td>
+                    <td>@user.Email</td>
+                    @* <td>@user.Enrolled.ToShortDateString()</td> *@
                 </tr>
             }
         </tbody>
@@ -37,6 +38,6 @@ else
 
 @code {
     [Parameter]
-    public IEnumerable<UserDto> Items { get; set; } = Enumerable.Empty<UserDto>();
+    public IEnumerable<ApplicationUserDTO> Items { get; set; } = Enumerable.Empty<ApplicationUserDTO>();
 }
 

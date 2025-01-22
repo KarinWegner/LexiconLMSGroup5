@@ -35,4 +35,9 @@ namespace LMS.Shared.DTOs.ApplicationUserDTOs
             Role = user.Role;
         }
     }
+
+    public record ApplicationUserResultDTO
+    {
+        public List<ApplicationUserDTO> Result { get; init; }
+    }
 }

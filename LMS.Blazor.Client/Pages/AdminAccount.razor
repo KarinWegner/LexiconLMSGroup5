@@ -1,5 +1,10 @@
 ﻿@using LMS.Shared.DTOs
-@inject IJSRuntime JSRuntime
+@using LMS.Blazor.Client.Services
+@using LMS.Shared.DTOs.ApplicationUserDTOs
+@using LMS.Shared.DTOs.CourseDTOs
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+
 @attribute [Route(VBRoutes.Student.LinkToAdministrationAccount)]
 @rendermode InteractiveWebAssembly
 
@@ -36,52 +41,57 @@
 
 
 @code {
-	private string searchTerm = string.Empty;
+    [Inject]
+    private IApiService _apiService { get; set; } = default!;
+    [Inject]
+    private AuthenticationStateProvider AuthenticationStateProvider { get; set; } = default!;
 
-	private string activeTab = "Students";
+    private string searchTerm = string.Empty;
+    private string activeTab = "Students";
+    private List<ApplicationUserDTO> data = new();
+    private List<ApplicationUserDTO> searchResults = new();
+    private bool isDataLoaded = false;
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && !isDataLoaded)
+        {
+            searchResults =  await LoadUsersAsync(); 
+            isDataLoaded = true;
+
+            // Trigger re-render to display the data
+            StateHasChanged();
+        }
+    }
+
+
+    private async Task<List<ApplicationUserDTO>> LoadUsersAsync()
+    {
+        var data = await _apiService.GetAsync<ApplicationUserResultDTO>("api/enrollment/user?roleFilter=Student");
+        return data?.Result ?? new List<ApplicationUserDTO>();
+    }
 
     private void SwitchTab(string tabName)
     {
         activeTab = tabName;
     }
 
-	private List<UserDto> data = new List<UserDto>
-	{
-		new UserDto { Username = "Alice", UserId = 1, Course = "Math", Enrolled = new DateTime(2023, 9, 15) },
-		new UserDto { Username = "Bob", UserId = 2, Course = "Science", Enrolled = new DateTime(2023, 9, 15) },
-		new UserDto { Username = "Charlie", UserId = 3, Course = "History", Enrolled = new DateTime(2023, 9, 15) },
-		new UserDto { Username = "Diana", UserId = 4, Course = "Art", Enrolled = new DateTime(2023, 9, 15) },
-		new UserDto { Username = "Eve", UserId = 5, Course = "Music", Enrolled = new DateTime(2023, 9, 15) },
-		new UserDto { Username = "Frank", UserId = 6, Course = "Physics", Enrolled = new DateTime(2023, 9, 15) },
-		new UserDto { Username = "Grace", UserId = 7, Course = "Chemistry", Enrolled = new DateTime(2023, 9, 15) }
-	};
+    private void HandleSearch(string searchString)
+    {
+        searchTerm = searchString;
 
-	private List<UserDto> searchResults = new();
-
-	private void HandleSearch(string searchString)
-	{
-		searchTerm = searchString;
-
-		if (string.IsNullOrWhiteSpace(searchString))
-		{
-			searchResults = data;
-		}
-		else
-		{
-			searchResults = data
-				.Where(user => user.Username.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-				.ToList();
-		}
-
-		Console.WriteLine($"Search Term: {searchString}");
-		Console.WriteLine($"Search Results: {string.Join(", ", searchResults.Select(u => u.Username))}");
-	}
-
-	protected override void OnInitialized()
-	{
-		searchResults = data; 
-	}
-
+        if (string.IsNullOrWhiteSpace(searchString))
+        {
+            searchResults = data;
+        }
+        else
+        {
+            searchResults = data
+                .Where(user => user.UserName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
+    }
 	
 }
 
