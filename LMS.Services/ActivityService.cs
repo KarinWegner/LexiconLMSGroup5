@@ -47,6 +47,7 @@ namespace LMS.Services
             var includes = new List<Expression<Func<Activity, object>>>();
 
             if (includeDocuments) includes.Add(m => m.Documents);
+            includes.Add(a => a.ActivityType); //to map the ActivityTypeName
 
             var (activities, totalCount) = await _uow.Activities.GetFilteredAndSortedEntitiesAsync(
                 filter: filter,
@@ -69,6 +70,8 @@ namespace LMS.Services
             IQueryable<Activity> query = _uow.Activities.Query().Where(m => m.ActivityId == id);
 
             if (includeDocuments) query = query.Include(m => m.Documents);
+
+            query = query.Include(a => a.ActivityType); //to map the ActivityTypeName
 
             var activity = await query.FirstOrDefaultAsync();
 

@@ -6,5 +6,17 @@
         public const string CourseOverview = "CourseOverview", Modules = "Modules", CourseParticipants = "CourseParticipants", Schedule = "Schedule", Planning = "Planning";
         //parameters getters
         public const string WithIntId = "{Id:int}", WithIntIdAndIntParentId = "{ParentId:int}/{Id:int}", WithStringId = "{Id}";
+        //parameters getters
+        public const string CourseId = "{CourseId:int}", ModuleId = "{ModuleId:int}", ActivityId = "{ActivityId:int}";
+        //Adminstration route
+        public const string AdministrationDashboard = "AdministrationDashboard", CourseDashboard = "CourseDashboard", StudentDashboard = "StudentDashboard";
+        //API Endpoints
+        public const string APIModules = "api/modules", APICourses = "api/Courses", APIActivity = "api/activities";
+        //API Course Queries
+        public const string APICoursesIncludeModules = "includeModules=true", APICoursesIncludeEnrollments = "includeEnrollments=true";
+        //API Module Queries
+        public const string APIModulesIncludeActivities = "includeActivities=true";
+        //Acess Denied
+        public const string AccessDenied = "/AccessDenied";
     }
 }

@@ -1,0 +1,10 @@
+﻿@attribute [Route(VBRoutes.Student.LinkToCourseParticipantDetails)]
+@rendermode InteractiveWebAssembly
+@if (CourseParticipant != default)
+{
+<h3>User Details - @CourseParticipant.Name</h3>
+
+<CourseNavbar ActiveNav="ECourseNav.Modules" CourseId="@CourseId"></CourseNavbar>
+
+<UserDetailComponent CourseParticipant="@CourseParticipant"></UserDetailComponent>
+}

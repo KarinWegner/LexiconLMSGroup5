@@ -1,0 +1,20 @@
+﻿@if (DisplayType == EDateDisplayType.DateTime)
+{
+    <div class="col-sm-auto">Start time: @StartTime</div>
+
+    <div class="col-sm-auto">End time: @EndTime</div>
+}
+else if (DisplayType == EDateDisplayType.Date)
+{
+    <div class="col-sm-auto">Start date: @DateOnly.FromDateTime(StartTime)</div>
+
+    <div class="col-sm-auto">End date: @DateOnly.FromDateTime(EndTime)</div>
+}
+else if (DisplayType == EDateDisplayType.DateTimeInline)
+{
+    <span class="col-sm-auto ms-3">@StartTime - @EndTime</span>
+}
+else if (DisplayType == EDateDisplayType.DateInline)
+{
+    <span class="col-sm-auto ms-3">@DateOnly.FromDateTime(StartTime) - @DateOnly.FromDateTime(EndTime)</span>
+}

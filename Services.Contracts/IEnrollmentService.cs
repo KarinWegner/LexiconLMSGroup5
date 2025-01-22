@@ -1,5 +1,6 @@
 ﻿using Domain.Models.Entities;
 using Domain.Models.Responses;
+using LMS.Shared.DTOs.ApplicationUserDTOs;
 using LMS.Shared.DTOs.EnrollmentDTOs;
 using System;
 using System.Collections.Generic;

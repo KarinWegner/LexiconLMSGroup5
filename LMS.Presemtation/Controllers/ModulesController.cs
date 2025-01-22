@@ -69,9 +69,9 @@ namespace LMS.Presemtation.Controllers
 
         // GET: api/modules/22
         [HttpGet("{id}")]
-        public async Task<ActionResult> GetModule(int id, bool includeActivities = false)
+        public async Task<ActionResult> GetModule(int id, bool includeActivities = false, bool includeDocuments = false)
         {
-                var response = await _serviceManager.ModuleService.GetModuleByIdAsync(id, includeActivities);
+                var response = await _serviceManager.ModuleService.GetModuleByIdAsync(id, includeActivities, includeDocuments);
 
             return response.Success ? Ok(response.GetOkResult<ModuleDTO>()) :
                 ProcessError(response);

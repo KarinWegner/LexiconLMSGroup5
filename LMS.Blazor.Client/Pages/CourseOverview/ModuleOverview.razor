@@ -1,0 +1,8 @@
+﻿@attribute [Route(VBRoutes.Student.LinkToSpecificModule)]
+@rendermode InteractiveWebAssembly
+
+<h3>Module Overview - @ModuleName</h3>
+
+<CourseNavbar ActiveNav="ECourseNav.Modules" CourseId="@CourseId"></CourseNavbar>
+
+<CourseEntryList ListEntries="@Entries" CourseId="@CourseId"></CourseEntryList>

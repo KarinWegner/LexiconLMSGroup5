@@ -1,0 +1,33 @@
+﻿
+
+@if (UpcommingEntries.CourseEntries.Count() > 0)
+{
+    <div>
+        <h4 class="h4-marg"> Upcomming:</h4>
+        <div>
+            <ul class="list-group" id="taskGroup">
+                @foreach (var e in UpcommingEntries.CourseEntries)
+                {
+
+                    <CourseEntryObject Model="e" CourseEntryType="UpcommingEntries.CourseEntryType" CourseId="@CourseId"></CourseEntryObject>
+                }
+            </ul>
+        </div>
+    </div>
+}
+@if (ExpiredEntries.CourseEntries.Count() > 0)
+{
+    <div>
+        <h4 class="h4-marg"> Expired: </h4>
+        <div>
+            <ul class="list-group" id="taskGroup">
+                @foreach (var e in ExpiredEntries.CourseEntries)
+                {
+
+                    <CourseEntryObject Model="e" CourseEntryType="ExpiredEntries.CourseEntryType" CourseId="@CourseId"></CourseEntryObject>
+                }
+            </ul>
+        </div>
+    </div>
+
+}

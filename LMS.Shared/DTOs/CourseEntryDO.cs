@@ -1,5 +1,10 @@
-﻿using System;
+﻿using LMS.Shared.DTOs.CourseDTOs;
+using LMS.Shared.DTOs.ModuleDTOs;
+using LMS.Shared.DTOs.ActivityDTOs;
+using LMS.Shared.DTOs.ApplicationUserDTOs;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,6 +20,8 @@ namespace LMS.Shared.DTOs
         public string ActivityType {  get; set; } = string.Empty;
         public DateTime StartTime { get; set; } = DateTime.MinValue;
         public DateTime EndTime { get; set; } = DateTime.MaxValue;
+        public IEnumerable<CourseEntryDO> CourseEntryDOs { get; set; } = [];
+        public IEnumerable<ApplicationUserDTO> Enrollments { get; set; } = [];
 
         /// <summary>
         /// DTO Constructor Type for Activity entries
@@ -63,6 +70,47 @@ namespace LMS.Shared.DTOs
         /// </summary>
         public CourseEntryDO() { }
 
+        public CourseEntryDO(ModuleDTO from)
+        {
+            Id = from.ModuleId;
+            ParentId = from.CourseId;
+            Name = from.Name!;
+            Description = from.Description!;
+            StartTime = from.StartDate;
+            EndTime = from.EndDate;
+            CourseEntryDOs = from.Activities.Select(x => new CourseEntryDO(x));
+        }
+        public CourseEntryDO(CourseDTO from)
+        {
+            Id = from.CourseId;
+            ParentId = -1;
+            Name = from.Name!;
+            Description = from.Description!;
+            StartTime = from.StartDate;
+            EndTime = from.EndDate;
+            CourseEntryDOs = from.Modules.Select(x => new CourseEntryDO(x));
+            Enrollments = from.Enrollments;
+        }
+        public CourseEntryDO(ActivityDTO from)
+        {
+            Id = from.ActivityId;
+            ParentId = from.ModuleId;
+            Name = from.Name!;
+            Description = from.Description!;
+            StartTime = from.StartDate;
+            EndTime = from.EndDate;
+            ActivityType = from.ActivityTypeName;
+        }
 
+        public CourseEntryDO(Domain.Models.Entities.Activity from)
+        {
+            Id = from.ActivityId;
+            ParentId = from.ModuleId;
+            Name = from.Name!;
+            Description = from.Description!;
+            StartTime = from.StartDate;
+            EndTime = from.EndDate;
+            //ActivityType = from.ActivityType.Name;
+        }
     }
 }
