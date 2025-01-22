@@ -19,6 +19,8 @@ namespace LMS.Shared.DTOs
         public string ActivityType {  get; set; } = string.Empty;
         public DateTime StartTime { get; set; } = DateTime.MinValue;
         public DateTime EndTime { get; set; } = DateTime.MaxValue;
+        public IEnumerable<CourseEntryDO> CourseEntryDOs { get; set; } = [];
+        public IEnumerable<ApplicationUserDTO> Enrollments { get; set; } = [];
 
         /// <summary>
         /// DTO Constructor Type for Activity entries
@@ -75,6 +77,7 @@ namespace LMS.Shared.DTOs
             Description = from.Description!;
             StartTime = from.StartDate;
             EndTime = from.EndDate;
+            CourseEntryDOs = from.Activities.Select(x => new CourseEntryDO(x));
         }
         public CourseEntryDO(CourseDTO from)
         {
@@ -84,6 +87,8 @@ namespace LMS.Shared.DTOs
             Description = from.Description!;
             StartTime = from.StartDate;
             EndTime = from.EndDate;
+            CourseEntryDOs = from.Modules.Select(x => new CourseEntryDO(x));
+            Enrollments = from.Enrollments;
         }
         public CourseEntryDO(ActivityDTO from)
         {

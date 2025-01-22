@@ -8,14 +8,16 @@ namespace LMS.Blazor.Client.Pages.Components.Admin
     public partial class CourseDashboardEntryBody
     {
         [Parameter]
-        public CourseEntryDO CourseEntry { get; set; }
+        public CourseEntryDO CourseEntry { get; set; } = default!;
         [Parameter]
         public ECourseEntryType CourseEntryType { get; set; }
-        IEnumerable<CourseEntryDO> modules;
+        IEnumerable<CourseEntryDO> modules = [];
+        private List<string> teachers = [];
+        private int nrOfStudents = 0;
         protected async override Task OnInitializedAsync()
         {
-            if(CourseEntryType == ECourseEntryType.Class)
-                modules = FakeDataService.GetModules();
+            modules = CourseEntry.CourseEntryDOs;
+            foreach (var user in CourseEntry.en)
             await base.OnInitializedAsync();
         }
     }

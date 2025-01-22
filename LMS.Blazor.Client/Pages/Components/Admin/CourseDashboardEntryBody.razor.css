@@ -5,6 +5,7 @@
 ::deep .notClick {
     cursor: default;
 }
+
 .bg-expanded {
     background-color: #D9D9D9;
     border-radius: 7px;
@@ -44,7 +45,7 @@
     text-align: right
 }
 
-::deep .blue
-{
-   color: #0d32ff !important;
+::deep .blue {
+    color: #0d32ff !important;
 }
+

@@ -56,3 +56,7 @@
 .align-right {
     text-align: right
 }
+.np {
+    padding-left: 0px;
+    padding-right: 0px;
+}

@@ -1,7 +1,7 @@
 ﻿<li class="mx-3 my-1 bg-expanded list-group-item">
     <div class="row">
         <NavLink class="clickable nav-link" @onclick="toggleExpanded">
-            <div class="row">
+            <div class="row gx-0">
 
                 <div class="col-sm-auto">
                     <h4>@CourseEntry.Name</h4>
@@ -19,7 +19,7 @@
                     <div class="col"></div>
                     <div class="col-sm-auto"><DateWidget DisplayType="@(EDateDisplayType.DateInline)" StartTime="CourseEntry.StartTime" EndTime="CourseEntry.EndTime"></DateWidget></div>
                     <div class="col"></div>
-                    <span class=" align-right col-sm-auto"><NavLink class="blue nav-link py-0" href="">Edit</NavLink></span>
+                    <span class="np align-right col-sm-auto"><NavLink class="np blue nav-link p-0" href="">Edit</NavLink></span>
 
                 }
             </div>
