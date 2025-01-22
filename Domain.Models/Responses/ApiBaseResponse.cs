@@ -106,6 +106,12 @@ namespace Domain.Models.Responses
         public BadPatchRequestResponse(string? message) : base(message ="Patch document could not be read") { }
     }
 
-    
+    public class DuplicateActivityTypeResponse : ApiBadRequestResponse
+    {
+        public DuplicateActivityTypeResponse(string name) : base($"There is already an activiy type named {name}")
+        {
+
+        }
+    }
 }
 

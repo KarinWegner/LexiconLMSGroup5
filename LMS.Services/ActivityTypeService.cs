@@ -42,7 +42,7 @@ namespace LMS.Services
 
         public async Task<ApiBaseResponse> CreateActivityTypeAsync(ActivityTypeCreateDTO activityTypeDto)
         {
-            if (await ActivityTypeExistsAsync(activityTypeDto.Name)) throw new ArgumentException("ActivityType with the same name already exists.");
+            if (await ActivityTypeExistsAsync(activityTypeDto.Name)) return new DuplicateActivityTypeResponse(activityTypeDto.Name);
 
             var activityType = _mapper.Map<ActivityType>(activityTypeDto);
             await _uow.ActivityTypes.AddAsync(activityType);
@@ -58,7 +58,7 @@ namespace LMS.Services
             var activityType = await _uow.ActivityTypes.GetByIdAsync(id);
             if (activityType == null) return new ActivityTypeNotFoundResponse(id);
 
-            if (await ActivityTypeExistsAsync(activityTypeUpdateDto.Name)) throw new ArgumentException("ActivityType with the same name already exists.");
+            if (await ActivityTypeExistsAsync(activityTypeUpdateDto.Name)) return new DuplicateActivityTypeResponse(activityTypeUpdateDto.Name);
 
             _mapper.Map(activityTypeUpdateDto, activityType);
             await _uow.ActivityTypes.UpdateAsync(activityType);
