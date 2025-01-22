@@ -12,34 +12,29 @@
 
 <h3>Account Administration</h3>
 
-@* ToDo add the href to new user page *@
-<button>Add new user</button>
+<a href="/AddNewUser" class="btn btn-secondary pointer my-5">Add new user</a>
 
-<h5> Manage Users</h5>
-
-
-	<div class="card p-3 shadow">
-		<h2 class="text-center p-3">Manage Users</h2>
-		<nav>
-			<div class="nav nav-tabs mb-3" id="nav-tab" role="tablist">
-			<button  @onclick="@(e => SwitchTab("Student"))"   class="nav-link  @(activeTab == "Student" ? "active" : "")" id="students-tab" data-bs-toggle="tab" data-bs-target="#nav-student" type="button" role="tab" aria-controls="nav-student" aria-selected="true">Students</button>
-			<button @onclick="@(e => SwitchTab("Teacher"))" class="nav-link @(activeTab == "Teacher" ? "active" : "")" id="teachers-tab" data-bs-toggle="tab" data-bs-target="#nav-teacher" type="button" role="tab" aria-controls="nav-teacher" aria-selected="false">Teachers</button>
-				
-			</div>
-		</nav
-
-	<Search SearchString="@searchTerm" OnSearch="HandleSearch" />
-		<div class="tab-content p-3 border bg-light">
-        <div class="tab-pane @(activeTab == "Student" ? "active" : "")">
-            <UserTable Items="searchResults" />
+<div class="card p-3 shadow">
+    <h2 class="text-center p-3">Manage Users</h2>
+    <nav>
+        <div class="nav nav-tabs mb-3" id="nav-tab" role="tablist">
+            <button @onclick="@(e => SwitchTab(Student))" class="nav-link @(activeTab == Student ? "active" : "")" id="students-tab" data-bs-toggle="tab" data-bs-target="#nav-student" type="button" role="tab" aria-controls="nav-student" aria-selected="true">Students</button>
+            <button @onclick="@(e => SwitchTab(Teacher))" class="nav-link @(activeTab == Teacher ? "active" : "")" id="teachers-tab" data-bs-toggle="tab" data-bs-target="#nav-teacher" type="button" role="tab" aria-controls="nav-teacher" aria-selected="false">Teachers</button>
         </div>
-        <div class="tab-pane @(activeTab == "Teacher" ? "active" : "")">
-            <p>This is the content for the Teachers tab.</p>
-              <UserTable Items="searchResults" />
-        </div>
-    </div>
-	</div>
+    </nav>
 
+    <Search SearchString="@searchTerm" OnSearch="HandleSearch" />
+
+        <div class="tab-content p-3 border bg-light">
+            <div class="tab-pane @(activeTab == Student ? "active" : "")">
+                <UserTable Items="searchResults" IsLoading ="isLoading"/>
+            </div>
+            <div class="tab-pane @(activeTab == Teacher ? "active" : "")">
+                <UserTable Items="searchResults" IsLoading="isLoading" />
+            </div>
+        </div>
+    
+</div>
 
 @code {
     [Inject]
@@ -47,43 +42,48 @@
     [Inject]
     private AuthenticationStateProvider AuthenticationStateProvider { get; set; } = default!;
 
+    private const string Student = "Student";
+    private const string Teacher = "Teacher";
+
     private string searchTerm = string.Empty;
-    private string activeTab = "Student";
+    private string activeTab = Student;
     private List<ApplicationUserDTO> data = new();
     private List<ApplicationUserDTO> searchResults = new();
-    private bool isDataLoaded = false;
+    private bool isLoading = true;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender && !isDataLoaded)
+        if (firstRender)
         {
-            data = await LoadUsersAsync(activeTab); 
-            searchResults = data;  
-            isDataLoaded = true;
-
-            StateHasChanged();
+            isLoading = true;
+            await LoadAndSetUsersAsync();
         }
     }
 
     private async Task<List<ApplicationUserDTO>> LoadUsersAsync(string roleFilter)
     {
-       var response = await _apiService.GetAsync<ApplicationUserResultDTO>($"api/enrollment/user?roleFilter={roleFilter}");
+        var response = await _apiService.GetAsync<ApplicationUserResultDTO>($"api/enrollment/user?roleFilter={roleFilter}");
         return response?.Result ?? new List<ApplicationUserDTO>();
     }
 
-      private async Task LoadAndSetUsersAsync()
+    private async Task LoadAndSetUsersAsync()
     {
+        isLoading = true;
+        StateHasChanged();
+
         data = await LoadUsersAsync(activeTab);
         searchResults = data;
+
+        isLoading = false;
         StateHasChanged();
     }
 
-     private async void SwitchTab(string tabName)
+    private async void SwitchTab(string tabName)
     {
         if (activeTab != tabName)
         {
             activeTab = tabName;
-            await LoadAndSetUsersAsync(); 
+            await LoadAndSetUsersAsync();
         }
     }
 
@@ -93,7 +93,7 @@
 
         if (string.IsNullOrWhiteSpace(searchString))
         {
-            searchResults = data; 
+            searchResults = data;
         }
         else
         {
@@ -103,4 +103,3 @@
         }
     }
 }
-
