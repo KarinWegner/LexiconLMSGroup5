@@ -7,15 +7,18 @@ using System.Threading.Tasks;
 
 namespace LMS.Shared.DTOs
 {
-    public record CourseParticipantDO : ApplicationUserDTO
+    namespace LMS.Shared.DTOs
     {
-        public string? ProfilePictureLink { get; set; }
-
-        public CourseParticipantDO(string? ProfilePictureLink, string? role, string? id, string? username, string? name, string? email) : base(id, username, name, email, role)
+        public record CourseParticipantDO : ApplicationUserDTO
         {
-            this.ProfilePictureLink = ProfilePictureLink ?? $"https://picsum.photos/{new Random().Next(10,1000)}";
-        }
+            public string? ProfilePictureLink { get; set; }
 
-        public CourseParticipantDO() { }
+            public CourseParticipantDO(string? ProfilePictureLink, string? role, string? id, string? username, string? name, string? email) : base(id, username, name, email, role)
+            {
+                this.ProfilePictureLink = ProfilePictureLink ?? $"https://picsum.photos/{new Random().Next(10, 1000)}";
+            }
+
+            public CourseParticipantDO() { }
+        }
     }
 }
