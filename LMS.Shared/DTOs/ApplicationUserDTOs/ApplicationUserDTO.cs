@@ -32,6 +32,7 @@ namespace LMS.Shared.DTOs.ApplicationUserDTOs
             UserName = user.UserName;
             Name = user.Name;
             Email = user.Email;
+            Role = user.Role;
         }
     }
 }

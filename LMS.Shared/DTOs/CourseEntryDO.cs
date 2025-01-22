@@ -1,6 +1,7 @@
 ﻿using LMS.Shared.DTOs.CourseDTOs;
 using LMS.Shared.DTOs.ModuleDTOs;
 using LMS.Shared.DTOs.ActivityDTOs;
+using LMS.Shared.DTOs.ApplicationUserDTOs;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -98,7 +99,7 @@ namespace LMS.Shared.DTOs
             Description = from.Description!;
             StartTime = from.StartDate;
             EndTime = from.EndDate;
-            //ActivityType = from.ActivityTypeId.ToString();
+            ActivityType = from.ActivityTypeName;
         }
 
         public CourseEntryDO(Domain.Models.Entities.Activity from)

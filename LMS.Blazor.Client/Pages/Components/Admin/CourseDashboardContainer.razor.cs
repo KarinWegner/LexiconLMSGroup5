@@ -28,8 +28,8 @@ namespace LMS.Blazor.Client.Pages.Components.Admin
         {
             if (firstRender)
             {
-                var res = await apiService.GetAsync<IEnumerable<CourseDTO>>(VBRoutes.API.Course.CoursesWithModulesAndEnrollments);
-                courseEntries = res.Select(x => new CourseEntryDO(x)).ToList();
+                var res = await apiService.GetAsync<(IEnumerable<CourseDTO> courseDtos, int totalCount)>(VBRoutes.API.Course.CoursesWithModulesAndEnrollments);
+                courseEntries = res.courseDtos.Select(x => new CourseEntryDO(x)).ToList();
                 StateHasChanged();
             }
             await base.OnAfterRenderAsync(firstRender);

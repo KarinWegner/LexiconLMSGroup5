@@ -17,7 +17,16 @@ namespace LMS.Blazor.Client.Pages.Components.Admin
         protected async override Task OnInitializedAsync()
         {
             modules = CourseEntry.CourseEntryDOs;
-            foreach (var user in CourseEntry.en)
+            if (CourseEntry.Enrollments != null && CourseEntry.Enrollments.Count() > 0)
+            {
+                foreach (var user in CourseEntry.Enrollments)
+                { 
+                    if(user.Role == "Teacher")
+                        teachers.Add(user.Name!);
+                    else
+                        nrOfStudents++;
+                }
+            }
             await base.OnInitializedAsync();
         }
     }

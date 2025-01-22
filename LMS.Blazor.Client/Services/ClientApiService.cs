@@ -13,7 +13,10 @@ public class ClientApiService(IHttpClientFactory httpClientFactory, NavigationMa
     private readonly HttpClient httpClient = httpClientFactory.CreateClient("BffClient");
 
     private readonly JsonSerializerOptions _jsonSerializerOptions = new()
-    { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        IncludeFields = true
+    };
 
 
     public async Task<TResponse?> GetAsync<TResponse>(string endpoint)

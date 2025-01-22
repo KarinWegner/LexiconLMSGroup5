@@ -1,6 +1,7 @@
 ﻿<li class="notClick mx-3 my-1 bg-expanded list-group-item ">
     @if (CourseEntryType == ECourseEntryType.Class)
     {
+        @* top bar *@
         <div class="row">
             <NavLink class="notClick nav-link">
                 <div class="row">
@@ -13,6 +14,7 @@
             </NavLink>
         </div>
         <div class="row">
+            @* modules *@
             <div class="col-8">
                 <div class="row">
                     <span class="h5 col-sm-auto ms-3">Modules</span>
@@ -21,7 +23,20 @@
                 </div>
                 <CourseDashboardList courseEntries="modules" CourseEntryType="ECourseEntryType.Module"></CourseDashboardList>
             </div>
-
+            @* enrollment info *@
+            <div class="col-4">
+                <div class="row">
+                    <h5>Teachers</h5>
+                    @foreach (string teacher in teachers)
+                    {
+                        <div>@teacher</div>
+                    }
+                </div>
+                <div class="row mt-3">
+                    <h5>Students</h5>
+                    <div>Enrolled: @nrOfStudents</div>
+                </div>
+            </div>
         </div>
     }
     else
