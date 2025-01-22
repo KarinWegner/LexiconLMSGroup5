@@ -92,8 +92,8 @@ namespace LMS.Services
 
             //Check dates - does it end before it starts, does it fit into the course timeline, does it overlap with other modules
             ValidateModuleDates(moduleDto);
-            if (!ValidateModuleFitsCourseDate(moduleDto, course)) throw new TimeOutsideBoundsResponse("The module date must fit into the course timeline.");
-            if (!ValidateModulesDoNotOverlapOnCreate(moduleDto, course)) throw new BadModuleRequestException("The module dates can't overlap.");
+            if (!ValidateModuleFitsCourseDate(moduleDto, course)) return new BadDateTimeFrameBreakResponse();
+            if (!ValidateModulesDoNotOverlapOnCreate(moduleDto, course)) return new BadDateOverlapResponse();
 
             var moduleToAdd = _mapper.Map<Domain.Models.Entities.Module>(moduleDto);
             moduleToAdd.CourseId = courseId;
@@ -108,7 +108,7 @@ namespace LMS.Services
 
         public async Task<ApiBaseResponse> UpdateModuleAsync(int id, int courseId, ModuleUpdateDTO moduleDto)
         {
-            var existingModule = await GetModuleIfExists(id);
+            var existingModule = await _uow.Modules.GetByIdAsync(id);
             if (existingModule == null) return new ModuleNotFoundResponse(id);
 
             var course = await _uow.Courses.GetByIdAsync(courseId);
@@ -116,8 +116,8 @@ namespace LMS.Services
 
             //Validate dates
             ValidateModuleDates(moduleDto);
-            if (!ValidateModuleFitsCourseDate(moduleDto, course)) throw new BadModuleRequestException("The module date must fit into the course timeline.");
-            if (!ValidateModulesDoNotOverlapOnUpdate(moduleDto, course)) throw new BadModuleRequestException("The module dates can't overlap.");
+            if (!ValidateModuleFitsCourseDate(moduleDto, course)) return new BadDateTimeFrameBreakResponse();
+            if (!ValidateModulesDoNotOverlapOnUpdate(moduleDto, course)) return new BadDateOverlapResponse();
 
             _mapper.Map(moduleDto, existingModule);
 
@@ -128,7 +128,8 @@ namespace LMS.Services
 
         public async Task<ApiBaseResponse> DeleteModuleAsync(int id)
         {
-            var module = await GetModuleIfExists(id);
+            var module = await _uow.Modules.GetByIdAsync(id);
+            if(module == null) return new ModuleNotFoundResponse(id);
 
             await _uow.Modules.DeleteAsync(module);
             await _uow.CompleteASync();
@@ -140,24 +141,14 @@ namespace LMS.Services
             return new ApiNoContentResponse();
         }
 
-
-        private async Task<Domain.Models.Entities.Module> GetModuleIfExists(int id)
-        {
-            var existingModule = await _uow.Modules.GetByIdAsync(id);
-            if (existingModule == null)
-            {
-                throw new ModuleNotFoundException(id);
-            }
-            return existingModule;
-        }
-
-
-        private void ValidateModuleDates(dynamic moduleDto)
+      
+        private bool ValidateModuleDates(dynamic moduleDto)
         {
             if (moduleDto.EndDate < moduleDto.StartDate)
             {
-                throw new BadDateSequenceException(moduleDto.StartDate, moduleDto.EndDate);
+                return false;
             }
+            return true;
         }
 
         private bool ValidateModuleFitsCourseDate(dynamic moduleDto, Course course)
