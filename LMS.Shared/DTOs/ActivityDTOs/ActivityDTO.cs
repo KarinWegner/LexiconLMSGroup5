@@ -18,8 +18,8 @@ namespace LMS.Shared.DTOs.ActivityDTOs
         public ICollection<DocumentDTO> Documents { get; init; }
       = new List<DocumentDTO>();
 
-        //Foreign Keys
         public int ActivityTypeId { get; init; }
+        public string ActivityTypeName { get; init; } = string.Empty;
         public int ModuleId { get; init; }
     }
 }

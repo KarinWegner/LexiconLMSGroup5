@@ -1,0 +1,25 @@
+﻿<li class="list-group-item">
+    <div class="row">
+        <NavLink class="nav-link " href="@ThisNavLink">
+            <div class="row">
+                <div class="col-sm-auto">
+                    <h4>@Model.Name</h4>
+                </div>
+                <div class="col"></div>
+                @if (CourseEntryType == ECourseEntryType.Activity)
+                {
+                    <div class="col-sm-auto align-right">@Model.ActivityType</div>
+                }
+            </div>
+            <div class="row">
+                <div class="col-sm-auto">
+                    <div class="col-1"></div>
+                    @Model.Description
+                </div>
+            </div>
+            <div class="row">
+                <DateWidget DisplayType="@(CourseEntryType != ECourseEntryType.Activity ? EDateDisplayType.Date : EDateDisplayType.DateTime)" StartTime="Model.StartTime" EndTime="Model.EndTime"></DateWidget>
+            </div>
+        </NavLink>
+    </div>
+</li>

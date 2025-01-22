@@ -2,7 +2,7 @@
 @rendermode InteractiveWebAssembly
 
 @using LMS.Blazor.Client.Services
-@using LMS.Shared.DTOs
+@using LMS.Shared.DTOs.CourseDTOs
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 
@@ -48,10 +48,10 @@ else
     [Inject]
     private AuthenticationStateProvider AuthenticationStateProvider { get; set; } = default!;
 
-    private List<DemoDto>? demo; 
+    private List<CourseDTO>? demo; 
 
     private async Task CallAPIAsync()
     {
-        demo = (await _apiService.GetAsync<IEnumerable<DemoDto>>("api/demoauth"))?.ToList() ?? [];
+        demo = (await _apiService.GetAsync<IEnumerable<CourseDTO>>(VBRoutes.API.Course.CoursesWithModulesAndEnrollments))?.ToList() ?? [];
     }
 }

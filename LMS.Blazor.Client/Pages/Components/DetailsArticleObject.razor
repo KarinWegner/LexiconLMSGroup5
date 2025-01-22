@@ -2,14 +2,7 @@
     <h4 class="ms-3 mt-3">@CourseEntry.Name</h4>
     @if(DisplayDate)
     {
-        @if (!ShowDateOnly)
-        {
-            <span class="col-sm-auto ms-3">@CourseEntry.StartTime - @CourseEntry.EndTime</span>
-        }
-        else
-        {
-            <span class="col-sm-auto ms-3">@DateOnly.FromDateTime(CourseEntry.StartTime) - @DateOnly.FromDateTime(CourseEntry.EndTime)</span>
-        }
+        <DateWidget DisplayType="@(ShowDateOnly ? EDateDisplayType.DateInline : EDateDisplayType.DateTimeInline)" StartTime="CourseEntry.StartTime" EndTime="CourseEntry.EndTime"></DateWidget>
     }
     <div class="ms-4 me-4 mt-4">
         @CourseEntry.Description

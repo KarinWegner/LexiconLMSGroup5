@@ -65,9 +65,21 @@ namespace LMS.Infrastructure.Repositories
 
         public async Task<IEnumerable<Course>> GetUserEnrollments(string userId)
         {
-            var enrollments = await _context.Users.Where(u=>u.Id == userId).Include(u=>u.Enrollments).SelectMany(u=>u.Enrollments).ToListAsync();
+            var enrollments = await UserQuery().Where(u=>u.Id == userId).Include(u=>u.Enrollments).SelectMany(u=>u.Enrollments).ToListAsync();
 
             return enrollments;
+        }
+
+        public async Task<IEnumerable<ApplicationUser>> GetAllUsersAsync(string? roleFilter)
+        {
+            IEnumerable<ApplicationUser> users = UserQuery().Where(u => u.Role == roleFilter);
+                     
+            return users;
+        }
+
+        public IQueryable<ApplicationUser> UserQuery()
+        {
+            return _context.Users.AsQueryable();
         }
     }
 }

@@ -3,6 +3,7 @@ using Domain.Contracts;
 using Domain.Models.Entities;
 using Domain.Models.Exceptions;
 using Domain.Models.Responses;
+using LMS.Shared.DTOs.ApplicationUserDTOs;
 using LMS.Shared.DTOs.EnrollmentDTOs;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -177,6 +178,15 @@ namespace LMS.Services
 
 
             return new ApiOkResponse<IEnumerable<EnrollmentUserCourseListDTO>>(enrollmentListDTO);
+        }
+
+        public async Task<ApiBaseResponse> GetUsers(string? roleFilter)
+        {
+           var userList = await _uow.Enrollments.GetAllUsersAsync(roleFilter);
+
+            var userListDto = _mapper.Map<IEnumerable<ApplicationUserListDTO>>(userList);
+
+            return new ApiOkResponse<IEnumerable<ApplicationUserListDTO>>(userListDto);
         }
 
         public async Task<ApiBaseResponse> RemoveEnrollment(int courseId, string userId)

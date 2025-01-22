@@ -26,14 +26,14 @@ namespace LMS.Services
         public async Task<ApiBaseResponse> GetAllCoursesAsync(
             bool includeModules = false,
             bool includeEnrollments = false,
+            bool includeDocuments = false,
             int pageNr = 1,
             int pageSize = 10)
         {
             IQueryable<Course> query = _uow.Courses.Query();
+            int totalCount = query.Count();
 
-            if (includeModules) query = query.Include(m => m.Modules);
-
-            if (includeEnrollments) query = query.Include(e => e.Enrollments);
+            query = IncludeRelatedEntities(query, includeModules, includeEnrollments, includeDocuments);
 
             //pagination
             var courses = await query
@@ -42,14 +42,14 @@ namespace LMS.Services
                 .ToListAsync();
 
             var courseDtos = _mapper.Map<IEnumerable<CourseDTO>>(courses);
-            return new ApiOkResponse<IEnumerable<CourseDTO>>(courseDtos);
+            return new ApiOkResponse<(IEnumerable<CourseDTO> courseDtos, int totalCount)>((courseDtos, totalCount));
         }
 
-        public async Task<ApiBaseResponse> GetCourseByIdAsync(int id, bool includeModules = false, bool includeEnrollments = false)
+        public async Task<ApiBaseResponse> GetCourseByIdAsync(int id, bool includeModules = false, bool includeEnrollments = false, bool includeDocuments = false)
         {
             IQueryable<Course> query = _uow.Courses.Query().Where(c => c.CourseId == id);
 
-            query = IncludeRelatedEntities(query, includeModules, includeEnrollments);
+            query = IncludeRelatedEntities(query, includeModules, includeEnrollments, includeDocuments);
 
             var course = await query.FirstOrDefaultAsync();
 
@@ -123,11 +123,14 @@ namespace LMS.Services
         private IQueryable<Course> IncludeRelatedEntities(
         IQueryable<Course> query, 
         bool includeModules, 
-        bool includeEnrollments)
+        bool includeEnrollments,
+        bool includeDocuments)
         {
             if (includeModules) query = query.Include(m => m.Modules);
 
             if (includeEnrollments) query = query.Include(e => e.Enrollments);
+
+            if (includeDocuments) query = query.Include(d => d.Documents);
 
             return query;
         }
