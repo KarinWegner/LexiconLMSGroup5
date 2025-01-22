@@ -69,7 +69,10 @@ namespace LMS.Services
         {
             IQueryable<Domain.Models.Entities.Module> query = _uow.Modules.Query().Where(m => m.ModuleId == id);
 
-            if (includeActivities) query = query.Include(m => m.Activities);
+            if (includeActivities) 
+            {
+                query = query.Include(m => m.Activities).ThenInclude(a => a.ActivityType);
+            }
             if (includeDocuments) query = query.Include(m => m.Documents);
 
             var module = await query.FirstOrDefaultAsync();
