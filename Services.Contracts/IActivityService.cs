@@ -21,7 +21,7 @@ namespace Services.Contracts
         Task<ApiBaseResponse> GetActivityByIdAsync(int id, bool includeDocuments = false);
         Task<ApiBaseResponse> CreateActivityAsync(ActivityCreateDTO activityDto, int moduleId);
         Task<ApiBaseResponse> UpdateActivityAsync(int id, ActivityUpdateDTO activityDto);
-        Task<bool> DeleteActivityAsync(int id);
+        Task<ApiBaseResponse> DeleteActivityAsync(int id);
 
        // Task<bool> IsOverlappingActivityAsync(int moduleId, int? activityId, DateTime startDate, DateTime endDate);
     }

@@ -100,10 +100,14 @@ namespace LMS.Presemtation.Controllers
             if(activityDto == null) return BadRequest("Activity info is required");
             var response = await _serviceManager.ActivityService.CreateActivityAsync(activityDto, moduleId);
 
+            if (response.Success)
+            {
             var createdActivity = response.GetCreatedAtResult<ActivityDTO>();
 
-            return response.Success ? CreatedAtAction(nameof(GetActivity), new { courseId, moduleId, id = createdActivity.ActivityId }, createdActivity) :
-                ProcessError(response);
+                return CreatedAtAction(nameof(GetActivity), new { courseId, moduleId, id = createdActivity.ActivityId }, createdActivity);
+            }
+
+            return ProcessError(response);
         }
 
         //PATCH: api/Activities/5
@@ -130,8 +134,8 @@ namespace LMS.Presemtation.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteActivity(int id)
         {
-            var isDeleted = await _serviceManager.ActivityService.DeleteActivityAsync(id);
-            return isDeleted ? NoContent() : NotFound($"Activity with ID {id} not found");
+            var response = await _serviceManager.ActivityService.DeleteActivityAsync(id);
+            return response.Success ? NoContent() : ProcessError(response);
         }
 
     }

@@ -118,14 +118,14 @@ namespace LMS.Services
         }
 
 
-        public async Task<bool> DeleteActivityAsync(int id)
+        public async Task<ApiBaseResponse> DeleteActivityAsync(int id)
         {
             var activity = await GetActivityIfExists(id);
-            if (activity == null) return false;
+            if (activity == null) return new ActivityNotFoundResponse(id);
 
             await _uow.Activities.DeleteAsync(activity);
             await _uow.CompleteASync();
-            return true;
+            return new ApiNoContentResponse();
         }
 
         private async Task<Activity> GetActivityIfExists(int id)
