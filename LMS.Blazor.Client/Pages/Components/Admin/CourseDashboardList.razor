@@ -1,0 +1,7 @@
+﻿@if (courseEntries != null && courseEntries.Count() != 0)
+{
+    @foreach (var e in courseEntries)
+    {
+        <CourseDashboardEntry CourseEntry="e" CourseEntryType="CourseEntryType"></CourseDashboardEntry>
+    }
+}

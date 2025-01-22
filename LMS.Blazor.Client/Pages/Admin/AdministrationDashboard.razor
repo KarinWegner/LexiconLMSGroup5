@@ -1,0 +1,15 @@
+﻿@attribute [Route(VBRoutes.Administration.LinkToDashboard)]
+
+
+@* Just a redirect page, here to make sure the active nav system plays nice mostly.*@
+
+
+@code {
+    [Inject]
+    NavigationManager NavigationManager { get; set; }
+    protected async override Task OnInitializedAsync()
+    {
+        NavigationManager.NavigateTo(VBRoutes.Administration.LinkToCourseDashboard);
+        await base.OnInitializedAsync();
+    }
+}

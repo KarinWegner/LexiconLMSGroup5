@@ -13,7 +13,10 @@ public class ClientApiService(IHttpClientFactory httpClientFactory, NavigationMa
     private readonly HttpClient httpClient = httpClientFactory.CreateClient("BffClient");
 
     private readonly JsonSerializerOptions _jsonSerializerOptions = new()
-    { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        IncludeFields = true
+    };
 
 
     public async Task<TResponse?> GetAsync<TResponse>(string endpoint)
@@ -71,11 +74,11 @@ public class ClientApiService(IHttpClientFactory httpClientFactory, NavigationMa
         var serialized = JsonSerializer.Serialize(dto);
         request.Content = new StringContent(serialized);
         request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-        
+
 
         var response = await httpClient.SendAsync(request);
 
-        
+
 
         response.EnsureSuccessStatusCode();
 

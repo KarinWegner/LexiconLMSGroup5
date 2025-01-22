@@ -1,0 +1,10 @@
+﻿@attribute [Route(VBRoutes.Student.LinkToActivityDetails)]
+@rendermode InteractiveWebAssembly
+@if (Activity != null)
+{
+    <h3>Activity Information</h3>
+    <h5 class="ms-2">@Activity.ActivityType</h5>
+
+    <CourseNavbar ActiveNav="ECourseNav.Modules" CourseId="@CourseId"></CourseNavbar>
+    <DetailsArticleObject CourseEntry="Activity"></DetailsArticleObject>
+}
