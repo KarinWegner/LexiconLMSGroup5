@@ -49,7 +49,7 @@
     private string activeTab = Student;
     private List<ApplicationUserDTO> data = new();
     private List<ApplicationUserDTO> searchResults = new();
-    private bool isLoading = true;
+    private bool isLoading = false;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
