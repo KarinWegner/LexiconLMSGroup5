@@ -55,15 +55,13 @@
     {
         if (firstRender)
         {
-            isLoading = true;
             await LoadAndSetUsersAsync();
         }
     }
 
     private async Task<List<ApplicationUserDTO>> LoadUsersAsync(string roleFilter)
     {
-        var response = await _apiService.GetAsync<ApplicationUserResultDTO>($"api/enrollment/user?roleFilter={roleFilter}");
-        return response?.Result ?? new List<ApplicationUserDTO>();
+        return await _apiService.GetAsync<List<ApplicationUserDTO>>($"api/enrollment/user?roleFilter={roleFilter}") ?? new List<ApplicationUserDTO>();
     }
 
     private async Task LoadAndSetUsersAsync()
@@ -71,13 +69,13 @@
         isLoading = true;
         StateHasChanged();
 
-        data = await LoadUsersAsync(activeTab);
-        searchResults = data;
+        var loadedData = await LoadUsersAsync(activeTab);
 
+        data = loadedData;
+        searchResults = data;
         isLoading = false;
         StateHasChanged();
     }
-
     private async void SwitchTab(string tabName)
     {
         if (activeTab != tabName)
@@ -101,5 +99,6 @@
                 .Where(user => user.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
                 .ToList();
         }
+        StateHasChanged();
     }
 }
