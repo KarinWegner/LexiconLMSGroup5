@@ -16,6 +16,7 @@ namespace Domain.Contracts
         Task<ApplicationUser> FindUserByIdAsync(string userId);
         Task<IEnumerable<Course>> GetUserEnrollments(string userId);
         Task<IEnumerable<ApplicationUser>> GetUsersByRoleAsync(string? roleFilter);
+        IQueryable<ApplicationUser> UserQuery();
         Task<IEnumerable<IdentityRole>> GetAllRolesAsync();
         Task<IEnumerable<ApplicationUser>> GetAllUsersAsync();
         Task AssignRoleToUserAsync(string userId, string roleName);

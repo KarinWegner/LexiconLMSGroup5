@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Services.Contracts;
 using LMS.Shared.DTOs.EnrollmentDTOs;
 using LMS.Shared.DTOs.ApplicationUserDTOs;
+using System.Text.Json;
 using LMS.Shared.DTOs;
 
 namespace LMS.Presemtation.Controllers
@@ -36,11 +37,24 @@ namespace LMS.Presemtation.Controllers
         // GET: api/Enrollments
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<EnrollmentListDTO>>> GetEnrollments()
+        public async Task<ActionResult<IEnumerable<EnrollmentListDTO>>> GetEnrollments(
+            int pageNr = 1,
+            int pageSize = 10)
         {
 
-            var enrollments = await _serviceManager.EnrollmentService.GetEnrollments();
-                          
+            var response = await _serviceManager.EnrollmentService.GetEnrollments(pageNr, pageSize);
+            var (enrollments, totalCount) = response.GetOkResult<(IEnumerable<EnrollmentListDTO> enrollments, int totalCount)>();
+
+                var metadata = new
+                {
+                    TotalItems = totalCount,
+                    PageSize = pageSize,
+                    CurrentPage = pageNr,
+                    TotalPages = (totalCount / pageSize)
+                };
+
+            Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(metadata));
+
             return Ok(enrollments);
         }
 
@@ -54,11 +68,16 @@ namespace LMS.Presemtation.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
 
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<EnrolledUserDTO>>> GetEnrollmentsForCourse(int courseId, bool excludeTeachers = false)
+        public async Task<ActionResult<IEnumerable<EnrolledUserDTO>>> GetEnrollmentsForCourse(
+            int courseId, 
+            bool excludeTeachers = false,
+            int pageNr = 1,
+            int pageSize = 10)
         {
             //var course = await _context.Courses.Include(c => c.Enrollments).Where(c => c.CourseId == courseId).FirstOrDefaultAsync();
 
-            var enrolledUsers = _serviceManager.EnrollmentService.GetEnrollmentsForCourse(courseId, excludeTeachers);
+            var response = await _serviceManager.EnrollmentService.GetEnrollmentsForCourse(courseId, excludeTeachers, pageNr, pageSize);
+            var (enrolledUsers, totalCount) = response.GetOkResult<(IEnumerable<EnrolledUserDTO> enrolledUsers, int totalCount)>();
             if (enrolledUsers == null) { return NotFound("course not found"); }
 
             return Ok(enrolledUsers);
@@ -156,11 +175,27 @@ namespace LMS.Presemtation.Controllers
         }
 
         [HttpGet("user/")]
-        public async Task<ActionResult<IEnumerable<ApplicationUserDTO>>> GetUsers(string? roleFilter)
+        public async Task<ActionResult<IEnumerable<ApplicationUserDTO>>> GetUsers(
+            string? roleFilter,
+            int pageNr = 1,
+            int pageSize = 10)
         {
-            var response = await _serviceManager.EnrollmentService.GetUsers(roleFilter);
+            var response = await _serviceManager.EnrollmentService.GetUsers(roleFilter, pageNr, pageSize);
 
-            return response.Success ? Ok(response.GetOkResult<IEnumerable<ApplicationUserListDTO>>()):
+            var (userList, totalCount) = response.GetOkResult<(IEnumerable<ApplicationUserListDTO> userList, int totalCount)>();
+
+            var metadata = new
+            {
+                TotalItems = totalCount,
+                PageSize = pageSize,
+                CurrentPage = pageNr,
+                TotalPages = (totalCount / pageSize)
+            };
+
+            Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(metadata));
+
+
+            return response.Success ? Ok(response.GetOkResult<(IEnumerable<ApplicationUserListDTO> userList, int totalCount)>()) :
                 ProcessError(response);
         }
 

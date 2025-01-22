@@ -13,9 +13,9 @@ namespace Services.Contracts
 {
     public interface IEnrollmentService
     {
-        Task<ApiBaseResponse> GetEnrollments();
+        Task<ApiBaseResponse> GetEnrollments(int pageNr, int pageSize);
 
-        Task<ApiBaseResponse> GetEnrollmentsForCourse(int courseId, bool excludeTeachers = false);
+        Task<ApiBaseResponse> GetEnrollmentsForCourse(int courseId, bool excludeTeachers, int pageNr, int pageSize);
         Task<ApiBaseResponse> EditEnrollment(int courseId, EnrollmentUpdateDTO updateDto);
         Task<ApiBaseResponse> AddEnrollment(int courseId, EnrollmentCreateDTO createDto);
         Task<ApiBaseResponse> RemoveEnrollment(int courseId, string userId);
@@ -24,5 +24,7 @@ namespace Services.Contracts
         Task<ApiBaseResponse> GetAllRolesAsync();
         Task<ApiBaseResponse> GetAllUsersAsync();
         Task<ApiBaseResponse> AssignRoleToUserAsync(AssignRoleDTO assignRoleDto);
+        Task<ApiBaseResponse> GetUsers(string? roleFilter, int pageNr, int pageSize);
+
     }
 }

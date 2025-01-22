@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Azure;
 using Domain.Contracts;
 using Domain.Models.Entities;
 using Domain.Models.Exceptions;
@@ -9,6 +10,7 @@ using LMS.Shared.DTOs.EnrollmentDTOs;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Services.Contracts;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using System.IO;
 
 namespace LMS.Services
@@ -91,21 +93,30 @@ namespace LMS.Services
 
        
 
-        public async Task<ApiBaseResponse> GetEnrollments()
+        public async Task<ApiBaseResponse> GetEnrollments(int pageNr, int pageSize)
         {
             //Fetch list of all courses
-            IQueryable<Course> query = _uow.Courses.Query();
+            IQueryable<ApplicationUser> query = _uow.Enrollments.UserQuery().OrderBy(u=>u.Name);
+            int totalCount = query.Count();
 
            //Include all enrollments
                 query = query.Include(e => e.Enrollments);
-            
 
-            var courses = await query.ToListAsync();
+            var enrollments = await query
+                .Skip((pageNr - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
 
             var EnrollmentListDTOs = new List<EnrollmentListDTO>();
 
-            foreach (var course in courses)
+            foreach (var user in enrollments)
             {
+                if (EnrollmentListDTOs.Count>pageSize-1)
+                {
+                    break;
+                }
+                foreach (var course in user.Enrollments)
+                {
                 var teacherNames = await _uow.Courses.Query()
                     .Where(c => c.CourseId == course.CourseId)
                     .SelectMany(c => c.Enrollments)
@@ -113,36 +124,46 @@ namespace LMS.Services
                     .Select(u => u.Name)
                     .ToListAsync();
 
-                foreach (var enrollment in course.Enrollments)
-                {
                     EnrollmentListDTOs.Add(new EnrollmentListDTO
                     {
                         CourseName = course.Name,
                         CourseStart = course.StartDate,
                         CourseEnd = course.EndDate,
-                        User = enrollment.Name,
+                        User = user.Name,
                         TeacherNames = teacherNames
+                        
                     });
                 }
             }
-            return new ApiOkResponse<IEnumerable<EnrollmentListDTO>>(EnrollmentListDTOs);
+            return new ApiOkResponse<(IEnumerable<EnrollmentListDTO> enrollments, int totalCount)>((EnrollmentListDTOs, totalCount));
         }
 
-        public async Task<ApiBaseResponse> GetEnrollmentsForCourse(int courseId, bool excludeTeachers = false)
+        public async Task<ApiBaseResponse> GetEnrollmentsForCourse(int courseId, bool excludeTeachers, int pageNr, int pageSize)
         {
-            IQueryable<ApplicationUser> enrollments =  _uow.Courses.Query().Where(c => c.CourseId == courseId).Include(c=>c.Enrollments).SelectMany(c=>c.Enrollments);
+            IQueryable<ApplicationUser> query =  _uow.Courses.Query()
+                                                             .Where(c => c.CourseId == courseId)
+                                                             .Include(c=>c.Enrollments)
+                                                             .SelectMany(c=>c.Enrollments)
+                                                             .OrderBy(u=>u.Name);
 
-            if (enrollments == null)
+            if (query == null)
             {
                 return new CourseNotFoundResponse(courseId);
             }
-            var enrolledUsers = excludeTeachers ?
-                 enrollments!.Where(u => u.Role == "Student")
-                 .ToList() :
-                enrollments!.ToList();
+
+            int totalCount = query.Count();
+
+            var filteredUsers = excludeTeachers ? query!.Where(u => u.Role == "Student"):
+                                                  query!;
+
+            var enrolledUsers = await query
+               .Skip((pageNr - 1) * pageSize)
+               .Take(pageSize)
+               .ToListAsync();
 
             var enrollmentsDto = _mapper.Map<IEnumerable<EnrolledUserDTO>>(enrolledUsers);
-            return new ApiOkResponse<IEnumerable<EnrolledUserDTO>>(enrollmentsDto);
+
+            return new ApiOkResponse<(IEnumerable<EnrolledUserDTO> enrolledUsers, int totalCount)>((enrollmentsDto, totalCount));
            
         }
 
@@ -183,13 +204,22 @@ namespace LMS.Services
             return new ApiOkResponse<IEnumerable<EnrollmentUserCourseListDTO>>(enrollmentListDTO);
         }
 
-        public async Task<ApiBaseResponse> GetUsers(string? roleFilter)
+        public async Task<ApiBaseResponse> GetUsers(string? roleFilter, int pageNr, int pageSize)
         {
-           var userList = await _uow.Enrollments.GetUsersByRoleAsync(roleFilter);
+            IQueryable<ApplicationUser> query = _uow.Courses.Query()                                                              
+                                                              .Include(c => c.Enrollments)
+                                                              .SelectMany(c => c.Enrollments);
+            int totalCount = query.Count();
+
+            var userList = await query
+                .Skip((pageNr - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
 
             var userListDto = _mapper.Map<IEnumerable<ApplicationUserListDTO>>(userList);
 
-            return new ApiOkResponse<IEnumerable<ApplicationUserListDTO>>(userListDto);
+            return new ApiOkResponse<(IEnumerable<ApplicationUserListDTO> userList, int totalCount)>((userListDto, totalCount));
         }
 
         public async Task<ApiBaseResponse> RemoveEnrollment(int courseId, string userId)
