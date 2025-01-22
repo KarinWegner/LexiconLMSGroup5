@@ -67,7 +67,7 @@ namespace LMS.Presemtation.Controllers
 
             Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(metadata));
 
-            return response.Success ? Ok(response.GetOkResult<IEnumerable<ActivityDTO>>()) :
+            return response.Success ? Ok(response.GetOkResult<(IEnumerable<ActivityDTO>, int)>()) :
                 ProcessError(response);
         }
 
@@ -98,11 +98,12 @@ namespace LMS.Presemtation.Controllers
         public async Task<ActionResult> CreateActivity([FromBody] ActivityCreateDTO activityDto, int courseId, int moduleId)
         {
             if(activityDto == null) return BadRequest("Activity info is required");
-            var createdActivity = await _serviceManager.ActivityService.CreateActivityAsync(activityDto, moduleId);
+            var response = await _serviceManager.ActivityService.CreateActivityAsync(activityDto, moduleId);
 
-            if (createdActivity == null) return BadRequest("Invalid module or activity details");
+            var createdActivity = response.GetCreatedAtResult<ActivityDTO>();
 
-            return CreatedAtAction(nameof(GetActivity), new { courseId, moduleId, id = createdActivity.ActivityId }, createdActivity);
+            return response.Success ? CreatedAtAction(nameof(GetActivity), new { courseId, moduleId, id = createdActivity.ActivityId }, createdActivity) :
+                ProcessError(response);
         }
 
         //PATCH: api/Activities/5

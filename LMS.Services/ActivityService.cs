@@ -56,7 +56,7 @@ namespace LMS.Services
 
             var activityDTOs = _mapper.Map<IEnumerable<ActivityDTO>>(activities);
 
-            return new ApiOkResponse<(IEnumerable<ActivityDTO>, int)>((activityDTOs, totalCount));
+            return new ApiOkResponse<(IEnumerable<ActivityDTO> activities, int totalCount)>((activityDTOs, totalCount));
         }
 
 
@@ -75,11 +75,12 @@ namespace LMS.Services
             return new ApiOkResponse<ActivityDTO>(activityDto);
         }
 
-        public async Task<ActivityDTO> CreateActivityAsync(ActivityCreateDTO activityDto, int moduleId)
+        public async Task<ApiBaseResponse> CreateActivityAsync(ActivityCreateDTO activityDto, int moduleId)
         {
             var module = await _uow.Modules.GetByIdAsync(moduleId);
-            if (module == null) return null;
-
+            if (module == null) return new ModuleNotFoundResponse(moduleId);
+            if (await _uow.ActivityTypes.GetByIdAsync(activityDto.ActivityTypeId) == null) return new ActivityTypeNotFoundResponse(activityDto.ActivityTypeId);
+            
 
             ValidateActivityDates(activityDto);
             if (!ValidateActivityFitsModuleDate(activityDto, module)) throw new ArgumentException("The activity date must fit into the module timeline.");
@@ -91,7 +92,8 @@ namespace LMS.Services
             await _uow.Activities.AddAsync(activity);
             await _uow.CompleteASync();
 
-            return _mapper.Map<ActivityDTO>(activity);
+            var activityToReturn = _mapper.Map<ActivityDTO>(activity);
+            return new ApiCreatedAtResponse<ActivityDTO>(activityToReturn);
         }
 
 

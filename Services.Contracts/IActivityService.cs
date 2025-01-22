@@ -19,7 +19,7 @@ namespace Services.Contracts
             bool isAscending = true,
             string? filteringValue = null);
         Task<ApiBaseResponse> GetActivityByIdAsync(int id, bool includeDocuments = false);
-        Task<ActivityDTO> CreateActivityAsync(ActivityCreateDTO activityDto, int moduleId);
+        Task<ApiBaseResponse> CreateActivityAsync(ActivityCreateDTO activityDto, int moduleId);
         Task<ApiBaseResponse> UpdateActivityAsync(int id, ActivityUpdateDTO activityDto);
         Task<bool> DeleteActivityAsync(int id);
 
