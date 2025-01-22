@@ -12,6 +12,6 @@ namespace Services.Contracts
         Task<ApiBaseResponse> GetCourseByIdAsync(int id, bool includeModules = false, bool includeEnrollments = false);
         Task<ApiBaseResponse> CreateCourseAsync(CourseCreateDTO courseDto);
         Task<ApiBaseResponse> UpdateCourseAsync(int id, CourseUpdateDTO courseDto);
-        Task<ApiBaseResponse> DeleteCourseAsync(int id)
+        Task<ApiBaseResponse> DeleteCourseAsync(int id);
     }
 }
