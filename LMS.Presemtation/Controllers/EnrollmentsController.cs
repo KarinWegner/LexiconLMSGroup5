@@ -83,10 +83,12 @@ namespace LMS.Presemtation.Controllers
 
             if (courseId != updateDTO.MoveFromCourseId) return BadRequest("Mismatched Course Id");
             if (courseId == updateDTO.MoveToCourseId) return BadRequest("Current and new course cannot have the same course Id");
-            await _serviceManager.EnrollmentService.EditEnrollment(courseId, updateDTO);
-           
 
-            return Ok();
+            var response = await _serviceManager.EnrollmentService.EditEnrollment(courseId, updateDTO);
+
+
+            return response.Success ? NoContent() :
+                ProcessError(response);
         }
 
         /// <summary>
@@ -103,10 +105,11 @@ namespace LMS.Presemtation.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<ActionResult<Course>> AddEnrollment(int courseId, EnrollmentCreateDTO enrollmentCreateDTO)
         {
-            await _serviceManager.EnrollmentService.AddEnrollment(courseId, enrollmentCreateDTO);
+            var result = await _serviceManager.EnrollmentService.AddEnrollment(courseId, enrollmentCreateDTO);
 
-            return Created();
-            //return CreatedAtAction("GetEnrollmentsForCourse", new { id = course.CourseId }, course);
+            return result.Success ? NoContent() :
+                ProcessError(result);
+;            //return CreatedAtAction("GetEnrollmentsForCourse", new { id = course.CourseId }, course);
         }
 
         /// <summary>
@@ -122,10 +125,11 @@ namespace LMS.Presemtation.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> RemoveEnrollment(int courseId, string userId)
         {
-            await _serviceManager.EnrollmentService.RemoveEnrollment(courseId, userId);
+            var response = await _serviceManager.EnrollmentService.RemoveEnrollment(courseId, userId);
            
 
-            return NoContent();
+            return response.Success ?  NoContent():
+                ProcessError(response);
         }
 
 
@@ -142,19 +146,21 @@ namespace LMS.Presemtation.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<EnrollmentUserCourseListDTO>>> GetUserEnrollments(string userId)
         {
-            var enrollmentList = await _serviceManager.EnrollmentService.GetUserEnrollments(userId);
+            var result = await _serviceManager.EnrollmentService.GetUserEnrollments(userId);
 
          
 
-            return Ok(enrollmentList.ToList());
+            return result.Success ? Ok(result.GetOkResult <IEnumerable<EnrollmentUserCourseListDTO>>()):
+                ProcessError(result);
         }
 
         [HttpGet("user/")]
         public async Task<ActionResult<IEnumerable<ApplicationUserDTO>>> GetUsers(string? roleFilter)
         {
-            var userList = _serviceManager.EnrollmentService.GetUsers(roleFilter);
+            var response = await _serviceManager.EnrollmentService.GetUsers(roleFilter);
 
-            return Ok(userList);
+            return response.Success ? Ok(response.GetOkResult<IEnumerable<ApplicationUserListDTO>>()):
+                ProcessError(response);
         }
     }
 }

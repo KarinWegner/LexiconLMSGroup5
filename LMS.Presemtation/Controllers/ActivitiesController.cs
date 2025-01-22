@@ -44,8 +44,8 @@ namespace LMS.Presemtation.Controllers
             string? filteringValue = null
             )
         {
-            var (activities, totalCount) = await _serviceManager.ActivityService.GetActivitiesAsync(
-                moduleId: moduleId,
+
+               var response = await _serviceManager.ActivityService.GetActivitiesAsync(moduleId: moduleId,
                 includeDocuments: includeDocuments,
                 pageNr: pageNr,
                 pageSize: pageSize,
@@ -53,6 +53,9 @@ namespace LMS.Presemtation.Controllers
                 isAscending: isAscending,
                 filteringValue: filteringValue
                 );
+
+            var (activities, totalCount) = response.GetOkResult<(IEnumerable<ActivityDTO>, int)>();
+                
 
             var metadata = new
             {
@@ -64,7 +67,8 @@ namespace LMS.Presemtation.Controllers
 
             Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(metadata));
 
-            return Ok(activities);
+            return response.Success ? Ok(response.GetOkResult<(IEnumerable<ActivityDTO>, int)>()) :
+                ProcessError(response);
         }
 
 
@@ -72,9 +76,10 @@ namespace LMS.Presemtation.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult> GetActivity(int id, bool includeDocuments = false)
         {
-            var activity = await _serviceManager.ActivityService.GetActivityByIdAsync(id, includeDocuments);
-            if (activity == null) return NotFound("Activity not found");
-            return Ok(activity);
+            var response = await _serviceManager.ActivityService.GetActivityByIdAsync(id, includeDocuments);
+
+            return response.Success ? Ok(response.GetOkResult<ActivityDTO>()):
+            ProcessError(response);
         }
 
         // PUT: api/Activities/5
@@ -83,8 +88,9 @@ namespace LMS.Presemtation.Controllers
         {
             if (id != activityDto.ActivityId) return BadRequest("Mismatched activity ID.");
 
-            var updated = await _serviceManager.ActivityService.UpdateActivityAsync(id, activityDto);
-            return updated ? NoContent() : NotFound($"Activity with ID {id} was not found.");
+
+            var response = await _serviceManager.ActivityService.UpdateActivityAsync(id, activityDto);
+            return response.Success ? NoContent() : ProcessError(response);
         }
 
         // POST: api/Activities
@@ -92,11 +98,16 @@ namespace LMS.Presemtation.Controllers
         public async Task<ActionResult> CreateActivity([FromBody] ActivityCreateDTO activityDto, int courseId, int moduleId)
         {
             if(activityDto == null) return BadRequest("Activity info is required");
-            var createdActivity = await _serviceManager.ActivityService.CreateActivityAsync(activityDto, moduleId);
+            var response = await _serviceManager.ActivityService.CreateActivityAsync(activityDto, moduleId);
 
-            if (createdActivity == null) return BadRequest("Invalid module or activity details");
+            if (response.Success)
+            {
+            var createdActivity = response.GetCreatedAtResult<ActivityDTO>();
 
-            return CreatedAtAction(nameof(GetActivity), new { courseId, moduleId, id = createdActivity.ActivityId }, createdActivity);
+                return CreatedAtAction(nameof(GetActivity), new { courseId, moduleId, id = createdActivity.ActivityId }, createdActivity);
+            }
+
+            return ProcessError(response);
         }
 
         //PATCH: api/Activities/5
@@ -123,8 +134,8 @@ namespace LMS.Presemtation.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteActivity(int id)
         {
-            var isDeleted = await _serviceManager.ActivityService.DeleteActivityAsync(id);
-            return isDeleted ? NoContent() : NotFound($"Activity with ID {id} not found");
+            var response = await _serviceManager.ActivityService.DeleteActivityAsync(id);
+            return response.Success ? NoContent() : ProcessError(response);
         }
 
     }

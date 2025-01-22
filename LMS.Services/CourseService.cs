@@ -64,47 +64,39 @@ namespace LMS.Services
         {
             try
             {
-                ValidateCourseDates(courseDto);
+                if(!ValidateCourseDates(courseDto)) return new BadDateSequenceResponse(courseDto.StartDate, courseDto.EndDate);
+                var courseToAdd = _mapper.Map<Course>(courseDto);
+                await _uow.Courses.AddAsync(courseToAdd);
+
+                await _uow.CompleteASync();
+
+                var createdCourseToReturn =_mapper.Map<CourseDTO>(courseToAdd);
+
+                return new ApiCreatedAtResponse<CourseDTO>(createdCourseToReturn);
             }
-            catch (BadDateSequenceException ex)
-            {
-                return new BadDateSequenceRequestResponse(ex.StartDate, ex.EndDate);
-                throw;
-            }
+            
             catch(Exception ex) 
             {
                 throw;
             }
 
-            var courseToAdd = _mapper.Map<Course>(courseDto);
-            await _uow.Courses.AddAsync(courseToAdd);
-
-            await _uow.CompleteASync();
-
-            var createdCourseToReturn =_mapper.Map<CourseDTO>(courseToAdd);
-
-            return new ApiCreatedAtResponse<CourseDTO>(createdCourseToReturn);
         }
 
         public async Task<ApiBaseResponse> DeleteCourseAsync(int id)
         {
             try
             {
-            var course = await GetCourseIfExists(id);
-            await _uow.Courses.DeleteAsync(course);
-            await _uow.CompleteASync();
-
+                var course = await _uow.Courses.GetByIdAsync(id);
+                if (course == null) return new CourseNotFoundResponse(id);
+                await _uow.Courses.DeleteAsync(course);
+                await _uow.CompleteASync();
+                return new ApiNoContentResponse();
             }
-            catch (CourseNotFoundException)
+            catch (Exception ex)
             {
-                return new CourseNotFoundResponse(id);
-            }
-            catch(Exception ex)
-            {
-                throw;
+                throw new ArgumentException($"An unhandled error occurred: {ex}");
             }
             
-                return new ApiNoContentResponse();
             
         }
 
@@ -113,29 +105,18 @@ namespace LMS.Services
 
             try
             {
-                ValidateCourseDates(courseDto);
-                var existingCourse = await GetCourseIfExists(id);
+                if (!ValidateCourseDates(courseDto)) return new BadDateSequenceResponse(courseDto.StartDate, courseDto.EndDate);
+                var existingCourse = await _uow.Courses.GetByIdAsync(id);
+                if (existingCourse == null) return new CourseNotFoundResponse(id);
                 _mapper.Map(courseDto, existingCourse);
-
-            }
-            catch (BadDateSequenceException ex)
-            {
-                return new BadDateSequenceRequestResponse(ex.StartDate, ex.EndDate);
-            }
-            catch (CourseNotFoundException )
-            {
-                return new CourseNotFoundResponse(id);
-            }           
+                await _uow.CompleteASync();
+                return new ApiNoContentResponse();
+            }        
             catch(Exception ex)
             {
-                throw new NotImplementedException(ex.Message);
+                throw new ArgumentException($"An unhandled error occurred: {ex}");
             }
 
-
-
-
-            await _uow.CompleteASync();
-            return new ApiNoContentResponse();
         }
 
       
@@ -154,23 +135,16 @@ namespace LMS.Services
             return query;
         }
 
-        private void ValidateCourseDates(dynamic courseDto)
+        private bool ValidateCourseDates(dynamic courseDto)
         {
             if (courseDto.EndDate < courseDto.StartDate)
             {
-                throw new BadDateSequenceException(courseDto.StartDate, courseDto.EndDate);
+                return false;
             }
+            return true;
         }
 
-        private async Task<Course> GetCourseIfExists(int id)
-        {
-            var existingCourse = await _uow.Courses.GetByIdAsync(id);
-            if (existingCourse == null)
-            {
-                throw new CourseNotFoundException(id);
-            }
-            return existingCourse;
-        }
+        
 
 
     }

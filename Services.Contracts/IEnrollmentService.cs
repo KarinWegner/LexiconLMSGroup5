@@ -1,4 +1,5 @@
 ﻿using Domain.Models.Entities;
+using Domain.Models.Responses;
 using LMS.Shared.DTOs.ApplicationUserDTOs;
 using LMS.Shared.DTOs.EnrollmentDTOs;
 using System;
@@ -11,13 +12,14 @@ namespace Services.Contracts
 {
     public interface IEnrollmentService
     {
-        Task<IEnumerable<EnrollmentListDTO>> GetEnrollments();
+        Task<ApiBaseResponse> GetEnrollments();
 
-        Task<IEnumerable<EnrolledUserDTO>> GetEnrollmentsForCourse(int courseId, bool excludeTeachers = false);
-        Task EditEnrollment(int courseId, EnrollmentUpdateDTO updateDto);
-        Task AddEnrollment(int courseId, EnrollmentCreateDTO createDto);
-        Task RemoveEnrollment(int courseId, string userId);
-        Task<IEnumerable<EnrollmentUserCourseListDTO>> GetUserEnrollments(string userId);
-        Task<IEnumerable<ApplicationUserListDTO>> GetUsers(string? roleFilter);
+        Task<ApiBaseResponse> GetEnrollmentsForCourse(int courseId, bool excludeTeachers = false);
+        Task<ApiBaseResponse> EditEnrollment(int courseId, EnrollmentUpdateDTO updateDto);
+        Task<ApiBaseResponse> AddEnrollment(int courseId, EnrollmentCreateDTO createDto);
+        Task<ApiBaseResponse> RemoveEnrollment(int courseId, string userId);
+        Task<ApiBaseResponse> GetUserEnrollments(string userId);
+        Task<ApiBaseResponse> GetUsers(string? roleFilter);
+
     }
 }

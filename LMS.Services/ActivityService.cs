@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Domain.Contracts;
 using Domain.Models.Entities;
+using Domain.Models.Responses;
 using LMS.Shared.DTOs.ActivityDTOs;
 using LMS.Shared.DTOs.ModuleDTOs;
 using Microsoft.AspNetCore.JsonPatch;
@@ -26,7 +27,7 @@ namespace LMS.Services
             _mapper = mapper;
         }
 
-        public async Task<(IEnumerable<ActivityDTO> Activities, int TotalCount)> GetActivitiesAsync(
+        public async Task<ApiBaseResponse> GetActivitiesAsync(
                 int moduleId,
                 bool includeDocuments = false,
                 int? pageNr = null,
@@ -36,6 +37,9 @@ namespace LMS.Services
                 string? filteringValue = null
                 )
         {
+            var module= await _uow.Modules.GetByIdAsync( moduleId );
+            if (module == null) return new ModuleNotFoundResponse(moduleId);
+
             Expression<Func<Activity, bool>> filter = m =>
                 m.ModuleId == moduleId &&
                 (string.IsNullOrEmpty(filteringValue) || m.Name.Contains(filteringValue)); //expand to cover all properties
@@ -56,12 +60,12 @@ namespace LMS.Services
 
             var activityDTOs = _mapper.Map<IEnumerable<ActivityDTO>>(activities);
 
-            return (activityDTOs, totalCount);
+            return new ApiOkResponse<(IEnumerable<ActivityDTO> activities, int totalCount)>((activityDTOs, totalCount));
         }
 
 
         
-        public async Task<ActivityDTO> GetActivityByIdAsync(int id, bool includeDocuments = false)
+        public async Task<ApiBaseResponse> GetActivityByIdAsync(int id, bool includeDocuments = false)
         {
             IQueryable<Activity> query = _uow.Activities.Query().Where(m => m.ActivityId == id);
 
@@ -71,20 +75,22 @@ namespace LMS.Services
 
             var activity = await query.FirstOrDefaultAsync();
 
-            if (activity == null) return null;
+            if (activity == null) return new ActivityNotFoundResponse(id);
 
-            return _mapper.Map<ActivityDTO>(activity);
+            var activityDto =_mapper.Map<ActivityDTO>(activity);
+            return new ApiOkResponse<ActivityDTO>(activityDto);
         }
 
-        public async Task<ActivityDTO> CreateActivityAsync(ActivityCreateDTO activityDto, int moduleId)
+        public async Task<ApiBaseResponse> CreateActivityAsync(ActivityCreateDTO activityDto, int moduleId)
         {
             var module = await _uow.Modules.GetByIdAsync(moduleId);
-            if (module == null) return null;
-
+            if (module == null) return new ModuleNotFoundResponse(moduleId);
+            if (await _uow.ActivityTypes.GetByIdAsync(activityDto.ActivityTypeId) == null) return new ActivityTypeNotFoundResponse(activityDto.ActivityTypeId);
+            
 
             ValidateActivityDates(activityDto);
-            if (!ValidateActivityFitsModuleDate(activityDto, module)) throw new ArgumentException("The activity date must fit into the module timeline.");
-            if (!ValidateActivitiesDoNotOverlapOnCreate(activityDto, module)) throw new ArgumentException("The activity dates can't overlap.");
+            if (!ValidateActivityFitsModuleDate(activityDto, module)) return new BadDateTimeFrameBreakResponse();
+            if (!ValidateActivitiesDoNotOverlapOnCreate(activityDto, module)) return new BadDateOverlapResponse();
 
             var activity = _mapper.Map<Activity>(activityDto);
             activity.ModuleId = moduleId; // Ensure that the moduleId is set
@@ -92,58 +98,60 @@ namespace LMS.Services
             await _uow.Activities.AddAsync(activity);
             await _uow.CompleteASync();
 
-            return _mapper.Map<ActivityDTO>(activity);
+            var activityToReturn = _mapper.Map<ActivityDTO>(activity);
+            return new ApiCreatedAtResponse<ActivityDTO>(activityToReturn);
         }
 
 
-        public async Task<bool> UpdateActivityAsync(int id, ActivityUpdateDTO activityDto)
+        public async Task<ApiBaseResponse> UpdateActivityAsync(int id, ActivityUpdateDTO activityDto)
         {
             var activity = await _uow.Activities.GetByIdAsync(id);
-            if (activity == null) return false;
+            if (activity == null) return new ActivityNotFoundResponse(id);
 
             var module = await _uow.Modules.GetByIdAsync(activity.ModuleId);
-            if (module == null) return false;
+            if (module == null) return new ModuleNotFoundResponse(activity.ModuleId);
 
             // Validate activity timeframe
             ValidateActivityDates(activityDto);
-            if (!ValidateActivityFitsModuleDate(activityDto, module)) throw new ArgumentException("The activity date must fit into the module timeline.");
-            if(!ValidateActivitiesDoNotOverlapOnUpdate(activityDto, module)) throw new ArgumentException("The activity dates can't overlap.");
+            if (!ValidateActivityFitsModuleDate(activityDto, module)) return new BadDateTimeFrameBreakResponse();
+            if(!ValidateActivitiesDoNotOverlapOnUpdate(activityDto, module)) return new BadDateOverlapResponse();
 
             _mapper.Map(activityDto, activity);
 
             await _uow.CompleteASync();
 
-            return true;
+            return new ApiNoContentResponse();
         }
 
 
-        public async Task<bool> DeleteActivityAsync(int id)
+        public async Task<ApiBaseResponse> DeleteActivityAsync(int id)
         {
-            var activity = await GetActivityIfExists(id);
-            if (activity == null) return false;
+            var activity = await _uow.Activities.GetByIdAsync(id);
+            if (activity == null) return new ActivityNotFoundResponse(id);
 
             await _uow.Activities.DeleteAsync(activity);
             await _uow.CompleteASync();
-            return true;
+            return new ApiNoContentResponse();
         }
 
-        private async Task<Activity> GetActivityIfExists(int id)
-        {
-            var activity = await _uow.Activities.GetByIdAsync(id);
-            if (activity == null)
-            {
-                throw new KeyNotFoundException($"Activity with ID {id} not found.");
-            }
-            return activity;
-        }
+        //private async Task<Activity> GetActivityIfExists(int id)
+        //{
+        //    var activity = await _uow.Activities.GetByIdAsync(id);
+        //    if (activity == null)
+        //    {
+        //        throw new ;
+        //    }
+        //    return activity;
+        //}
 
 
-        private void ValidateActivityDates(dynamic activityDto)
+        private bool ValidateActivityDates(dynamic activityDto)
         {
             if (activityDto.EndDate < activityDto.StartDate)
             {
-                throw new ArgumentException("The activity cannot end before the start date.");
+                return false;
             }
+            return true;
         }
 
         private bool ValidateActivityFitsModuleDate(dynamic activityDto, Module module)

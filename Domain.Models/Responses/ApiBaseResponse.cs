@@ -64,18 +64,20 @@ namespace Domain.Models.Responses
             Message = message;
         }
     }
-    //public abstract class ApiInternalServerErrorResponse : ApiBaseResponse
-    //{
-    //    public string Message { get; set; }
-    //    public ApiInternalServerErrorResponse(string message) : base(false)
-    //    {
-    //        Message = message;
-    //    }
-    //}
+   
     public abstract class ApiBadRequestResponse : ApiBaseResponse
     {
         public string Message { get; set; }
         public ApiBadRequestResponse(string message) : base(false)
+        {
+            Message = message;
+        }
+    }
+
+    public abstract class ApiModificationErrorResponse : ApiBaseResponse
+    {
+        public string Message { get; set; }
+        public ApiModificationErrorResponse(string message) : base(false)
         {
             Message = message;
         }
@@ -104,44 +106,11 @@ namespace Domain.Models.Responses
         public BadPatchRequestResponse(string? message) : base(message ="Patch document could not be read") { }
     }
 
-    public class CourseNotFoundResponse : ApiNotFoundResponse
+    public class DuplicateActivityTypeResponse : ApiBadRequestResponse
     {
-        public CourseNotFoundResponse(int id) : base($"Course with id {id} was not found")
-        {
-        }
-    }
-    public class ModuleNotFoundResponse : ApiNotFoundResponse
-    {
-        public ModuleNotFoundResponse(int id) : base($"Module with id {id} was not found")
-        {
-        }
-    }
-    public class ActivityNotFoundResponse : ApiNotFoundResponse
-    {
-        public ActivityNotFoundResponse(int id) : base($"Activity with id {id} was not found")
-        {
-        }
-    }
-    public class ActivityTypeNotFoundResponse : ApiNotFoundResponse
-    {
-        public ActivityTypeNotFoundResponse(int id) : base($"The Activity Type with id {id} was not found")
+        public DuplicateActivityTypeResponse(string name) : base($"There is already an activiy type named {name}")
         {
 
-        }
-    }
-    public class UserNotFoundResponse : ApiNotFoundResponse
-    {
-        public UserNotFoundResponse(string id) : base($"The User with id {id} was not found")
-        {
-
-        }
-    }
-   
-    public class BadDateSequenceRequestResponse : ApiBadRequestResponse
-    {
-
-        public BadDateSequenceRequestResponse(DateTime startDate, DateTime endDate) : base($"Start date {startDate} cannot be after end date {endDate}") 
-        {
         }
     }
 }

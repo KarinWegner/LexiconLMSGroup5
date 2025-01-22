@@ -1,5 +1,6 @@
 ﻿using Domain.Contracts;
 using Domain.Models.Entities;
+using Domain.Models.Exceptions;
 using LMS.Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -37,16 +38,23 @@ namespace LMS.Infrastructure.Repositories
         public async Task EditEnrollment(int courseId, string userId, int newCourseId)
         {
             var course = await _context.Courses.Where(c => c.CourseId == courseId).Include(c => c.Enrollments).FirstOrDefaultAsync();
-            if (course == null) {/*ToDo: Add error*/ }
+            if (course == null) throw new CourseNotFoundException(courseId);
 
             var user = course.Enrollments.Where(u => u.Id == userId).FirstOrDefault();
-            if (user == null) {/*ToDo: Add error*/ }
+            if (user == null) throw new UserNotFoundException(userId);
 
             var newCourse = await _context.Courses.Where(c => c.CourseId == newCourseId).Include(c => c.Enrollments).FirstOrDefaultAsync();
-            if (course == null) {/*ToDo: Add error*/ }
+            if (newCourse == null) { throw new CourseNotFoundException(newCourseId); }
 
+            try
+            {
             course.Enrollments.Remove(user);
             newCourse.Enrollments.Add(user);
+            }
+            catch (Exception ex)
+            {
+                throw new EnrollmentEditFailedException(userId, courseId, newCourseId, ex.Message);
+            }
 
         }
         public async Task<ApplicationUser> FindUserByIdAsync(string userId)

@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Domain.Contracts;
 using Domain.Models.Entities;
+using Domain.Models.Exceptions;
+using Domain.Models.Responses;
 using LMS.Shared.DTOs.ApplicationUserDTOs;
 using LMS.Shared.DTOs.EnrollmentDTOs;
 using Microsoft.AspNetCore.Identity;
@@ -19,76 +21,75 @@ namespace LMS.Services
             _uow = uow;
             _mapper = mapper;
         }
-        public async Task AddEnrollment(int courseId, EnrollmentCreateDTO createDto)
+        public async Task<ApiBaseResponse> AddEnrollment(int courseId, EnrollmentCreateDTO createDto)
         {
 
             var course = await _uow.Courses.Query().Where(c => c.CourseId == courseId).Include(c => c.Enrollments).FirstOrDefaultAsync();
 
-            if (course == null)
-            {
-                return;
-                //ToDo: Add error
-                // return NotFound("Course not found");
-            }
-
+            if (course == null) 
+                return new CourseNotFoundResponse(courseId);
+                            
             var user = await _uow.Enrollments.FindUserByIdAsync(createDto.UserId);
 
-            if (user == null)
-            {
-                return;
-                // return NotFound("Student not found");
-            }
-                       
-            if (string.IsNullOrEmpty(user.Role))
-            {
-                return;
-                // return BadRequest("User has not been assigned a role");
-            }
-
-            if (course.Enrollments.Any(u => u.Id == createDto.UserId))
-            {
-                return;
-               // return BadRequest("User is already enrolled in course");
-            }
-
+            if (user == null) 
+                return new UserNotFoundResponse(createDto.UserId);
+                                      
+            if (string.IsNullOrEmpty(user.Role)) 
+                return new UserMissingRoleResponse();
+              
             if (user.Role == "Student")
             {
-                
-                if (await _uow.Courses.Query().Include(c => c.Enrollments).SelectMany(c => c.Enrollments).Where(c => c.Id == createDto.UserId).AnyAsync())
-                {
-                    return;
-                    //return BadRequest("Student can only be enrolled in one course at a time.");
-                }
+                 if (course.Enrollments.Any(u => u.Id == createDto.UserId))
+                return new UserEnrollmetLimitResponse(createDto.UserId);                
             }                    
 
             await _uow.Enrollments.AddEnrollment(courseId, user);
 
             await _uow.CompleteASync();
-           
+
+            return new ApiNoContentResponse();
         }
 
-        public async Task EditEnrollment(int courseId, EnrollmentUpdateDTO updateDto)
+        public async Task<ApiBaseResponse> EditEnrollment(int courseId, EnrollmentUpdateDTO updateDto)
         {
+            if (await _uow.Courses.GetByIdAsync(updateDto.MoveFromCourseId) == null)
+                return new CourseNotFoundResponse(updateDto.MoveFromCourseId);
+            if (await _uow.Courses.GetByIdAsync(updateDto.MoveToCourseId) == null)
+                return new CourseNotFoundResponse(updateDto.MoveToCourseId);
+
+            var user = await _uow.Enrollments.FindUserByIdAsync(updateDto.UserId);
+            if (user == null) return new UserNotFoundResponse(updateDto.UserId);
+
+            var userEnrollments = await _uow.Enrollments.GetUserEnrollments(updateDto.UserId);
+            if (!userEnrollments.Any(c=>c.CourseId == courseId))
+                return new UserNotEnrolledResponse();
+
+            try
+            {
             await _uow.Enrollments.EditEnrollment(updateDto.MoveFromCourseId, updateDto.UserId, updateDto.MoveToCourseId);
              await _uow.CompleteASync();
 
-
-            //Checks that user has been removed from old course
-            if( await _uow.Courses.Query().Where(c => c.CourseId == updateDto.MoveFromCourseId).Include(c => c.Enrollments).SelectMany(c => c.Enrollments).Where(c => c.Id == updateDto.UserId).AnyAsync())
+            }
+            catch(CourseNotFoundException ex)
             {
-                return;
-                //ToDo: Add error
+                return new CourseNotFoundResponse(ex.Id);
+            }
+            catch(UserNotFoundException ex)
+            {
+                return new UserNotFoundResponse(ex.UserId);
+            }
+            catch (EnrollmentEditFailedException ex)
+            {
+                return new EnrollmentEditErrorResponse(ex.Message);
             }
 
-            //Checks that user has been added to new course
-            if (await _uow.Courses.Query().Where(c => c.CourseId == updateDto.MoveToCourseId).Include(c => c.Enrollments).SelectMany(c => c.Enrollments).Where(c => c.Id == updateDto.UserId).AnyAsync())
-            {
-                //ToDo: add error await
-                return;
-            }
+            return new ApiNoContentResponse();
+                        
         }
 
-        public async Task<IEnumerable<EnrollmentListDTO>> GetEnrollments()
+       
+
+        public async Task<ApiBaseResponse> GetEnrollments()
         {
             //Fetch list of all courses
             IQueryable<Course> query = _uow.Courses.Query();
@@ -103,7 +104,13 @@ namespace LMS.Services
 
             foreach (var course in courses)
             {
-                var teacherNames = await _uow.Courses.Query().Where(c => c.CourseId == course.CourseId).SelectMany(c => c.Enrollments).Where(u => u.Role == "Teacher").Select(u => u.Name).ToListAsync();
+                var teacherNames = await _uow.Courses.Query()
+                    .Where(c => c.CourseId == course.CourseId)
+                    .SelectMany(c => c.Enrollments)
+                    .Where(u => u.Role == "Teacher")
+                    .Select(u => u.Name)
+                    .ToListAsync();
+
                 foreach (var enrollment in course.Enrollments)
                 {
                     EnrollmentListDTOs.Add(new EnrollmentListDTO
@@ -116,45 +123,48 @@ namespace LMS.Services
                     });
                 }
             }
-            return EnrollmentListDTOs;
+            return new ApiOkResponse<IEnumerable<EnrollmentListDTO>>(EnrollmentListDTOs);
         }
 
-        public async Task<IEnumerable<EnrolledUserDTO>> GetEnrollmentsForCourse(int courseId, bool excludeTeachers = false)
+        public async Task<ApiBaseResponse> GetEnrollmentsForCourse(int courseId, bool excludeTeachers = false)
         {
             IQueryable<ApplicationUser> enrollments =  _uow.Courses.Query().Where(c => c.CourseId == courseId).Include(c=>c.Enrollments).SelectMany(c=>c.Enrollments);
 
             if (enrollments == null)
             {
-                return null;
-                //ToDo: Add error handling
-                // return NotFound("Course not found");
+                return new CourseNotFoundResponse(courseId);
             }
             var enrolledUsers = excludeTeachers ?
                  enrollments!.Where(u => u.Role == "Student")
                  .ToList() :
                 enrollments!.ToList();
 
-
-            return _mapper.Map<IEnumerable<EnrolledUserDTO>>(enrolledUsers);
+            var enrollmentsDto = _mapper.Map<IEnumerable<EnrolledUserDTO>>(enrolledUsers);
+            return new ApiOkResponse<IEnumerable<EnrolledUserDTO>>(enrollmentsDto);
            
         }
 
-        public async Task<IEnumerable<EnrollmentUserCourseListDTO>> GetUserEnrollments(string userId)
+        public async Task<ApiBaseResponse> GetUserEnrollments(string userId)
         {
             var user = await _uow.Enrollments.FindUserByIdAsync(userId);
             if (user == null)
             {
-                return null; // NotFound("User not found");
+                return new UserNotFoundResponse(userId);
             }
 
             var enrollmentList = await _uow.Enrollments.GetUserEnrollments(userId);
 
-            if (enrollmentList.Count() == 0) return null; //ToDo: Add response for empty reply Ok("User has no enrollments");
+            if (enrollmentList.Count() == 0) return new ApiNoContentResponse(); 
 
             var enrollmentListDTO = new List<EnrollmentUserCourseListDTO>();
             foreach (var course in enrollmentList)
             {
-                var teacherNames = await _uow.Courses.Query().Where(c => c.CourseId == course.CourseId).SelectMany(c => c.Enrollments).Where(u => u.Role == "Teacher").Select(u => u.Name).ToListAsync();
+                var teacherNames = await _uow.Courses.Query()
+                    .Where(c => c.CourseId == course.CourseId)
+                    .SelectMany(c => c.Enrollments)
+                    .Where(u => u.Role == "Teacher")
+                    .Select(u => u.Name)
+                    .ToListAsync();
                
                     enrollmentListDTO.Add(new EnrollmentUserCourseListDTO
                     {
@@ -167,38 +177,40 @@ namespace LMS.Services
             }
 
 
-            return enrollmentListDTO;
+            return new ApiOkResponse<IEnumerable<EnrollmentUserCourseListDTO>>(enrollmentListDTO);
         }
 
-        public async Task<IEnumerable<ApplicationUserListDTO>> GetUsers(string? roleFilter)
+        public async Task<ApiBaseResponse> GetUsers(string? roleFilter)
         {
            var userList = await _uow.Enrollments.GetAllUsersAsync(roleFilter);
 
             var userListDto = _mapper.Map<IEnumerable<ApplicationUserListDTO>>(userList);
 
-            return userListDto;
+            return new ApiOkResponse<IEnumerable<ApplicationUserListDTO>>(userListDto);
         }
 
-        public async Task RemoveEnrollment(int courseId, string userId)
+        public async Task<ApiBaseResponse> RemoveEnrollment(int courseId, string userId)
         {
             var course = await _uow.Courses.GetByIdAsync(courseId);
             if (course == null)
             {
-                return; //NotFound("Course not found");
+                return new CourseNotFoundResponse(courseId);
             }
 
             var user = await _uow.Enrollments.FindUserByIdAsync(userId);
             if (user == null)
             {
-                return; //NotFound("User not found");
+                return new UserNotFoundResponse(userId);
             }
 
             if (!course.Enrollments.Any(u => u.Id == userId))
-                return; //BadRequest("User is not enrolled in course.");
+                return new UserNotEnrolledResponse();
             await _uow.Enrollments.DeleteEnrollment(courseId, userId);
             
 
             await _uow.CompleteASync();
+
+            return new ApiNoContentResponse();
         }
     }
 }
