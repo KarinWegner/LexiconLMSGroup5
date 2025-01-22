@@ -22,19 +22,20 @@
 		<h2 class="text-center p-3">Manage Users</h2>
 		<nav>
 			<div class="nav nav-tabs mb-3" id="nav-tab" role="tablist">
-			<button  @onclick="@(e => SwitchTab("Students"))"   class="nav-link  @(activeTab == "Students" ? "active" : "")" id="students-tab" data-bs-toggle="tab" data-bs-target="#nav-student" type="button" role="tab" aria-controls="nav-student" aria-selected="true">Students</button>
-			<button @onclick="@(e => SwitchTab("Teachers"))" class="nav-link @(activeTab == "Teachers" ? "active" : "")" id="teachers-tab" data-bs-toggle="tab" data-bs-target="#nav-teacher" type="button" role="tab" aria-controls="nav-teacher" aria-selected="false">Teachers</button>
+			<button  @onclick="@(e => SwitchTab("Student"))"   class="nav-link  @(activeTab == "Student" ? "active" : "")" id="students-tab" data-bs-toggle="tab" data-bs-target="#nav-student" type="button" role="tab" aria-controls="nav-student" aria-selected="true">Students</button>
+			<button @onclick="@(e => SwitchTab("Teacher"))" class="nav-link @(activeTab == "Teacher" ? "active" : "")" id="teachers-tab" data-bs-toggle="tab" data-bs-target="#nav-teacher" type="button" role="tab" aria-controls="nav-teacher" aria-selected="false">Teachers</button>
 				
 			</div>
 		</nav
 
 	<Search SearchString="@searchTerm" OnSearch="HandleSearch" />
 		<div class="tab-content p-3 border bg-light">
-        <div class="tab-pane @(activeTab == "Students" ? "active" : "")">
+        <div class="tab-pane @(activeTab == "Student" ? "active" : "")">
             <UserTable Items="searchResults" />
         </div>
-        <div class="tab-pane @(activeTab == "Teachers" ? "active" : "")">
+        <div class="tab-pane @(activeTab == "Teacher" ? "active" : "")">
             <p>This is the content for the Teachers tab.</p>
+              <UserTable Items="searchResults" />
         </div>
     </div>
 	</div>
@@ -47,7 +48,7 @@
     private AuthenticationStateProvider AuthenticationStateProvider { get; set; } = default!;
 
     private string searchTerm = string.Empty;
-    private string activeTab = "Students";
+    private string activeTab = "Student";
     private List<ApplicationUserDTO> data = new();
     private List<ApplicationUserDTO> searchResults = new();
     private bool isDataLoaded = false;
@@ -56,7 +57,7 @@
     {
         if (firstRender && !isDataLoaded)
         {
-            data = await LoadUsersAsync(); 
+            data = await LoadUsersAsync(activeTab); 
             searchResults = data;  
             isDataLoaded = true;
 
@@ -64,15 +65,26 @@
         }
     }
 
-    private async Task<List<ApplicationUserDTO>> LoadUsersAsync()
+    private async Task<List<ApplicationUserDTO>> LoadUsersAsync(string roleFilter)
     {
-        var response = await _apiService.GetAsync<ApplicationUserResultDTO>("api/enrollment/user?roleFilter=Student");
+       var response = await _apiService.GetAsync<ApplicationUserResultDTO>($"api/enrollment/user?roleFilter={roleFilter}");
         return response?.Result ?? new List<ApplicationUserDTO>();
     }
 
-    private void SwitchTab(string tabName)
+      private async Task LoadAndSetUsersAsync()
     {
-        activeTab = tabName;
+        data = await LoadUsersAsync(activeTab);
+        searchResults = data;
+        StateHasChanged();
+    }
+
+     private async void SwitchTab(string tabName)
+    {
+        if (activeTab != tabName)
+        {
+            activeTab = tabName;
+            await LoadAndSetUsersAsync(); 
+        }
     }
 
     private void HandleSearch(string searchString)
