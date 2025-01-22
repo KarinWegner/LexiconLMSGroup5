@@ -69,7 +69,7 @@ namespace LMS.Services
 
             var activity = await query.FirstOrDefaultAsync();
 
-            if (activity == null) return null;
+            if (activity == null) return new ActivityNotFoundResponse(id);
 
             var activityDto =_mapper.Map<ActivityDTO>(activity);
             return new ApiOkResponse<ActivityDTO>(activityDto);
@@ -83,8 +83,8 @@ namespace LMS.Services
             
 
             ValidateActivityDates(activityDto);
-            if (!ValidateActivityFitsModuleDate(activityDto, module)) throw new ArgumentException("The activity date must fit into the module timeline.");
-            if (!ValidateActivitiesDoNotOverlapOnCreate(activityDto, module)) throw new ArgumentException("The activity dates can't overlap.");
+            if (!ValidateActivityFitsModuleDate(activityDto, module)) return new BadDateTimeFrameBreakResponse();
+            if (!ValidateActivitiesDoNotOverlapOnCreate(activityDto, module)) return new BadDateOverlapResponse();
 
             var activity = _mapper.Map<Activity>(activityDto);
             activity.ModuleId = moduleId; // Ensure that the moduleId is set
@@ -107,8 +107,8 @@ namespace LMS.Services
 
             // Validate activity timeframe
             ValidateActivityDates(activityDto);
-            if (!ValidateActivityFitsModuleDate(activityDto, module)) throw new ArgumentException("The activity date must fit into the module timeline.");
-            if(!ValidateActivitiesDoNotOverlapOnUpdate(activityDto, module)) throw new ArgumentException("The activity dates can't overlap.");
+            if (!ValidateActivityFitsModuleDate(activityDto, module)) return new BadDateTimeFrameBreakResponse();
+            if(!ValidateActivitiesDoNotOverlapOnUpdate(activityDto, module)) return new BadDateOverlapResponse();
 
             _mapper.Map(activityDto, activity);
 
@@ -120,7 +120,7 @@ namespace LMS.Services
 
         public async Task<ApiBaseResponse> DeleteActivityAsync(int id)
         {
-            var activity = await GetActivityIfExists(id);
+            var activity = await _uow.Activities.GetByIdAsync(id);
             if (activity == null) return new ActivityNotFoundResponse(id);
 
             await _uow.Activities.DeleteAsync(activity);
@@ -128,23 +128,24 @@ namespace LMS.Services
             return new ApiNoContentResponse();
         }
 
-        private async Task<Activity> GetActivityIfExists(int id)
-        {
-            var activity = await _uow.Activities.GetByIdAsync(id);
-            if (activity == null)
-            {
-                throw new KeyNotFoundException($"Activity with ID {id} not found.");
-            }
-            return activity;
-        }
+        //private async Task<Activity> GetActivityIfExists(int id)
+        //{
+        //    var activity = await _uow.Activities.GetByIdAsync(id);
+        //    if (activity == null)
+        //    {
+        //        throw new ;
+        //    }
+        //    return activity;
+        //}
 
 
-        private void ValidateActivityDates(dynamic activityDto)
+        private bool ValidateActivityDates(dynamic activityDto)
         {
             if (activityDto.EndDate < activityDto.StartDate)
             {
-                throw new ArgumentException("The activity cannot end before the start date.");
+                return false;
             }
+            return true;
         }
 
         private bool ValidateActivityFitsModuleDate(dynamic activityDto, Module module)

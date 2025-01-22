@@ -92,7 +92,7 @@ namespace LMS.Services
 
             //Check dates - does it end before it starts, does it fit into the course timeline, does it overlap with other modules
             ValidateModuleDates(moduleDto);
-            if (!ValidateModuleFitsCourseDate(moduleDto, course)) throw new BadModuleRequestException("The module date must fit into the course timeline.");
+            if (!ValidateModuleFitsCourseDate(moduleDto, course)) throw new TimeOutsideBoundsResponse("The module date must fit into the course timeline.");
             if (!ValidateModulesDoNotOverlapOnCreate(moduleDto, course)) throw new BadModuleRequestException("The module dates can't overlap.");
 
             var moduleToAdd = _mapper.Map<Domain.Models.Entities.Module>(moduleDto);

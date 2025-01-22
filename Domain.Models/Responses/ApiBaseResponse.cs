@@ -104,6 +104,8 @@ namespace Domain.Models.Responses
         public BadPatchRequestResponse(string? message) : base(message ="Patch document could not be read") { }
     }
 
+    
+
     public class CourseNotFoundResponse : ApiNotFoundResponse
     {
         public CourseNotFoundResponse(int id) : base($"Course with id {id} was not found")
@@ -137,12 +139,23 @@ namespace Domain.Models.Responses
         }
     }
    
-    public class BadDateSequenceRequestResponse : ApiBadRequestResponse
+    public class BadDateSequenceResponse : ApiBadRequestResponse
     {
-
-        public BadDateSequenceRequestResponse(DateTime startDate, DateTime endDate) : base($"Start date {startDate} cannot be after end date {endDate}") 
+        public BadDateSequenceResponse(DateTime startDate, DateTime endDate) : base($"Item end date{endDate} is before its start date {startDate}.") 
         {
+
         }
+    }
+    public class BadDateTimeFrameBreakResponse : ApiBadRequestResponse 
+    {        
+        public BadDateTimeFrameBreakResponse() : base("Item is scheduled outside allowed timeframe") 
+        {
+            
+        }
+    }
+    public class BadDateOverlapResponse : ApiBadRequestResponse
+    {
+        public BadDateOverlapResponse() : base("Another item is scheduled during entered timespan") { }
     }
 }
 

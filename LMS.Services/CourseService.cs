@@ -68,7 +68,7 @@ namespace LMS.Services
             }
             catch (BadDateSequenceException ex)
             {
-                return new BadDateSequenceRequestResponse(ex.StartDate, ex.EndDate);
+                return new BadDateSequenceResponse(ex.StartDate, ex.EndDate);
                 throw;
             }
             catch(Exception ex) 
@@ -120,7 +120,7 @@ namespace LMS.Services
             }
             catch (BadDateSequenceException ex)
             {
-                return new BadDateSequenceRequestResponse(ex.StartDate, ex.EndDate);
+                return new BadDateSequenceResponse(ex.StartDate, ex.EndDate);
             }
             catch (CourseNotFoundException )
             {
