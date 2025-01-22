@@ -40,19 +40,18 @@ namespace LMS.Services
                 m.ModuleId == moduleId &&
                 (string.IsNullOrEmpty(filteringValue) || m.Name.Contains(filteringValue)); //expand to cover all properties
 
-            var query = _uow.Modules.Query();
+            var includes = new List<Expression<Func<Activity, object>>>();
 
-            if (includeDocuments)
-            {
-                query = query.Include(m => m.Documents);
-            }
+            if (includeDocuments) includes.Add(m => m.Documents);
+            includes.Add(a => a.ActivityType); //to map the ActivityTypeName
 
             var (activities, totalCount) = await _uow.Activities.GetFilteredAndSortedEntitiesAsync(
                 filter: filter,
                 sortBy: sortBy,
                 isAscending: isAscending,
                 pageNr: pageNr,
-                pageSize: pageSize
+                pageSize: pageSize,
+                includes: includes.ToArray()
             );
 
             var activityDTOs = _mapper.Map<IEnumerable<ActivityDTO>>(activities);
@@ -67,6 +66,8 @@ namespace LMS.Services
             IQueryable<Activity> query = _uow.Activities.Query().Where(m => m.ActivityId == id);
 
             if (includeDocuments) query = query.Include(m => m.Documents);
+
+            query = query.Include(a => a.ActivityType); //to map the ActivityTypeName
 
             var activity = await query.FirstOrDefaultAsync();
 

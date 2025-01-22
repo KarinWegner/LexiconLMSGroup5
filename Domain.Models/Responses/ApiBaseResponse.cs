@@ -83,10 +83,19 @@ namespace Domain.Models.Responses
 
     public class BadCourseRequestResponse : ApiBadRequestResponse
     {
-        
+
         public BadCourseRequestResponse(string message) : base(message)
         {
-            
+
+        }
+    }
+
+    public class BadModuleRequestResponse : ApiBadRequestResponse
+    {
+
+        public BadModuleRequestResponse(string message) : base(message)
+        {
+
         }
     }
 

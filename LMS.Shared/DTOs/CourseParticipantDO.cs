@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LMS.Shared.DTOs.ApplicationUserDTOs;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;

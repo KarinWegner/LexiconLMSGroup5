@@ -27,7 +27,7 @@ namespace LMS.Presemtation.Controllers
 
         // Upload a document
         [HttpPost("upload")]
-        public async Task<IActionResult> UploadDocument([FromForm] DocumentUploadDto dto)
+        public async Task<IActionResult> UploadDocument([FromForm] DocumentUploadDTO dto)
         {
             if (dto.File == null || dto.File.Length == 0) return BadRequest("No file uploaded.");
 
@@ -91,7 +91,7 @@ namespace LMS.Presemtation.Controllers
             if (currentUser == null) return Unauthorized();
 
             //ToDo: Implement restrictions on who can access what documents
-            var documentDto = new DocumentDto
+            var documentDto = new DocumentDTO
             {
                 Id = document.DocumentId,
                 Name = document.Name,
@@ -113,7 +113,7 @@ namespace LMS.Presemtation.Controllers
 
             var documents = await _context.Documents
                 .Where(d => d.ModuleId == moduleId)
-                .Select(d => new DocumentDto
+                .Select(d => new DocumentDTO
                    {
                        Id = d.DocumentId,
                        Name = d.Name,
@@ -136,7 +136,7 @@ namespace LMS.Presemtation.Controllers
 
             var documents = await _context.Documents
                 .Where(d => d.ActivityId == activityId)
-                .Select(d => new DocumentDto
+                .Select(d => new DocumentDTO
                 {
                     Id = d.DocumentId,
                     Name = d.Name,

@@ -14,5 +14,6 @@ namespace Domain.Contracts
         Task EditEnrollment(int moveFromCourseId, string userId, int moveToCourseId);
         Task<ApplicationUser> FindUserByIdAsync(string userId);
         Task<IEnumerable<Course>> GetUserEnrollments(string userId);
+        Task<IEnumerable<ApplicationUser>> GetAllUsersAsync(string? roleFilter);
     }
 }

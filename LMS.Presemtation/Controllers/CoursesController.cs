@@ -6,6 +6,9 @@ using AutoMapper;
 using Azure;
 using Domain.Models.Responses;
 using Domain.Models.Exceptions;
+using LMS.Shared.DTOs.ModuleDTOs;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Text.Json;
 
 namespace LMS.Presemtation.Controllers
 {
@@ -24,21 +27,38 @@ namespace LMS.Presemtation.Controllers
 
         // GET: api/Courses
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CourseDTO>>> GetCourses(bool includeModules = false, bool includeEnrollments = false)
+        public async Task<ActionResult> GetCourses(
+            bool includeModules = false, 
+            bool includeEnrollments = false, 
+            bool includeDocuments = false,
+            int pageNr = 1,
+            int pageSize = 10
+            )
         {
-            ApiBaseResponse response = await _serviceManager.CourseService.GetAllCoursesAsync(includeModules, includeEnrollments);
-           
+            ApiBaseResponse response = await _serviceManager.CourseService.GetAllCoursesAsync(includeModules, includeEnrollments, includeDocuments, pageNr, pageSize);
+
+            var (courseDtos, totalCount) = response.GetOkResult<(IEnumerable<CourseDTO> courseDtos, int totalCount)>();
+
+            var metadata = new
+            {
+                TotalItems = totalCount,
+                PageSize = pageSize,
+                CurrentPage = pageNr,
+                TotalPages = (totalCount / pageSize)
+            };
+            Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(metadata));
+
             return response.Success ?
-               Ok(response.GetOkResult<IEnumerable<CourseDTO>>()) :
+               Ok(response.GetOkResult<(IEnumerable<CourseDTO> courseDtos, int totalCount)>()) :
                ProcessError(response);
         }
 
 
         // GET: api/Courses/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<CourseDTO>> GetCourse(int id, bool includeModules = false, bool includeEnrollments = false)
+        public async Task<ActionResult> GetCourse(int id, bool includeModules = false, bool includeEnrollments = false, bool includeDocuments = false)
         {
-            ApiBaseResponse response = await _serviceManager.CourseService.GetCourseByIdAsync(id, includeModules, includeEnrollments);
+            ApiBaseResponse response = await _serviceManager.CourseService.GetCourseByIdAsync(id, includeModules, includeEnrollments, includeDocuments);
 
             return response.Success ?
                Ok(response.GetOkResult<CourseDTO>()) :
@@ -67,18 +87,9 @@ namespace LMS.Presemtation.Controllers
         {
             if (id != courseDto.CourseId) return BadRequest("Mismatched Course ID.");
 
-          
-              var result =  await _serviceManager.CourseService.UpdateCourseAsync(id, courseDto);
+            var result =  await _serviceManager.CourseService.UpdateCourseAsync(id, courseDto);
             if (result.Success)   return NoContent();
             return ProcessError(result);
-            //catch (CourseNotFoundException)
-            //{
-            //    return CourseNotFoundResponse($"Course with ID {id} not found.");
-            //}
-            //catch (Exception ex)
-            //{
-            //    return StatusCode(500, $"An error occurred: {ex.Message}");
-            //}
         }
 
 
@@ -86,29 +97,25 @@ namespace LMS.Presemtation.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCourse(int id)
         {
-            
-                var deleted = await _serviceManager.CourseService.DeleteCourseAsync(id);
-                if (deleted.Success) return NoContent();
-                return ProcessError(deleted);
-           
+            var deleted = await _serviceManager.CourseService.DeleteCourseAsync(id);
+            if (deleted.Success) return NoContent();
+            return ProcessError(deleted);
         }
 
 
         [HttpPatch("{id}")]
         public async Task<ActionResult> PatchCourse(int id, [FromBody] JsonPatchDocument<CourseUpdateDTO> patchDocument)
         {
-
             if (patchDocument == null) return BadRequest("Invalid patch document.");
             
-            var courseToPatch = await _serviceManager.CourseService.GetCourseByIdAsync(id); //Already CourseDTO
+            var courseToPatch = await _serviceManager.CourseService.GetCourseByIdAsync(id); 
             if (courseToPatch == null) return NotFound($"Course with ID {id} not found.");
 
-            var courseUpdateDto = _mapper.Map<CourseUpdateDTO>(courseToPatch); //Mapp it to UpdateCourseDto
+            var courseUpdateDto = _mapper.Map<CourseUpdateDTO>(courseToPatch);
             patchDocument.ApplyTo(courseUpdateDto, ModelState);
 
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            //_mapper.Map(courseUpdateDto, courseToPatch);
             await _serviceManager.CourseService.UpdateCourseAsync(id, courseUpdateDto);
 
             return NoContent();
