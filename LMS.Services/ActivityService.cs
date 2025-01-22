@@ -37,6 +37,9 @@ namespace LMS.Services
                 string? filteringValue = null
                 )
         {
+            var module= await _uow.Modules.GetByIdAsync( moduleId );
+            if (module == null) return new ModuleNotFoundResponse(moduleId);
+
             Expression<Func<Activity, bool>> filter = m =>
                 m.ModuleId == moduleId &&
                 (string.IsNullOrEmpty(filteringValue) || m.Name.Contains(filteringValue)); //expand to cover all properties
