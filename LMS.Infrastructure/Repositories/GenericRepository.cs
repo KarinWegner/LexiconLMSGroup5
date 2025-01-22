@@ -1,4 +1,5 @@
 ﻿using Domain.Contracts;
+using Domain.Models.Entities;
 using LMS.Infrastructure.Data;
 using LMS.Shared.Extensions;
 using Microsoft.AspNetCore.JsonPatch;
@@ -51,7 +52,13 @@ namespace LMS.Infrastructure.Repositories
                 query = query.Include(include);
             }
 
-             query = query.ApplyFiltering(filter)
+            if (typeof(T) == typeof(Module)) // If T is Module, include nested properties
+            {
+                query = query.Include(m => ((Module)(object)m).Activities)
+                             .ThenInclude(a => a.ActivityType);
+            }
+
+            query = query.ApplyFiltering(filter)
                 .ApplySorting(sortBy, isAscending);
 
             // Get the total count before pagination
