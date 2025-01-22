@@ -52,24 +52,22 @@
     private List<ApplicationUserDTO> searchResults = new();
     private bool isDataLoaded = false;
 
-
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender && !isDataLoaded)
         {
-            searchResults =  await LoadUsersAsync(); 
+            data = await LoadUsersAsync(); 
+            searchResults = data;  
             isDataLoaded = true;
 
-            // Trigger re-render to display the data
             StateHasChanged();
         }
     }
 
-
     private async Task<List<ApplicationUserDTO>> LoadUsersAsync()
     {
-        var data = await _apiService.GetAsync<ApplicationUserResultDTO>("api/enrollment/user?roleFilter=Student");
-        return data?.Result ?? new List<ApplicationUserDTO>();
+        var response = await _apiService.GetAsync<ApplicationUserResultDTO>("api/enrollment/user?roleFilter=Student");
+        return response?.Result ?? new List<ApplicationUserDTO>();
     }
 
     private void SwitchTab(string tabName)
@@ -83,15 +81,14 @@
 
         if (string.IsNullOrWhiteSpace(searchString))
         {
-            searchResults = data;
+            searchResults = data; 
         }
         else
         {
             searchResults = data
-                .Where(user => user.UserName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+                .Where(user => user.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
                 .ToList();
         }
     }
-	
 }
 
