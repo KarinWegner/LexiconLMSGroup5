@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Domain.Contracts;
 using Domain.Models.Entities;
+using Domain.Models.Responses;
 using LMS.Shared.DTOs.ActivityTypeDTOs;
 using Microsoft.EntityFrameworkCore;
 using Services.Contracts;
@@ -23,37 +24,39 @@ namespace LMS.Services
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<ActivityTypeDTO>> GetActivityTypesAsync()
+        public async Task<ApiBaseResponse> GetActivityTypesAsync()
         {
             var activityTypes = await _uow.ActivityTypes.GetAllAsync();
-            return _mapper.Map<IEnumerable<ActivityTypeDTO>>(activityTypes);
+            var activityTypesDto = _mapper.Map<IEnumerable<ActivityTypeDTO>>(activityTypes);
+            return new ApiOkResponse<IEnumerable<ActivityTypeDTO>>(activityTypesDto);
         }
 
 
-        public async Task<ActivityTypeDTO> GetActivityTypeByIdAsync(int id)
+        public async Task<ApiBaseResponse> GetActivityTypeByIdAsync(int id)
         {
             var activityType = await _uow.ActivityTypes.GetByIdAsync(id);
-            if (activityType == null) return null;
-
-            return _mapper.Map<ActivityTypeDTO>(activityType);
+            if (activityType == null) return new ActivityTypeNotFoundResponse(id);
+            var activityTypeDto = _mapper.Map<ActivityTypeDTO>(activityType);
+            return new ApiOkResponse<ActivityTypeDTO>(activityTypeDto);
         }
 
-        public async Task<ActivityTypeDTO> CreateActivityTypeAsync(ActivityTypeCreateDTO activityTypeDto)
+        public async Task<ApiBaseResponse> CreateActivityTypeAsync(ActivityTypeCreateDTO activityTypeDto)
         {
             if (await ActivityTypeExistsAsync(activityTypeDto.Name)) throw new ArgumentException("ActivityType with the same name already exists.");
 
             var activityType = _mapper.Map<ActivityType>(activityTypeDto);
             await _uow.ActivityTypes.AddAsync(activityType);
             await _uow.CompleteASync();
+            var createdActivityType = _mapper.Map<ActivityTypeDTO>(activityType);
 
-            return _mapper.Map<ActivityTypeDTO>(activityType);
+            return new ApiCreatedAtResponse<ActivityTypeDTO>(createdActivityType);
         }
 
 
-        public async Task<bool> UpdateActivityTypeAsync(int id, ActivityTypeUpdateDTO activityTypeUpdateDto)
+        public async Task<ApiBaseResponse> UpdateActivityTypeAsync(int id, ActivityTypeUpdateDTO activityTypeUpdateDto)
         {
             var activityType = await _uow.ActivityTypes.GetByIdAsync(id);
-            if (activityType == null) return false;
+            if (activityType == null) return new ActivityTypeNotFoundResponse(id);
 
             if (await ActivityTypeExistsAsync(activityTypeUpdateDto.Name)) throw new ArgumentException("ActivityType with the same name already exists.");
 
@@ -61,19 +64,19 @@ namespace LMS.Services
             await _uow.ActivityTypes.UpdateAsync(activityType);
             await _uow.CompleteASync();
 
-            return true;
+            return new ApiNoContentResponse();
         }
 
 
-        public async Task<bool> DeleteActivityTypeAsync(int id)
+        public async Task<ApiBaseResponse> DeleteActivityTypeAsync(int id)
         {
             var activityType = await _uow.ActivityTypes.GetByIdAsync(id);
-            if (activityType == null) return false;
+            if (activityType == null) return new ActivityTypeNotFoundResponse(id);
 
             await _uow.ActivityTypes.DeleteAsync(activityType);
             await _uow.CompleteASync();
 
-            return true;
+            return new ApiNoContentResponse();
         }
 
         private async Task<bool> ActivityTypeExistsAsync(string name)

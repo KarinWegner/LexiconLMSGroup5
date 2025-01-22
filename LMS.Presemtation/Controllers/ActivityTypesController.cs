@@ -11,6 +11,7 @@ using LMS.Shared.DTOs.ActivityTypeDTOs;
 using AutoMapper;
 using LMS.Shared.DTOs.ActivityDTOs;
 using Services.Contracts;
+using Azure;
 
 namespace LMS.Presemtation.Controllers
 {
@@ -30,42 +31,31 @@ namespace LMS.Presemtation.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ActivityTypeDTO>>> GetActivityTypes()
         {
-            var activityTypes = await _serviceManager.ActivityTypeService.GetActivityTypesAsync();
-            return Ok(activityTypes);
+            var response = await _serviceManager.ActivityTypeService.GetActivityTypesAsync();
+            return response.Success ? Ok(response.GetOkResult<IEnumerable<ActivityTypeDTO>>()):
+                ProcessError(response);
         }
 
         // GET: api/ActivityTypes/5
         [HttpGet("{id}")]
         public async Task<ActionResult<ActivityTypeDTO>> GetActivityType(int id)
         {
-            var activityType = await _serviceManager.ActivityTypeService.GetActivityTypeByIdAsync(id);
+            var response = await _serviceManager.ActivityTypeService.GetActivityTypeByIdAsync(id);
 
-            if (activityType == null)
-            {
-                return NotFound("Activity type not found.");
-            }
 
-            return Ok(activityType);
+            return response.Success ? Ok(response.GetOkResult<ActivityTypeDTO>()) :
+               ProcessError(response);
         }
 
         // PUT: api/ActivityTypes/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutActivityType(int id, ActivityTypeUpdateDTO activityTypeDto)
-        {
-            //if (id != activityTypeDto.ActivityTypeId)
-            //{
-            //    return BadRequest("Activity type ID mismatch.");
-            //}
+        {        
+            var response = await _serviceManager.ActivityTypeService.UpdateActivityTypeAsync(id, activityTypeDto);
 
-            var isUpdated = await _serviceManager.ActivityTypeService.UpdateActivityTypeAsync(id, activityTypeDto);
-
-            if (!isUpdated)
-            {
-                return NotFound("Activity type not found.");
-            }
-
-            return NoContent();
+            return response.Success ? NoContent() :
+               ProcessError(response);
         }
 
         // POST: api/ActivityTypes
@@ -73,29 +63,25 @@ namespace LMS.Presemtation.Controllers
         [HttpPost]
         public async Task<ActionResult<ActivityTypeDTO>> PostActivityType(ActivityTypeCreateDTO activityTypeDto)
         {
-            try
-            {
-                var createdActivityType = await _serviceManager.ActivityTypeService.CreateActivityTypeAsync(activityTypeDto);
-                return CreatedAtAction(nameof(GetActivityType), new { id = createdActivityType.ActivityTypeId }, createdActivityType);
+           
+            var response = await _serviceManager.ActivityTypeService.CreateActivityTypeAsync(activityTypeDto);
+
+            if (response.Success) {
+                var createdActivityType = response.GetCreatedAtResult<ActivityTypeDTO>();
+                return CreatedAtAction(nameof(GetActivityType), new { id = createdActivityType.ActivityTypeId }, createdActivityType);    
             }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
+
+            return ProcessError(response);           
         }
 
         // DELETE: api/ActivityTypes/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteActivityType(int id)
         {
-            var isDeleted = await _serviceManager.ActivityTypeService.DeleteActivityTypeAsync(id);
+            var response = await _serviceManager.ActivityTypeService.DeleteActivityTypeAsync(id);
 
-            if (!isDeleted)
-            {
-                return NotFound("Activity type not found.");
-            }
-
-            return NoContent();
+            return response.Success ? NoContent() :
+                ProcessError(response);
         }
     }
 }

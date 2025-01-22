@@ -1,4 +1,5 @@
-﻿using LMS.Shared.DTOs.ActivityTypeDTOs;
+﻿using Domain.Models.Responses;
+using LMS.Shared.DTOs.ActivityTypeDTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,10 +10,10 @@ namespace Services.Contracts
 {
     public interface IActivityTypeService
     {
-        Task<IEnumerable<ActivityTypeDTO>> GetActivityTypesAsync();
-        Task<ActivityTypeDTO> GetActivityTypeByIdAsync(int id);
-        Task<ActivityTypeDTO> CreateActivityTypeAsync(ActivityTypeCreateDTO activityTypeDto);
-        Task<bool> UpdateActivityTypeAsync(int id, ActivityTypeUpdateDTO activityTypeUpdateDto);
-        Task<bool> DeleteActivityTypeAsync(int id);
+        Task<ApiBaseResponse> GetActivityTypesAsync();
+        Task<ApiBaseResponse> GetActivityTypeByIdAsync(int id);
+        Task<ApiBaseResponse> CreateActivityTypeAsync(ActivityTypeCreateDTO activityTypeDto);
+        Task<ApiBaseResponse> UpdateActivityTypeAsync(int id, ActivityTypeUpdateDTO activityTypeUpdateDto);
+        Task<ApiBaseResponse> DeleteActivityTypeAsync(int id);
     }
 }
