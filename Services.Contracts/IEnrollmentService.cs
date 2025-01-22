@@ -14,7 +14,6 @@ namespace Services.Contracts
     {
         Task<ApiBaseResponse> GetEnrollments();
 
-
         Task<ApiBaseResponse> GetEnrollmentsForCourse(int courseId, bool excludeTeachers = false);
         Task<ApiBaseResponse> EditEnrollment(int courseId, EnrollmentUpdateDTO updateDto);
         Task<ApiBaseResponse> AddEnrollment(int courseId, EnrollmentCreateDTO createDto);
