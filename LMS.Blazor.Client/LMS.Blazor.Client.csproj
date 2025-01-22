@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="Pages\Components\CourseNavbar.razor.cs" />
+    <None Include="Pages\Components\CourseOverview\CourseNavbar.razor.cs" />
   </ItemGroup>
 
   <ItemGroup>

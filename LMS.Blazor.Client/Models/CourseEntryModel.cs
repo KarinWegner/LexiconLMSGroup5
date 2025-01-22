@@ -19,5 +19,10 @@ namespace LMS.Blazor.Client.Models
             CourseEntryType = entryType;
             CourseEntries = [];
         }
+        public CourseEntryModel()
+        {
+            CourseEntryType = ECourseEntryType.Module;
+            CourseEntries = [];
+        }
     }
 }

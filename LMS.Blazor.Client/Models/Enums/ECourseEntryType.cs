@@ -2,6 +2,7 @@
 {
     public enum ECourseEntryType
     {
+        Class = -1,
         Module = 0,
         Activity = 1
     };

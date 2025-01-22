@@ -9,7 +9,7 @@
                 @foreach (var e in UpcommingEntries.CourseEntries)
                 {
 
-                    <CourseEntryObject Model="e" CourseEntryType="UpcommingEntries.CourseEntryType"></CourseEntryObject>
+                    <CourseEntryObject Model="e" CourseEntryType="UpcommingEntries.CourseEntryType" CourseId="@CourseId"></CourseEntryObject>
                 }
             </ul>
         </div>
@@ -24,7 +24,7 @@
                 @foreach (var e in ExpiredEntries.CourseEntries)
                 {
 
-                    <CourseEntryObject Model="e" CourseEntryType="ExpiredEntries.CourseEntryType"></CourseEntryObject>
+                    <CourseEntryObject Model="e" CourseEntryType="ExpiredEntries.CourseEntryType" CourseId="@CourseId"></CourseEntryObject>
                 }
             </ul>
         </div>

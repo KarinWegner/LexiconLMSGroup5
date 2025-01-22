@@ -2,13 +2,15 @@
 using LMS.Shared.DTOs;
 using Microsoft.AspNetCore.Components;
 
-namespace LMS.Blazor.Client.Pages.Components
+namespace LMS.Blazor.Client.Pages.Components.CourseOverview
 {
     public partial class CourseParticipantObject
     {
         [Parameter]
         public CourseParticipantDO Model { get; set; } = null!;
-        public string ThisNavLink => $"{VBRoutes.Student.LinkToCourseParticipants}/{Model.Id}";
+        [Parameter]
+        public int CourseId { get; set; }
+        public string ThisNavLink => VBRoutes.Student.LinkToCourseParticipant(CourseId, Model.Id!);
 
 
     }
