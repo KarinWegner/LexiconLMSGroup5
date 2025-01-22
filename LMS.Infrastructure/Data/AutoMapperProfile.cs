@@ -36,7 +36,8 @@ public class AutoMapperProfile : Profile
 
 
         CreateMap<Activity, ActivityDTO>()
-          .ForMember(dest => dest.Documents, opt => opt.MapFrom(src => src.Documents));
+          .ForMember(dest => dest.Documents, opt => opt.MapFrom(src => src.Documents))
+          .ForMember(dest => dest.ActivityTypeName, opt => opt.MapFrom(src => src.ActivityType.Name));
         CreateMap<ActivityCreateDTO, Activity>();
         CreateMap<ActivityUpdateDTO, Activity>().ReverseMap();
         CreateMap<ActivityDTO, ActivityUpdateDTO>();
