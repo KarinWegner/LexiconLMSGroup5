@@ -16,6 +16,8 @@
         public const string APICoursesIncludeModules = "includeModules=true", APICoursesIncludeEnrollments = "includeEnrollments=true";
         //API Module Queries
         public const string APIModulesIncludeActivities = "includeActivities=true";
+        //API Enrollment Queries
+        public const string APIEnrollmentsFilterByString = "?roleFilter=";
         //Acess Denied
         public const string AccessDenied = "/AccessDenied";
     }
