@@ -1,11 +1,5 @@
-﻿@using LMS.Shared.DTOs.CourseDTOs;
-@attribute [Route(VBRoutes.Administration.LinkToCreateCourse)]
+﻿@attribute [Route(VBRoutes.Administration.LinkToCreateCourse)]
 
 <h3>Create Course</h3>
 
-<AddCourseForm Model="courseCreateDTO"></AddCourseForm>
-
-@code 
-{
-    CourseCreateDTO courseCreateDTO = new();
-}
+<AddCourseForm></AddCourseForm>

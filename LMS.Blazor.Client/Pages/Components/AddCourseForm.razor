@@ -2,6 +2,7 @@
 @using LMS.Shared.DTOs.CourseDTOs;
 @using Services;
 @rendermode InteractiveWebAssembly
+@attribute [StreamRendering(true)]
 
 <EditForm Model="Model" OnValidSubmit="HandleValidSubmit">
     <DataAnnotationsValidator />
@@ -31,21 +32,9 @@
 
 
 @code {
-    [Inject]
-    private NavigationManager NavigationManager { get; set; } = default!;
-
-    private ClientApiService ApiService { get; set; } = default!;
+    [Parameter]
+    public CourseModel Model { get; set; } = default!;
 
     [Parameter]
-    public CourseCreateDTO Model { get; set; } = default!;
-
-    [Parameter]
-    public EventCallback<CourseCreateDTO> OnSubmit { get; set; }
-
-    private async Task HandleValidSubmit()
-    {
-        await OnSubmit.InvokeAsync(Model);
-        var result = await ApiService.PostAsync<CourseCreateDTO, ApiResponse>(VBRoutes.API.Course.Courses, Model);
-        NavigationManager.NavigateTo(VBRoutes.Administration.LinkToCourseDashboard);
-    }
+    public EventCallback<CourseModel> OnSubmit { get; set; }
 }

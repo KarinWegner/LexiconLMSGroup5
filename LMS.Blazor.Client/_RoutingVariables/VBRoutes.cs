@@ -29,7 +29,7 @@
             public const string LinkToCourseDashboard = $"/{RoutingVariables.AdministrationDashboard}/{RoutingVariables.CourseDashboard}";
             public const string LinkToStudentDashboard = $"/{RoutingVariables.AdministrationDashboard}/{RoutingVariables.StudentDashboard}";
 
-            public const string LinkToCreateCourse = $"{LinkToCourseDashboard}/create-course";
+            public const string LinkToCreateCourse = $"/{RoutingVariables.Create}/{RoutingVariables.CreateCourse}";
         }
 
         public record API
