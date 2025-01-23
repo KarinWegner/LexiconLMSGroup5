@@ -7,23 +7,41 @@
 
 <PageTitle>User Registration</PageTitle>
 
-
+<h3 class="text-center">Register New User</h3>
 <div class="d-flex justify-content-center">
-    <h3 c>Register New User</h3>
     <div class="card p-4 shadow" style="width:80%; max-width: 800px">
         <EditForm Model="@registrationModel" OnValidSubmit="HandleValidSubmit">
             <DataAnnotationsValidator />
             <ValidationSummary />
 
             <div class="mb-3">
-                <label for="Name" class="form-label">Name</label>
-                <InputText id="Name" class="form-control" @bind-Value="registrationModel.Name" />
-                <ValidationMessage For="@(() => registrationModel.Name)" />
+                <label for="Name" class="form-label">Select User</label>
+                <InputSelect id="Name" class="form-control" @bind-Value="registrationModel.UserName">
+                    <option value="" disabled>Select a user</option>
+                    @if (usersDetails != null)
+                    {
+                        @foreach (var user in usersDetails)
+                        {
+                            <option value="@user.UserName.ToString()">@user.UserName</option>
+                        }
+                    }
+                </InputSelect>
+               
+                <ValidationMessage For="@(() => registrationModel.UserName)" />
             </div>
 
             <div class="mb-3">
                 <label for="Email" class="form-label">Email</label>
-                <InputText id="Email" type="email" class="form-control" @bind-Value="registrationModel.Email" />
+                <InputSelect id="Email" class="form-control" @bind-Value="registrationModel.Email">
+                    <option value="" disabled>Select a email</option>
+                    @if (usersDetails != null)
+                    {
+                        @foreach (var user in usersDetails)
+                        {
+                            <option value="@user.Email.ToString()">@user.Email</option>
+                        }
+                    }
+                </InputSelect>
                 <ValidationMessage For="@(() => registrationModel.Email)" />
             </div>
 
@@ -70,6 +88,7 @@
     private bool firstRender = true;
 
     private List<RoleDTO> roles = new();
+    private List<UserDTO> usersDetails = new();
 
     private async Task HandleValidSubmit()
     {
@@ -102,7 +121,7 @@
 
     private async Task LoadRolesAsync()
     {
-       
+
         try
         {
             var response = await _apiService.GetAsync<List<RoleDTO>>("api/enrollment/roles");
@@ -118,11 +137,31 @@
         }
     }
 
+    private async Task LoadUsersDetailsAsync()
+    {
+        try
+        {
+            var response = await _apiService.GetAsync<List<UserDTO>>("api/enrollment/users/all");
+            if (response != null)
+            {
+                usersDetails = response;
+            }
+        }
+        catch (Exception ex)
+        {
+            submissionMessage = $"Failed to load users details: {ex.Message}";
+        }
+
+        StateHasChanged();
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             await LoadRolesAsync();
+            await LoadUsersDetailsAsync();
+
             StateHasChanged();
 
         }
@@ -132,7 +171,7 @@
     private class RegistrationModel
     {
         [Required(ErrorMessage = "Name is required.")]
-        public string Name { get; set; } = string.Empty;
+        public string UserName { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Email is required.")]
         [EmailAddress(ErrorMessage = "Invalid email address.")]
