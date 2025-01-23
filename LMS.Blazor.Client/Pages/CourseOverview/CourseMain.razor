@@ -1,2 +1,7 @@
 ﻿@attribute [Route(VBRoutes.Student.LinkToMain)]
 @rendermode InteractiveWebAssembly
+
+@if (courses.CourseEntries.IsValid())
+{
+    <CourseEntryList ListEntries="courses"></CourseEntryList>
+}

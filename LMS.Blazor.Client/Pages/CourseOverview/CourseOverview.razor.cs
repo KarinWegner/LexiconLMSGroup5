@@ -21,9 +21,8 @@ namespace LMS.Blazor.Client.Pages.CourseOverview
         {
             if (firstRender)
             {
-                //TODO: PICK THE ACTUAL COURSE
                 var res = await apiService.GetAsync<CourseDTO>(VBRoutes.API.Course.CourseAtId(CourseId));
-                Course = new CourseEntryDO(res);
+                Course = new CourseEntryDO(res!);
                 StateHasChanged();
             }
             await base.OnAfterRenderAsync(firstRender);

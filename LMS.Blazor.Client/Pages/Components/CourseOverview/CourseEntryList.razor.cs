@@ -17,26 +17,29 @@ namespace LMS.Blazor.Client.Pages.Components.CourseOverview
 
         protected async override Task OnParametersSetAsync()
         {
-            if (ListEntries == null)
+            if (ListEntries.CourseEntryType != ECourseEntryType.Class)
             {
-                UpcommingEntries = new();
-                ExpiredEntries = new();
-                return;
-            }
+                if (ListEntries == null)
+                {
+                    UpcommingEntries = new();
+                    ExpiredEntries = new();
+                    return;
+                }
                 var store = ListEntries.CourseEntries.OrderBy(x => x.EndTime);
 
-            List<CourseEntryDO> expired = new(), next = new();
+                List<CourseEntryDO> expired = new(), next = new();
 
-            foreach (var module in store)
-            {
-                if (module.EndTime < DateTime.Now)
-                    expired.Add(module);
-                else
-                    next.Add(module);
+                foreach (var module in store)
+                {
+                    if (module.EndTime < DateTime.Now)
+                        expired.Add(module);
+                    else
+                        next.Add(module);
+                }
+                UpcommingEntries = new(ListEntries.CourseEntryType, next);
+                ExpiredEntries = new(ListEntries.CourseEntryType, expired);
+                await base.OnParametersSetAsync();
             }
-            UpcommingEntries = new(ListEntries.CourseEntryType, next);
-            ExpiredEntries = new(ListEntries.CourseEntryType, expired);
-            await base.OnParametersSetAsync();
         }
     }
 }
