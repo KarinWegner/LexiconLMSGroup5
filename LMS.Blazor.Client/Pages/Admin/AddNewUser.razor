@@ -60,6 +60,21 @@
                 <ValidationMessage For="@(() => registrationModel.Role)" />
             </div>
 
+            <div class="mb-3">
+                <label for="Role" class="form-label">Role</label>
+                <InputSelect id="Role" class="form-control" @bind-Value="registrationModel.Role">
+                    <option value="" disabled>Select a role</option>
+                    @if (roles != null)
+                    {
+                        @foreach (var role in roles)
+                        {
+                            <option value="@role">@role</option>
+                        }
+                    }
+                </InputSelect>
+                <ValidationMessage For="@(() => registrationModel.Role)" />
+            </div>
+
             <button type="submit" class="btn btn-primary">Add new user</button>
         </EditForm>
     </div>

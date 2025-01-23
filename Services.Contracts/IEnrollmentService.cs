@@ -25,6 +25,7 @@ namespace Services.Contracts
         Task<ApiBaseResponse> GetAllUsersAsync();
         Task<ApiBaseResponse> AssignRoleToUserAsync(AssignRoleDTO assignRoleDto);
         Task<ApiBaseResponse> GetUsers(string? roleFilter, int pageNr, int pageSize);
+        Task<ApiBaseResponse> GetAllRolesAsync();
 
     }
 }
