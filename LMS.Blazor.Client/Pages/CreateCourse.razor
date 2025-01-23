@@ -1,7 +1,6 @@
-﻿@page "/create-course"
-@using Services
+﻿@using Services
 @using LMS.Shared.DTOs.CourseDTOs
-@inject ClientApiService ClientApiService 
+@attribute [Route(VBRoutes.Administration.LinkToCreateCourse)]
 
 <h3>Create Course</h3>
 
@@ -42,7 +41,7 @@
     {
         try
         {
-            var response = await ClientApiService.PostAsync<CourseCreateDTO, object>("api/Courses", courseCreateDto);
+           //var response = await ClientApiService.PostAsync<CourseCreateDTO, object>("api/Courses", courseCreateDto);
 
             NavigationManager.NavigateTo(VBRoutes.Administration.LinkToCourseDashboard);
         }
