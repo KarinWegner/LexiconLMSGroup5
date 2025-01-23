@@ -6,11 +6,11 @@ namespace LMS.Blazor.Client.Pages.Components
 {
     public partial class AddCourseForm
     {
-        protected override async Task OnInitializedAsync()
-        {
-            base.OnInitialized();
-            Model = new CourseCreateDTO();
-        }
+        //protected override async Task OnInitializedAsync()
+        //{
+        //    base.OnInitialized();
+        //    Model = new CourseCreateDTO();
+        //}
     }
 }
 

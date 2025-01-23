@@ -34,14 +34,13 @@
     [Inject]
     private NavigationManager NavigationManager { get; set; } = default!;
 
+    private ClientApiService ApiService { get; set; } = default!;
+
     [Parameter]
     public CourseCreateDTO Model { get; set; } = default!;
 
     [Parameter]
     public EventCallback<CourseCreateDTO> OnSubmit { get; set; }
-
-    [Parameter]
-    public string SubmitButtonText { get; set; } = "Submit";
 
     private async Task HandleValidSubmit()
     {
