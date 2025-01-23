@@ -53,6 +53,11 @@
                 public const string Activities = RoutingVariables.APIActivity;
                 public static string ActivityAtId(int id) => $"{RoutingVariables.APIActivity}/{id}";
             }
+            public record ActivityType
+            {
+                public const string ActivityTypes = RoutingVariables.APIActivityType;
+                public static string ActivityTypeAtId(int Id) => $"{RoutingVariables.APIActivityType}/{Id}";
+            }
         }
         public const string AccessDenied = RoutingVariables.AccessDenied;
     }

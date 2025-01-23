@@ -1,5 +1,5 @@
 ﻿@using LMS.Blazor.Client.Interfaces
-@typeparam TModel where TModel : IEntity
+@rendermode InteractiveWebAssembly
 
 <EditForm Model="Model" OnValidSubmit="HandleValidSubmit">
     <DataAnnotationsValidator />
@@ -9,6 +9,19 @@
         <label for="name">Name</label>
         <InputText id="name" @bind-Value="Model.Name" class="form-control" />
     </div>
+        
+    <div>
+            <div class="form-label">Activity Type:</div>
+            <InputSelect class="form-select" Value=Model.ActivityType ValueExpression="() => Model.ActivityType">
+                <option value="" selected>-- Select Activity --</option>
+                @foreach (var activityType in this.activityTypes)
+                {
+                    <option value="@activityType">@activityType.Name</option>
+                }
+            </InputSelect>        
+    </div>
+    
+
 
     <div>
         <label for="start-date">Start Date</label>
@@ -37,13 +50,13 @@
 @code {
     [Parameter]
 
-    public TModel Model { get; set; } = default!;
+    public ActivityModel Model { get; set; } = default!;
 
 
 
     [Parameter]
 
-    public EventCallback<TModel> OnSubmit { get; set; }
+    public EventCallback<ActivityModel> OnSubmit { get; set; }
 
 
 
