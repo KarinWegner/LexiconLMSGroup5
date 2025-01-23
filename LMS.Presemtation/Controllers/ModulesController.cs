@@ -80,16 +80,18 @@ namespace LMS.Presemtation.Controllers
 
         // POST: api/modules
         [HttpPost("course/{courseId}/module")]
-        public async Task<ActionResult> CreateModule([FromBody] ModuleCreateDTO moduleDto, int courseId)
+        public async Task<ActionResult> CreateModule([FromBody] ModuleCreateDTO moduleDto)
         {
-                var response = await _serviceManager.ModuleService.CreateModuleAsync(moduleDto, courseId);
-            var createdModule = response.GetCreatedAtResult<ModuleDTO>();
-            if (createdModule == null)
-            {
-                return BadRequest("Invalid module data.");
-            }
+                var response = await _serviceManager.ModuleService.CreateModuleAsync(moduleDto);
 
-            return CreatedAtAction(nameof(GetModule), new { courseId, id = createdModule.ModuleId }, createdModule);
+            if (response.Success)
+            {
+                var createdModule = response.GetCreatedAtResult<ModuleDTO>();
+
+
+                return CreatedAtAction(nameof(GetModule), new { moduleDto.CourseId, id = createdModule.ModuleId }, createdModule);
+            }
+            return ProcessError(response);
         }
 
 

@@ -26,6 +26,7 @@ namespace LMS.Blazor.Client.Pages.Admin
         {
             moduleCreateDTO.StartDate = DateTime.Now;
             moduleCreateDTO.EndDate = moduleCreateDTO.StartDate.AddDays(20);
+            moduleCreateDTO.CourseId = CourseId;
             base.OnInitialized();
             editContext = new(moduleCreateDTO);
             validationMessageStore = new(editContext);

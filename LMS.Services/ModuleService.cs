@@ -84,14 +84,14 @@ namespace LMS.Services
         }
 
 
-        public async Task<ApiBaseResponse> CreateModuleAsync(ModuleCreateDTO moduleDto, int courseId)
+        public async Task<ApiBaseResponse> CreateModuleAsync(ModuleCreateDTO moduleDto)
         {
 
             if (moduleDto == null) return new BadModuleRequestResponse("Module info is required.");
 
-            var course = await _uow.Courses.GetByIdAsync(courseId, c => c.Modules); 
+            var course = await _uow.Courses.GetByIdAsync(moduleDto.CourseId, c => c.Modules); 
 
-            if (course == null) return new CourseNotFoundResponse(courseId);
+            if (course == null) return new CourseNotFoundResponse(moduleDto.CourseId);
 
             //Check dates - does it end before it starts, does it fit into the course timeline, does it overlap with other modules
             ValidateModuleDates(moduleDto);
@@ -99,7 +99,7 @@ namespace LMS.Services
             if (!ValidateModulesDoNotOverlapOnCreate(moduleDto, course)) return new BadDateOverlapResponse();
 
             var moduleToAdd = _mapper.Map<Domain.Models.Entities.Module>(moduleDto);
-            moduleToAdd.CourseId = courseId;
+           // moduleToAdd.CourseId = courseId;
             await _uow.Modules.AddAsync(moduleToAdd);
 
             await _uow.CompleteASync();
