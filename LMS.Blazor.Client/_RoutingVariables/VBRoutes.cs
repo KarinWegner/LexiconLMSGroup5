@@ -20,7 +20,6 @@
             public static string LinkToModule(int CourseId, int ModuleId) => $"{LinkToCourse(CourseId)}/{RoutingVariables.Modules}/{ModuleId}";
             public static string LinkToActivity(int CourseId, int ModuleId, int ActivityId) => $"{LinkToModule(CourseId, ModuleId)}/{ActivityId}";
             public static string LinkToCourseParticipant(int CourseId, string id) => $"{DLinkToCourseParticipants(CourseId)}/{id}";
-            public const string LinkToAdministrationAccount = $"/{RoutingVariables.AdminAccount}";
         }
 
         public record Administration
@@ -57,7 +56,9 @@
             public record Enrollment
             {
                 public const string Enrollments = RoutingVariables.Enrollments;
-                public static string GetUserEnrollment(string id) => $"{Enrollments}/{RoutingVariables.EnrollmentsFromUser}/{id}";
+                public const string EnrollmentsUser = $"{Enrollments}/{RoutingVariables.EnrollmentsFromUser}";
+                public static string GetUserEnrollment(string id) => $"{EnrollmentsUser}/{id}";
+                public static string GetUserEnrolmentWithFiler(string filter) => $"{EnrollmentsUser}{RoutingVariables.APIEnrollmentsFilterByString}{filter}";
             }
         }
         public const string AccessDenied = RoutingVariables.AccessDenied;
