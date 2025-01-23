@@ -9,6 +9,7 @@ namespace LMS.Shared.DTOs.EnrollmentDTOs
     public record EnrollmentUserCourseListDTO
     {
         public string CourseName { get; init; }
+        public int CourseId { get; init; }
         public DateTime CourseStart { get; init; }
         public DateTime CourseEnd { get; init; }
         public List<string> TeacherNames { get; init; }
