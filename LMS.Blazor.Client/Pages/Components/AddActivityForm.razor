@@ -9,14 +9,21 @@
         <label for="name">Name</label>
         <InputText id="name" @bind-Value="Model.Name" class="form-control" />
     </div>
-        
+
     <div>
-            <div class="form-label">Activity Type:</div>
-            <InputSelect class="form-select" Value=Model.ActivityType ValueExpression="() => Model.ActivityType">
+        <div class="form-label">Activity Type:</div>
+        <InputSelect class="form-select" Value=Model.ActivityType ValueExpression="() => Model.ActivityType">
+            @if(ActivityTypes.Count==null)
+                {
+                       <option value="" selected>Loading types...</option>     
+                }
+
+                else{
                 <option value="" selected>-- Select Activity --</option>
-                @foreach (var activityType in this.activityTypes)
+                @foreach (var activityType in ActivityTypes)
                 {
                     <option value="@activityType">@activityType.Name</option>
+                }
                 }
             </InputSelect>        
     </div>

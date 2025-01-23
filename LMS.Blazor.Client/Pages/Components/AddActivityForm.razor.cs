@@ -20,22 +20,30 @@ namespace LMS.Blazor.Client.Pages.Components
             public string Description { get; set; }
             public  string ActivityType { get; set; }
         }
-
-         List<ActivityTypeDTO> activityTypes { get; set; }
+        [Parameter]
+        public List<ActivityTypeDTO> ActivityTypes { get; set; } = new List<ActivityTypeDTO>();
         protected async override Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
             {
-                var res = await apiService.GetAsync<(IEnumerable<ActivityTypeDTO> activityTypeDTOs, int totalCount)>(VBRoutes.API.ActivityType.ActivityTypes);
+                var activityTypes = await apiService.GetAsync<IEnumerable<ActivityTypeDTO>>(VBRoutes.API.ActivityType.ActivityTypes);
                StateHasChanged();
             }
             await base.OnAfterRenderAsync(firstRender);
         }
-        protected override void OnInitialized()
+        protected override async Task OnInitializedAsync()
         {
+             //GetActivityTypes();
             base.OnInitialized();
             Model = new ActivityModel();
         }
+        protected async Task GetActivityTypes()
+        {
+
+            var activityTypes = await apiService.GetAsync<IEnumerable<ActivityTypeDTO>>(VBRoutes.API.ActivityType.ActivityTypes);
+            StateHasChanged();
+        }
+        
 
     }
 }
