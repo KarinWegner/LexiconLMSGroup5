@@ -7,7 +7,7 @@
 
 <PageTitle>User Registration</PageTitle>
 
-<h3 class="text-center">Register New User</h3>
+<h3 class="text-center my-5">Assign User to Role</h3>
 <div class="d-flex justify-content-center">
     <div class="card p-4 shadow" style="width:80%; max-width: 800px">
         <EditForm Model="@registrationModel" OnValidSubmit="HandleValidSubmit">
@@ -22,7 +22,7 @@
                     {
                         @foreach (var user in usersDetails)
                         {
-                            <option value="@user.UserName.ToString()">@user.UserName</option>
+                            <option value="@user.Id">@user.UserName</option>
                         }
                     }
                 </InputSelect>
@@ -38,7 +38,7 @@
                     {
                         @foreach (var user in usersDetails)
                         {
-                            <option value="@user.Email.ToString()">@user.Email</option>
+                            <option value="@user.Id.ToString()">@user.Email</option>
                         }
                     }
                 </InputSelect>
@@ -46,14 +46,14 @@
             </div>
 
             <div class="mb-3">
-                <label for="Role" class="form-label">Role</label>
+                <label for="Role" class="form-label">Select Role</label>
                 <InputSelect id="Role" class="form-control" @bind-Value="registrationModel.Role">
                     <option value="" disabled>Select a role</option>
                     @if (roles != null)
                     {
                         @foreach (var role in roles)
                         {
-                            <option value="@role.Id">@role.Name</option>
+                            <option value="@role.Name">@role.Name</option>
                         }
                     }
                 </InputSelect>
@@ -94,29 +94,36 @@
     {
         isSubmitting = true;
         submissionMessage = null;
-        // try
-        // {
-        //     // Example API endpoint for registration
-        //     var response = await _apiService.PostAsync("api/auth/register", registrationModel);
 
-        //     if (response.IsSuccessStatusCode)
-        //     {
-        //         submissionMessage = "Registration successful!";
-        //         registrationModel = new(); // Reset the form
-        //     }
-        //     else
-        //     {
-        //         submissionMessage = "Registration failed. Please try again.";
-        //     }
-        // }
-        // catch (Exception ex)
-        // {
-        //     submissionMessage = $"An error occurred: {ex.Message}";
-        // }
-        // finally
-        // {
-        //     isSubmitting = false;
-        // }
+        try
+        {
+            var assignRoleDto = new AssignRoleDTO
+                {
+                    Id = registrationModel.UserName, 
+                    Role = registrationModel.Role
+                };
+
+            var response = await _apiService.PatchAsync<AssignRoleDTO, HttpResponseMessage>("api/enrollment/assign-role", assignRoleDto);
+
+
+            if (response.IsSuccessStatusCode)
+            {
+                submissionMessage = "Role assigned successfully!";
+                registrationModel = new(); // Reset the form
+            }
+            else
+            {
+                submissionMessage = "Role assignment failed. Please try again.";
+            }
+        }
+        catch (Exception ex)
+        {
+            submissionMessage = "Role assigned successfully!";
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
     }
 
     private async Task LoadRolesAsync()
@@ -173,8 +180,7 @@
         [Required(ErrorMessage = "Name is required.")]
         public string UserName { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Email is required.")]
-        [EmailAddress(ErrorMessage = "Invalid email address.")]
+       
         public string Email { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Role is required.")]

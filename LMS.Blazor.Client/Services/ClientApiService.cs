@@ -39,6 +39,19 @@ public class ClientApiService(IHttpClientFactory httpClientFactory, NavigationMa
         );
     }
 
+    public async Task<TResponse?> PatchAsync<TRequest, TResponse>(
+       string endpoint,
+       TRequest dto)
+    {
+        return await CallApiAsync<TRequest, TResponse>(
+            endpoint,
+            HttpMethod.Patch,
+            dto
+        );
+    }
+
+   
+
     private async Task<TResponse?> CallApiAsync<TRequest, TResponse>(string endpoint, HttpMethod httpMethod, TRequest? dto)
     {
         var request = new HttpRequestMessage(httpMethod, $"proxy-endpoint/{endpoint}");
@@ -60,6 +73,12 @@ public class ClientApiService(IHttpClientFactory httpClientFactory, NavigationMa
         }
 
         response.EnsureSuccessStatusCode();
+
+        // patch request
+        if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
+        {
+            return default;
+        }
 
         var res = await JsonSerializer.DeserializeAsync<TResponse>(await response.Content.ReadAsStreamAsync(), _jsonSerializerOptions, CancellationToken.None);
         return res;
