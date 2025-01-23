@@ -3,6 +3,7 @@ using Domain.Contracts;
 using Domain.Models.Entities;
 using Domain.Models.Exceptions;
 using Domain.Models.Responses;
+using LMS.Shared.DTOs;
 using LMS.Shared.DTOs.ApplicationUserDTOs;
 using LMS.Shared.DTOs.EnrollmentDTOs;
 using Microsoft.AspNetCore.Identity;
@@ -211,6 +212,13 @@ namespace LMS.Services
             await _uow.CompleteASync();
 
             return new ApiNoContentResponse();
+        }
+
+        public async Task<ApiBaseResponse> GetAllRolesAsync()
+        {
+            var roles = await _uow.Enrollments.GetAllRolesAsync();
+            var roleDTOs = _mapper.Map<IEnumerable<RoleDTO>>(roles);
+            return new ApiOkResponse<IEnumerable<RoleDTO>>(roleDTOs);
         }
     }
 }

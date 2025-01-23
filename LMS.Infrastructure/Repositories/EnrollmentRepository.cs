@@ -81,5 +81,10 @@ namespace LMS.Infrastructure.Repositories
         {
             return _context.Users.AsQueryable();
         }
+
+        public async Task<IEnumerable<IdentityRole>> GetAllRolesAsync()
+        {
+            return await _context.Roles.ToListAsync();
+        }
     }
 }

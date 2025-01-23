@@ -1,4 +1,5 @@
 ﻿using Domain.Models.Entities;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,5 +16,6 @@ namespace Domain.Contracts
         Task<ApplicationUser> FindUserByIdAsync(string userId);
         Task<IEnumerable<Course>> GetUserEnrollments(string userId);
         Task<IEnumerable<ApplicationUser>> GetAllUsersAsync(string? roleFilter);
+        Task<IEnumerable<IdentityRole>> GetAllRolesAsync();
     }
 }

@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Services.Contracts;
 using LMS.Shared.DTOs.EnrollmentDTOs;
 using LMS.Shared.DTOs.ApplicationUserDTOs;
+using LMS.Shared.DTOs;
 
 namespace LMS.Presemtation.Controllers
 {
@@ -161,6 +162,14 @@ namespace LMS.Presemtation.Controllers
 
             return response.Success ? Ok(response.GetOkResult<IEnumerable<ApplicationUserListDTO>>()):
                 ProcessError(response);
+        }
+
+        [HttpGet("roles")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<IEnumerable<RoleDTO>>> GetAllRoles()
+        {
+            var response = await _serviceManager.EnrollmentService.GetAllRolesAsync();
+            return response.Success ? Ok(response.GetOkResult<IEnumerable<RoleDTO>>()) : ProcessError(response);
         }
     }
 }

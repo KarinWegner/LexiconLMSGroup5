@@ -8,6 +8,7 @@ using LMS.Shared.DTOs.ActivityTypeDTOs;
 using LMS.Shared.DTOs.EnrollmentDTOs;
 using LMS.Shared.DTOs.ApplicationUserDTOs;
 using LMS.Shared.DTOs.DocumentDTOs;
+using Microsoft.AspNetCore.Identity;
 
 namespace LMS.Infrastructure.Data;
 
@@ -56,6 +57,7 @@ public class AutoMapperProfile : Profile
         CreateMap<ApplicationUser, ApplicationUserListDTO>();
 
         CreateMap<ApplicationUser , EnrolledUserDTO > ();
-        
+        CreateMap<IdentityRole, RoleDTO>();
+
     }
 }

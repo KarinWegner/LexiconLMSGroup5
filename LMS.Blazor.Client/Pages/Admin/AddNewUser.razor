@@ -32,6 +32,21 @@
                 <ValidationMessage For="@(() => registrationModel.Role)" />
             </div>
 
+            <div class="mb-3">
+                <label for="Role" class="form-label">Role</label>
+                <InputSelect id="Role" class="form-control" @bind-Value="registrationModel.Role">
+                    <option value="" disabled>Select a role</option>
+                    @if (roles != null)
+                    {
+                        @foreach (var role in roles)
+                        {
+                            <option value="@role">@role</option>
+                        }
+                    }
+                </InputSelect>
+                <ValidationMessage For="@(() => registrationModel.Role)" />
+            </div>
+
             <button type="submit" class="btn btn-primary">Add new user</button>
         </EditForm>
     </div>
@@ -58,7 +73,53 @@
     private bool isSubmitting = false;
     private string? submissionMessage = null;
 
-   
+    private List<string> roles = new();
+    private async Task HandleValidSubmit()
+    {
+        isSubmitting = true;
+        submissionMessage = null;
+        // try
+        // {
+        //     // Example API endpoint for registration
+        //     var response = await _apiService.PostAsync("api/auth/register", registrationModel);
+
+        //     if (response.IsSuccessStatusCode)
+        //     {
+        //         submissionMessage = "Registration successful!";
+        //         registrationModel = new(); // Reset the form
+        //     }
+        //     else
+        //     {
+        //         submissionMessage = "Registration failed. Please try again.";
+        //     }
+        // }
+        // catch (Exception ex)
+        // {
+        //     submissionMessage = $"An error occurred: {ex.Message}";
+        // }
+        // finally
+        // {
+        //     isSubmitting = false;
+        // }
+    }
+
+    private async Task LoadRolesAsync()
+    {
+        try
+        {
+            // Replace with your actual API endpoint for roles
+            var response = await _apiService.GetAsync<List<string>>("api/roles");
+
+            if (response != null)
+            {
+                roles = response;
+            }
+        }
+        catch (Exception ex)
+        {
+            submissionMessage = $"Failed to load roles: {ex.Message}";
+        }
+    }
 
     private class RegistrationModel
     {

@@ -20,6 +20,7 @@ namespace Services.Contracts
         Task<ApiBaseResponse> RemoveEnrollment(int courseId, string userId);
         Task<ApiBaseResponse> GetUserEnrollments(string userId);
         Task<ApiBaseResponse> GetUsers(string? roleFilter);
+        Task<ApiBaseResponse> GetAllRolesAsync();
 
     }
 }
