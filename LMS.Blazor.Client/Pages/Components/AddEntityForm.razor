@@ -1,4 +1,5 @@
-﻿@typeparam TModel where TModel : IEntity
+﻿@using Interfaces
+@typeparam TModel where TModel : IEntity
 
 <EditForm Model="Model" OnValidSubmit="HandleValidSubmit">
     <DataAnnotationsValidator />
