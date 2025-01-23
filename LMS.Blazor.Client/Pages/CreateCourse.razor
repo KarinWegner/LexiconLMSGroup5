@@ -1,53 +1,5 @@
-﻿@using Services
-@using LMS.Shared.DTOs.CourseDTOs
-@attribute [Route(VBRoutes.Administration.LinkToCreateCourse)]
+﻿@attribute [Route(VBRoutes.Administration.LinkToCreateCourse)]
 
 <h3>Create Course</h3>
 
-<EditForm Model="courseCreateDto" OnValidSubmit="HandleSubmit">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-
-    <div>
-        <label for="name">Name</label>
-        <InputText id="name" @bind-Value="courseCreateDto.Name" class="form-control" />
-    </div>
-
-    <div>
-        <label for="start-date">Start Date</label>
-        <InputDate id="start-date" @bind-Value="courseCreateDto.StartDate" class="form-control" />
-    </div>
-
-    <div>
-        <label for="end-date">End Date</label>
-        <InputDate id="end-date" @bind-Value="courseCreateDto.EndDate" class="form-control" />
-    </div>
-
-    <div>
-        <label for="description">Description</label>
-        <InputTextArea id="description" @bind-Value="courseCreateDto.Description" class="form-control" />
-    </div>
-
-    <button type="submit" class="btn btn-primary">Create Course</button>
-</EditForm>
-
-@code {
-    private CourseCreateDTO courseCreateDto = new();
-
-    [Inject]
-    private NavigationManager NavigationManager { get; set; } = default!;
-
-    private async Task HandleSubmit()
-    {
-        try
-        {
-           //var response = await ClientApiService.PostAsync<CourseCreateDTO, object>("api/Courses", courseCreateDto);
-
-            NavigationManager.NavigateTo(VBRoutes.Administration.LinkToCourseDashboard);
-        }
-        catch (Exception)
-        {
-            //handle exeption
-        }
-    }
-}
+<AddCourseForm></AddCourseForm>
