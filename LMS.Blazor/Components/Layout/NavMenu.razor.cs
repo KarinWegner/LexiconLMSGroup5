@@ -9,6 +9,7 @@ namespace LMS.Blazor.Components.Layout
         private string AdministrationDashboardLink => VBRoutes.Administration.LinkToDashboard;
         private string CourseAdministrationLink => VBRoutes.Administration.LinkToCourseDashboard;
         private string StudentAdministrationLink => VBRoutes.Administration.LinkToStudentDashboard;
+        private string AdministrationAccountRoute => VBRoutes.Student.LinkToAdministrationAccount;
 
         private string? currentUrl;
         private string showAdminEntries = "d-none";
@@ -33,4 +34,7 @@ namespace LMS.Blazor.Components.Layout
             NavigationManager.LocationChanged -= OnLocationChanged;
         }
     }
+
+		
+	
 }
