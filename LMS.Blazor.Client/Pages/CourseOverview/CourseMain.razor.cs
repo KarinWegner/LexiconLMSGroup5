@@ -10,7 +10,7 @@ namespace LMS.Blazor.Client.Pages.CourseOverview
         protected async override Task OnInitializedAsync()
         {
             //TODO: SET ACTUAL USER ID
-            NavigationManager.NavigateTo(VBRoutes.Student.LinkToCourse(1));
+            NavigationManager.NavigateTo(VBRoutes.Student.LinkToCourse(1030));
             await base.OnInitializedAsync();
 
         }

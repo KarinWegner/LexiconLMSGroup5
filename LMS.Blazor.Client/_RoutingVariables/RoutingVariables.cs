@@ -10,6 +10,8 @@
         public const string CourseId = "{CourseId:int}", ModuleId = "{ModuleId:int}", ActivityId = "{ActivityId:int}";
         //Adminstration route
         public const string AdministrationDashboard = "AdministrationDashboard", CourseDashboard = "CourseDashboard", StudentDashboard = "StudentDashboard";
+        //Create course/module/activity route
+        public const string Create = "Create", CreateActivity = "CreateActivity", CreateModule = "CreateModule", CreateCourse = "CreateCourse";
         //API Endpoints
         public const string APIModules = "api/modules", APICourses = "api/Courses", APIActivity = "api/activities";
         //API Course Queries

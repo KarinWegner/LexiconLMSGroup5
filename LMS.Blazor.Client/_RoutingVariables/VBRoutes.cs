@@ -28,6 +28,7 @@
             public const string LinkToDashboard = $"/{RoutingVariables.AdministrationDashboard}";
             public const string LinkToCourseDashboard = $"/{RoutingVariables.AdministrationDashboard}/{RoutingVariables.CourseDashboard}";
             public const string LinkToStudentDashboard = $"/{RoutingVariables.AdministrationDashboard}/{RoutingVariables.StudentDashboard}";
+            public const string LinkToCreateActivity = $"/{RoutingVariables.Create}/{RoutingVariables.CreateActivity}";
         }
 
         public record API
