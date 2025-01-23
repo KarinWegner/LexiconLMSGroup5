@@ -169,6 +169,7 @@ namespace LMS.Services
                     enrollmentListDTO.Add(new EnrollmentUserCourseListDTO
                     {
                         CourseName = course.Name,
+                        CourseId = course.CourseId,
                         CourseStart = course.StartDate,
                         CourseEnd = course.EndDate,
                         TeacherNames = teacherNames
