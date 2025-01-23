@@ -9,7 +9,7 @@
 .bg-expanded {
     background-color: #C3C3C3;
     border-radius: 7px;
-    padding: 4px 40px 5px 10px;
+    padding: 5px 10px 5px 10px;
 
 }
 
@@ -17,6 +17,11 @@
     margin-top: 5px;
     outline: 2px solid black;
     border-radius: 5px;
+}
+
+.navbar
+{
+    display: block !important;
 }
 
 /*.bg-opened > .nav-link{
@@ -40,4 +45,7 @@
 
 ::deep h4 {
     margin-bottom: 0px;
+}
+.align-right {
+    text-align: right
 }
