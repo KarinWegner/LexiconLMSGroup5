@@ -1,0 +1,52 @@
+﻿@using LMS.Shared.DTOs
+@using LMS.Shared.DTOs.ApplicationUserDTOs
+
+@if (IsLoading)
+{
+    <div class="d-flex justify-content-center my-3">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+}
+else if (Items != null && Items.Any())
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Profile</th>
+                <th>Name</th>
+                <th>Id</th>
+                <th>Email</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Items)
+            {
+                <tr>
+                    <td>
+                        <img src="https://tse4.mm.bing.net/th?id=OIP.4Q7-yMnrlnqwR4ORH7c06AHaHa&pid=Api&P=0&h=180"
+                             class="profilePicture rounded-circle"
+                             alt="@($"{user.Name} profile picture")"
+                             style="width: 50px; height: 50px;">
+                    </td>
+                    <td>@user.Name</td>
+                    <td>@user.Id</td>
+                    <td>@user.Email</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No results found.</p>
+}
+
+@code {
+    [Parameter]
+    public IEnumerable<ApplicationUserListDTO> Items { get; set; } = [];
+
+    [Parameter]
+    public bool IsLoading { get; set; } = false;
+}

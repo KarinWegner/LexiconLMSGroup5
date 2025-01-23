@@ -33,4 +33,7 @@ namespace LMS.Blazor.Components.Layout
             NavigationManager.LocationChanged -= OnLocationChanged;
         }
     }
+
+		
+	
 }

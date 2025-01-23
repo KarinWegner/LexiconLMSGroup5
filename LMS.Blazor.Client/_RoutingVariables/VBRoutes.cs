@@ -23,7 +23,6 @@ namespace LMS.Blazor.Client._RoutingVariables
             public static string LinkToActivity(int CourseId, int ModuleId, int ActivityId) => $"{LinkToModule(CourseId, ModuleId)}/{ActivityId}";
 
             public static string LinkToCourseParticipant(int CourseId, string id) => $"{DLinkToCourseParticipants(CourseId)}/{id}";
-
         }
 
         public record Administration
@@ -62,6 +61,13 @@ namespace LMS.Blazor.Client._RoutingVariables
                 public const string ActivityTypes = RoutingVariables.APIActivityType;
                 public static string ActivityTypeAtId(int Id) => $"{RoutingVariables.APIActivityType}/{Id}";
                 
+            }
+            public record Enrollment
+            {
+                public const string Enrollments = RoutingVariables.Enrollments;
+                public const string EnrollmentsUser = $"{Enrollments}/{RoutingVariables.EnrollmentsFromUser}";
+                public static string GetUserEnrollment(string id) => $"{EnrollmentsUser}/{id}";
+                public static string GetUserEnrollmentWithFiler(string filter) => $"{EnrollmentsUser}{RoutingVariables.APIEnrollmentsFilterByString}{filter}";
             }
         }
         public const string AccessDenied = RoutingVariables.AccessDenied;

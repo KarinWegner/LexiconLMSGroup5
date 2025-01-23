@@ -6,6 +6,7 @@
         public const string CourseOverview = "CourseOverview", Modules = "Modules", CourseParticipants = "CourseParticipants", Schedule = "Schedule", Planning = "Planning";
         //parameters POST
         public const string CoursePost = "Courses", ModulePost = "Modules", APIPostActivity = "api/activities";
+        public const string CourseOverview = "CourseOverview", Modules = "Modules", CourseParticipants = "CourseParticipants", Schedule = "Schedule", Planning = "Planning", AdminAccount="AdministrationAccount";
         //parameters getters
         public const string WithIntId = "{Id:int}", WithIntIdAndIntParentId = "{ParentId:int}/{Id:int}", WithStringId = "{Id}";
         //parameters getters
@@ -15,12 +16,13 @@
         //Create course/module/activity route
         public const string Create = "Create", CreateActivity = "CreateActivity", CreateModule = "CreateModule", CreateCourse = "CreateCourse";
         //API Endpoints
-        public const string APIModules = "api/modules", APICourses = "api/Courses", APIActivity = "api/activities", APIActivityType = "api/activitytypes";
-
+        public const string APIModules = "api/modules", APICourses = "api/Courses", APIActivity = "api/activities", APIActivityTypes="api/activitytypes", Enrollments = "api/enrollment", EnrollmentsFromUser = "user";
         //API Course Queries
         public const string APICoursesIncludeModules = "includeModules=true", APICoursesIncludeEnrollments = "includeEnrollments=true";
         //API Module Queries
         public const string APIModulesIncludeActivities = "includeActivities=true";
+        //API Enrollment Queries
+        public const string APIEnrollmentsFilterByString = "?roleFilter=";
         //Acess Denied
         public const string AccessDenied = "/AccessDenied";
         public const string NotFound = "/NotFound";
