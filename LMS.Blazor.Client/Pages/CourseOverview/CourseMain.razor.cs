@@ -10,6 +10,8 @@ using System.Security.Claims;
 using LMS.Shared.DTOs;
 using LMS.Blazor.Client.Models;
 using LMS.Blazor.Client.Models.Enums;
+using LMS.Shared.DTOs.CourseDTOs;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace LMS.Blazor.Client.Pages.CourseOverview
 {
     public partial class CourseMain
@@ -30,6 +32,9 @@ namespace LMS.Blazor.Client.Pages.CourseOverview
                 if (id == default)
                     NavigationManager.NavigateTo(VBRoutes.AccessDenied);
                 var res = await ApiService.GetAsync<IEnumerable<EnrollmentUserCourseListDTO>>(VBRoutes.API.Enrollment.GetUserEnrollment(id!.Value));
+                //var result = ApiService.PostAsync<CourseCreateDTO, ApiResponse>(VBRoutes.API.Course.Courses, data);
+                //var result = ApiService.PostAsync<CourseUpdateDTO, ApiResponse>(VBRoutes.API.Course.CourseAtId(id), data);
+
                 switch (res!.Count())
                 {
                     case 1:
