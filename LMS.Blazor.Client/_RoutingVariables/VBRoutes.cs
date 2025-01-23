@@ -56,7 +56,7 @@
                 public const string Enrollments = RoutingVariables.Enrollments;
                 public const string EnrollmentsUser = $"{Enrollments}/{RoutingVariables.EnrollmentsFromUser}";
                 public static string GetUserEnrollment(string id) => $"{EnrollmentsUser}/{id}";
-                public static string GetUserEnrolmentWithFiler(string filter) => $"{EnrollmentsUser}{RoutingVariables.APIEnrollmentsFilterByString}{filter}";
+                public static string GetUserEnrollmentWithFiler(string filter) => $"{EnrollmentsUser}{RoutingVariables.APIEnrollmentsFilterByString}{filter}";
             }
         }
         public const string AccessDenied = RoutingVariables.AccessDenied;

@@ -32,7 +32,7 @@ namespace LMS.Blazor.Client.Pages
 
         private async Task<IEnumerable<ApplicationUserListDTO>> LoadUsersAsync(string roleFilter)
         {
-            return (await _apiService.GetAsync<(IEnumerable<ApplicationUserListDTO> userList, int totalCount)>(VBRoutes.API.Enrollment.GetUserEnrolmentWithFiler(roleFilter))).userList;
+            return (await _apiService.GetAsync<(IEnumerable<ApplicationUserListDTO> userList, int totalCount)>(VBRoutes.API.Enrollment.GetUserEnrollmentWithFiler(roleFilter))).userList;
         }
 
         private async Task LoadAndSetUsersAsync()
