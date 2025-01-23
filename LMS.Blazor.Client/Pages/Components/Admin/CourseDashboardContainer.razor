@@ -3,9 +3,11 @@
 <nav class="navbar navbar-expand bg-expanded">
     <div class="row" id="navbarNavAltMarkup">
         <div class="navbar-nav">
-            <NavLink class="@($"clickable {@IsMyCoursesActive} nav-link col-sm-auto")" @onclick="setMyCoursesActive"><h4>My Courses</h4></NavLink>
-            <NavLink class="@($"clickable {@IsAllCoursesActive} nav-link col-sm-auto")" @onclick="setAllCoursesActive"><h4>All Courses</h4></NavLink>
+            <NavLink class="@($"col-sm-auto clickable {@IsMyCoursesActive} nav-link")" @onclick="setMyCoursesActive"><h4>My Courses</h4></NavLink>
+            <NavLink class="@($"col-sm-auto clickable {@IsAllCoursesActive} nav-link ")" @onclick="setAllCoursesActive"><h4>All Courses</h4></NavLink>
             <div class="col"></div>
+            <NavLink class="col-sm-auto align-right clickable nav-link " ActiveClass="" href=""><h4>Add new course</h4></NavLink>
+            <div class="col-1"></div>
         </div>
     </div>
 </nav>
