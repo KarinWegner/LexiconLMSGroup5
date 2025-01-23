@@ -54,6 +54,11 @@
                 public const string Activities = RoutingVariables.APIActivity;
                 public static string ActivityAtId(int id) => $"{RoutingVariables.APIActivity}/{id}";
             }
+            public record Enrollment
+            {
+                public const string Enrollments = RoutingVariables.Enrollments;
+                public static string GetUserEnrollment(string id) => $"{Enrollments}/{RoutingVariables.EnrollmentsFromUser}/{id}";
+            }
         }
         public const string AccessDenied = RoutingVariables.AccessDenied;
     }
