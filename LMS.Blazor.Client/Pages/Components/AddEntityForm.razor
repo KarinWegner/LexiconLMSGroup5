@@ -1,0 +1,69 @@
+﻿@using Interfaces
+@typeparam TModel where TModel : IEntity
+
+<EditForm Model="Model" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <label for="name">Name</label>
+        <InputText id="name" @bind-Value="Model.Name" class="form-control" />
+    </div>
+
+    <div>
+        <label for="start-date">Start Date</label>
+        <InputDate id="start-date" @bind-Value="Model.StartDate" class="form-control" />
+    </div>
+
+    <div>
+        <label for="end-date">End Date</label>
+        <InputDate id="end-date" @bind-Value="Model.EndDate" class="form-control" />
+    </div>
+
+    <div>
+        <label for="description">Description</label>
+        <InputTextArea id="description" @bind-Value="Model.Description" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">@SubmitButtonText</button>
+</EditForm>
+
+@if (ErrorMessage != null)
+
+{
+    <p class="text-danger">@ErrorMessage</p>
+}
+
+@code {
+    [Parameter]
+
+    public TModel Model { get; set; } = default!;
+
+
+
+    [Parameter]
+
+    public EventCallback<TModel> OnSubmit { get; set; }
+
+
+
+    [Parameter]
+
+    public string SubmitButtonText { get; set; } = "Submit";
+
+
+
+    [Parameter]
+
+    public string? ErrorMessage { get; set; }
+
+
+
+    private async Task HandleValidSubmit()
+
+    {
+
+        await OnSubmit.InvokeAsync(Model);
+
+    }
+}
