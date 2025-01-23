@@ -1,49 +1,51 @@
-﻿
-@if (ListEntries.CourseEntryType != ECourseEntryType.Class)
+﻿@if (ListEntries.IsValid())
 {
-    @if (UpcommingEntries.CourseEntries.Count() > 0)
+    @if (ListEntries.CourseEntryType != ECourseEntryType.Class)
+    {
+        @if (UpcommingEntries.IsValid())
+        {
+            <div>
+                <h4 class="h4-marg"> Upcomming:</h4>
+                <div>
+                    <ul class="list-group" id="taskGroup">
+                        @foreach (var e in UpcommingEntries.CourseEntries)
+                        {
+
+                            <CourseEntryObject Model="e" CourseEntryType="UpcommingEntries.CourseEntryType" CourseId="@CourseId"></CourseEntryObject>
+                        }
+                    </ul>
+                </div>
+            </div>
+        }
+        @if (ExpiredEntries.IsValid())
+        {
+            <div>
+                <h4 class="h4-marg"> Expired: </h4>
+                <div>
+                    <ul class="list-group" id="taskGroup">
+                        @foreach (var e in ExpiredEntries.CourseEntries)
+                        {
+
+                            <CourseEntryObject Model="e" CourseEntryType="ExpiredEntries.CourseEntryType" CourseId="@CourseId"></CourseEntryObject>
+                        }
+                    </ul>
+                </div>
+            </div>
+        }
+    }
+    else
     {
         <div>
-            <h4 class="h4-marg"> Upcomming:</h4>
+            <h4 class="h4-marg"> Your Courses:</h4>
             <div>
                 <ul class="list-group" id="taskGroup">
-                    @foreach (var e in UpcommingEntries.CourseEntries)
+                    @foreach (var e in ListEntries.CourseEntries)
                     {
 
-                        <CourseEntryObject Model="e" CourseEntryType="UpcommingEntries.CourseEntryType" CourseId="@CourseId"></CourseEntryObject>
+                        <CourseEntryObject Model="e" CourseEntryType="ListEntries.CourseEntryType"></CourseEntryObject>
                     }
                 </ul>
             </div>
         </div>
     }
-    @if (ExpiredEntries.CourseEntries.Count() > 0)
-    {
-        <div>
-            <h4 class="h4-marg"> Expired: </h4>
-            <div>
-                <ul class="list-group" id="taskGroup">
-                    @foreach (var e in ExpiredEntries.CourseEntries)
-                    {
-
-                        <CourseEntryObject Model="e" CourseEntryType="ExpiredEntries.CourseEntryType" CourseId="@CourseId"></CourseEntryObject>
-                    }
-                </ul>
-            </div>
-        </div>
-    }
-}
-else
-{
-    <div>
-        <h4 class="h4-marg"> Your Courses:</h4>
-        <div>
-            <ul class="list-group" id="taskGroup">
-                @foreach (var e in ListEntries.CourseEntries)
-                {
-
-                    <CourseEntryObject Model="e" CourseEntryType="ListEntries.CourseEntryType"></CourseEntryObject>
-                }
-            </ul>
-        </div>
-    </div>
 }

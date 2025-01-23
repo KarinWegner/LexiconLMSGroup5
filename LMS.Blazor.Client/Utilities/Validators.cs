@@ -1,4 +1,6 @@
-﻿namespace LMS.Blazor.Client.Utilities
+﻿using LMS.Blazor.Client.Models;
+
+namespace LMS.Blazor.Client.Utilities
 {
     public static class Validators
     {
@@ -8,5 +10,13 @@
                 return true;
             return false;
         }
+        public static bool IsValid(this CourseEntryModel model)
+        {
+            if(model == null) return false;
+            if(model.CourseEntries == null) return false;
+            if(model.CourseEntries.Count() == 0) return false;
+            return true;
+        }
+
     }
 }

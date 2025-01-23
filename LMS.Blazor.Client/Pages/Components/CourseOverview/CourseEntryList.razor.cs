@@ -1,6 +1,7 @@
 ﻿using LMS.Blazor.Client.Models;
 using LMS.Blazor.Client.Models.Enums;
 using LMS.Blazor.Client.Services;
+using LMS.Blazor.Client.Utilities;
 using LMS.Shared.DTOs;
 using Microsoft.AspNetCore.Components;
 
@@ -17,14 +18,15 @@ namespace LMS.Blazor.Client.Pages.Components.CourseOverview
 
         protected async override Task OnParametersSetAsync()
         {
+            if (!ListEntries.IsValid())
+            {
+                UpcommingEntries = new();
+                ExpiredEntries = new();
+                return;
+            }
             if (ListEntries.CourseEntryType != ECourseEntryType.Class)
             {
-                if (ListEntries == null)
-                {
-                    UpcommingEntries = new();
-                    ExpiredEntries = new();
-                    return;
-                }
+
                 var store = ListEntries.CourseEntries.OrderBy(x => x.EndTime);
 
                 List<CourseEntryDO> expired = new(), next = new();
