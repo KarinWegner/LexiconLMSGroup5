@@ -183,7 +183,7 @@ namespace LMS.Services
 
         public async Task<ApiBaseResponse> GetUsers(string? roleFilter)
         {
-           var userList = await _uow.Enrollments.GetAllUsersAsync(roleFilter);
+           var userList = await _uow.Enrollments.GetUsersByRoleAsync(roleFilter);
 
             var userListDto = _mapper.Map<IEnumerable<ApplicationUserListDTO>>(userList);
 
@@ -219,6 +219,13 @@ namespace LMS.Services
             var roles = await _uow.Enrollments.GetAllRolesAsync();
             var roleDTOs = _mapper.Map<IEnumerable<RoleDTO>>(roles);
             return new ApiOkResponse<IEnumerable<RoleDTO>>(roleDTOs);
+        }
+
+        public async Task<ApiBaseResponse> GetAllUsersAsync()
+        {
+            var users = await _uow.Enrollments.GetAllUsersAsync();
+            var userDTOs = _mapper.Map<IEnumerable<UserDTO>>(users);
+            return new ApiOkResponse<IEnumerable<UserDTO>>(userDTOs);
         }
     }
 }

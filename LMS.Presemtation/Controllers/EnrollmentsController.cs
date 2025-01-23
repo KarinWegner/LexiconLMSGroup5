@@ -171,5 +171,12 @@ namespace LMS.Presemtation.Controllers
             var response = await _serviceManager.EnrollmentService.GetAllRolesAsync();
             return response.Success ? Ok(response.GetOkResult<IEnumerable<RoleDTO>>()) : ProcessError(response);
         }
+
+        [HttpGet("users/all")]
+        public async Task<ActionResult<IEnumerable<UserDTO>>> GetAllUsers()
+        {
+            var response = await _serviceManager.EnrollmentService.GetAllUsersAsync();
+            return response.Success ? Ok(response.GetOkResult<IEnumerable<UserDTO>>()) : ProcessError(response);
+        }
     }
 }

@@ -58,6 +58,6 @@ public class AutoMapperProfile : Profile
 
         CreateMap<ApplicationUser , EnrolledUserDTO > ();
         CreateMap<IdentityRole, RoleDTO>();
-
+        CreateMap<ApplicationUser, UserDTO>();
     }
 }

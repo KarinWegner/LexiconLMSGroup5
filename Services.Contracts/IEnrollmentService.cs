@@ -21,6 +21,6 @@ namespace Services.Contracts
         Task<ApiBaseResponse> GetUserEnrollments(string userId);
         Task<ApiBaseResponse> GetUsers(string? roleFilter);
         Task<ApiBaseResponse> GetAllRolesAsync();
-
+        Task<ApiBaseResponse> GetAllUsersAsync();
     }
 }

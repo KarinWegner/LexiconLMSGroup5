@@ -70,7 +70,7 @@ namespace LMS.Infrastructure.Repositories
             return enrollments;
         }
 
-        public async Task<IEnumerable<ApplicationUser>> GetAllUsersAsync(string? roleFilter)
+        public async Task<IEnumerable<ApplicationUser>> GetUsersByRoleAsync(string? roleFilter)
         {
             IEnumerable<ApplicationUser> users = UserQuery().Where(u => u.Role == roleFilter);
                      
@@ -85,6 +85,11 @@ namespace LMS.Infrastructure.Repositories
         public async Task<IEnumerable<IdentityRole>> GetAllRolesAsync()
         {
             return await _context.Roles.ToListAsync();
+        }
+
+        public async Task<IEnumerable<ApplicationUser>> GetAllUsersAsync()
+        {
+            return await _context.Users.ToListAsync();
         }
     }
 }
