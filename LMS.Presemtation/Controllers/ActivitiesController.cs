@@ -100,10 +100,10 @@ namespace LMS.Presemtation.Controllers
             if(activityDto == null) return BadRequest("Activity info is required");
             var response = await _serviceManager.ActivityService.CreateActivityAsync(activityDto, activityDto.ModuleId);
 
-            var moduleRes = await _serviceManager.ModuleService.GetModuleByIdAsync(activityDto.ModuleId);
-            var module = moduleRes.GetOkResult<ModuleDTO>();
             if (response.Success)
             {
+            var moduleRes = await _serviceManager.ModuleService.GetModuleByIdAsync(activityDto.ModuleId);
+            var module = moduleRes.GetOkResult<ModuleDTO>();
             var createdActivity = response.GetCreatedAtResult<ActivityDTO>();
                  
                 return CreatedAtAction(nameof(GetActivity), new { module.ModuleId, id = createdActivity.ActivityId }, createdActivity);

@@ -68,9 +68,15 @@ public class ProxyController : ControllerBase
         }
 
         var response = await client.SendAsync(requestMessage);
-
+        //ToDo: Fix whatever this is
         if (!response.IsSuccessStatusCode)
+        {
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                return NotFound(response);
+            }
             return Unauthorized(); //ToDo pass correct statuscode to caller
+        }
 
         Response.StatusCode = (int)response.StatusCode;
         Response.ContentType = response.Content.Headers.ContentType?.ToString() ?? "application/json";

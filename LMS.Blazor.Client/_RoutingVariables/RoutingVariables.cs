@@ -23,5 +23,6 @@
         public const string APIModulesIncludeActivities = "includeActivities=true";
         //Acess Denied
         public const string AccessDenied = "/AccessDenied";
+        public const string NotFound = "/NotFound";
     }
 }

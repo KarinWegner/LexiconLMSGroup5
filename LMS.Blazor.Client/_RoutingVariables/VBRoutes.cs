@@ -65,5 +65,6 @@ namespace LMS.Blazor.Client._RoutingVariables
             }
         }
         public const string AccessDenied = RoutingVariables.AccessDenied;
+        public const string NotFound = RoutingVariables.NotFound;
     }
 }
