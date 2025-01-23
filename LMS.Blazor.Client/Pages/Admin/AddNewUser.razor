@@ -3,12 +3,13 @@
 @using System.ComponentModel.DataAnnotations
 
 @attribute [Route(VBRoutes.Administration.LinkAddNewUser)]
+@rendermode InteractiveWebAssembly
 
 <PageTitle>User Registration</PageTitle>
 
 
 <div class="d-flex justify-content-center">
-    <h3>Register New User</h3>
+    <h3 c>Register New User</h3>
     <div class="card p-4 shadow" style="width:80%; max-width: 800px">
         <EditForm Model="@registrationModel" OnValidSubmit="HandleValidSubmit">
             <DataAnnotationsValidator />
@@ -28,19 +29,13 @@
 
             <div class="mb-3">
                 <label for="Role" class="form-label">Role</label>
-                <InputText id="Role" class="form-control" @bind-Value="registrationModel.Role" />
-                <ValidationMessage For="@(() => registrationModel.Role)" />
-            </div>
-
-            <div class="mb-3">
-                <label for="Role" class="form-label">Role</label>
                 <InputSelect id="Role" class="form-control" @bind-Value="registrationModel.Role">
                     <option value="" disabled>Select a role</option>
                     @if (roles != null)
                     {
                         @foreach (var role in roles)
                         {
-                            <option value="@role">@role</option>
+                            <option value="@role.Id">@role.Name</option>
                         }
                     }
                 </InputSelect>
@@ -72,8 +67,10 @@
     private RegistrationModel registrationModel = new();
     private bool isSubmitting = false;
     private string? submissionMessage = null;
+    private bool firstRender = true;
 
-    private List<string> roles = new();
+    private List<RoleDTO> roles = new();
+
     private async Task HandleValidSubmit()
     {
         isSubmitting = true;
@@ -105,10 +102,10 @@
 
     private async Task LoadRolesAsync()
     {
+       
         try
         {
-            // Replace with your actual API endpoint for roles
-            var response = await _apiService.GetAsync<List<string>>("api/roles");
+            var response = await _apiService.GetAsync<List<RoleDTO>>("api/enrollment/roles");
 
             if (response != null)
             {
@@ -120,6 +117,17 @@
             submissionMessage = $"Failed to load roles: {ex.Message}";
         }
     }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadRolesAsync();
+            StateHasChanged();
+
+        }
+    }
+
 
     private class RegistrationModel
     {
