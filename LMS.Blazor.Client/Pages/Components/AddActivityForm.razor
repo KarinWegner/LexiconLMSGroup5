@@ -1,9 +1,24 @@
 ﻿@using LMS.Blazor.Client.Interfaces
 @rendermode InteractiveWebAssembly
 
+@attribute [StreamRendering(true)]
+@inject ILogger<CreateActivity> Logger
+
+
+
+
 <EditForm Model="Model" OnValidSubmit="HandleValidSubmit">
     <DataAnnotationsValidator />
     <ValidationSummary />
+    <div>
+        <label for="courseid">Course Id</label>
+        <InputNumber id="courseid" @bind-Value="Model.CourseId" class="form-control" />
+    </div>
+    <div>
+        <label for="moduleid">Module Id</label>
+        <InputNumber id="moduleid" @bind-Value="Model.ModuleId" class="form-control" />
+    </div>
+
 
     <div>
         <label for="name">Name</label>
@@ -11,23 +26,17 @@
     </div>
 
     <div>
-        <div class="form-label">Activity Type:</div>
-        <InputSelect class="form-select" Value=Model.ActivityType ValueExpression="() => Model.ActivityType">
-            @if(ActivityTypes.Count==null)
+        <div>
+            <label for="ActivityTypeId">Activity Type</label>
+            <InputSelect id="ActivityTypeId" @bind-Value="Model.ActivityTypeID">
+                @foreach (var type in ActivityTypes)
                 {
-                       <option value="" selected>Loading types...</option>     
+                    <option value="@type.ActivityTypeId">@type.Name</option>
                 }
-
-                else{
-                <option value="" selected>-- Select Activity --</option>
-                @foreach (var activityType in ActivityTypes)
-                {
-                    <option value="@activityType">@activityType.Name</option>
-                }
-                }
-            </InputSelect>        
+            </InputSelect>
+        </div>
     </div>
-    
+
 
 
     <div>
@@ -60,7 +69,6 @@
     public ActivityModel Model { get; set; } = default!;
 
 
-
     [Parameter]
 
     public EventCallback<ActivityModel> OnSubmit { get; set; }
@@ -76,14 +84,6 @@
     [Parameter]
 
     public string? ErrorMessage { get; set; }
-
-
-
-    private async Task HandleValidSubmit()
-
-    {
-
-        await OnSubmit.InvokeAsync(Model);
-
-    }
+  
+    
 }

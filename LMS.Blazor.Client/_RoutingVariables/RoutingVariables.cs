@@ -4,6 +4,8 @@
     {
         //Student CourseOverview Route variables
         public const string CourseOverview = "CourseOverview", Modules = "Modules", CourseParticipants = "CourseParticipants", Schedule = "Schedule", Planning = "Planning";
+        //parameters POST
+        public const string CoursePost = "Courses", ModulePost = "Modules", APIPostActivity = "api/activities";
         //parameters getters
         public const string WithIntId = "{Id:int}", WithIntIdAndIntParentId = "{ParentId:int}/{Id:int}", WithStringId = "{Id}";
         //parameters getters
@@ -14,6 +16,7 @@
         public const string Create = "Create", CreateActivity = "CreateActivity", CreateModule = "CreateModule", CreateCourse = "CreateCourse";
         //API Endpoints
         public const string APIModules = "api/modules", APICourses = "api/Courses", APIActivity = "api/activities", APIActivityType = "api/activitytypes";
+
         //API Course Queries
         public const string APICoursesIncludeModules = "includeModules=true", APICoursesIncludeEnrollments = "includeEnrollments=true";
         //API Module Queries

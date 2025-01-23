@@ -95,16 +95,18 @@ namespace LMS.Presemtation.Controllers
 
         // POST: api/Activities
         [HttpPost]
-        public async Task<ActionResult> CreateActivity([FromBody] ActivityCreateDTO activityDto, int courseId, int moduleId)
+        public async Task<ActionResult> CreateActivity([FromBody] ActivityCreateDTO activityDto)
         {
             if(activityDto == null) return BadRequest("Activity info is required");
-            var response = await _serviceManager.ActivityService.CreateActivityAsync(activityDto, moduleId);
+            var response = await _serviceManager.ActivityService.CreateActivityAsync(activityDto, activityDto.ModuleId);
 
+            var moduleRes = await _serviceManager.ModuleService.GetModuleByIdAsync(activityDto.ModuleId);
+            var module = moduleRes.GetOkResult<ModuleDTO>();
             if (response.Success)
             {
             var createdActivity = response.GetCreatedAtResult<ActivityDTO>();
-
-                return CreatedAtAction(nameof(GetActivity), new { courseId, moduleId, id = createdActivity.ActivityId }, createdActivity);
+                 
+                return CreatedAtAction(nameof(GetActivity), new { module.ModuleId, id = createdActivity.ActivityId }, createdActivity);
             }
 
             return ProcessError(response);
