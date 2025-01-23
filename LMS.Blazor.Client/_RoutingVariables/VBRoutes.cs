@@ -37,6 +37,9 @@
             {
                 public const string Modules = RoutingVariables.APIModules;
                 public static string ModuleAtIdWithActivities(int id) => $"{RoutingVariables.APIModules}/{id}?{RoutingVariables.APIModulesIncludeActivities}";
+                public static string ModuleAtId(int id) => $"{RoutingVariables.APIModules}/{id}";
+                public static string PostModuleAtId(int CourseId) => $"{RoutingVariables.APIModules}/{RoutingVariables.ModuleCourse}/{CourseId}/{RoutingVariables.ModuleModule}";
+
 
             }
             public record Course

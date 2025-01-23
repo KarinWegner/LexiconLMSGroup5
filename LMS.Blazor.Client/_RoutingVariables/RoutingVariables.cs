@@ -13,14 +13,14 @@
         //Administration directives
         public const string New = "new";
         //API Endpoints
-        public const string APIModules = "api/modules", APICourses = "api/Courses", APIActivity = "api/activities", Enrollments = "api/enrollment", EnrollmentsFromUser = "user";
+        public const string APIModules = "api/modules", APICourses = "api/Courses", APIActivity = "api/activities", Enrollments = "api/enrollment", EnrollmentsFromUser = "user", ModuleCourse = "course", ModuleModule = "module";
         //API Course Queries
         public const string APICoursesIncludeModules = "includeModules=true", APICoursesIncludeEnrollments = "includeEnrollments=true";
         //API Module Queries
         public const string APIModulesIncludeActivities = "includeActivities=true";
         //API Enrollment Queries
         public const string APIEnrollmentsFilterByString = "?roleFilter=";
-        //Acess Denied
+        //Access Denied
         public const string AccessDenied = "/AccessDenied";
     }
 }

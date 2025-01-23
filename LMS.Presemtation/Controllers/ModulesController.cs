@@ -79,7 +79,7 @@ namespace LMS.Presemtation.Controllers
 
 
         // POST: api/modules
-        [HttpPost]
+        [HttpPost("course/{courseId}/module")]
         public async Task<ActionResult> CreateModule([FromBody] ModuleCreateDTO moduleDto, int courseId)
         {
                 var response = await _serviceManager.ModuleService.CreateModuleAsync(moduleDto, courseId);
