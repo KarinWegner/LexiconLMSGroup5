@@ -1,5 +1,6 @@
 ﻿using Domain.Models.Entities;
 using Domain.Models.Responses;
+using LMS.Shared.DTOs;
 using LMS.Shared.DTOs.ApplicationUserDTOs;
 using LMS.Shared.DTOs.EnrollmentDTOs;
 using System;
@@ -22,5 +23,6 @@ namespace Services.Contracts
         Task<ApiBaseResponse> GetUsers(string? roleFilter);
         Task<ApiBaseResponse> GetAllRolesAsync();
         Task<ApiBaseResponse> GetAllUsersAsync();
+        Task<ApiBaseResponse> AssignRoleToUserAsync(AssignRoleDTO assignRoleDto);
     }
 }

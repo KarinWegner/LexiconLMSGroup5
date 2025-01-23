@@ -178,5 +178,30 @@ namespace LMS.Presemtation.Controllers
             var response = await _serviceManager.EnrollmentService.GetAllUsersAsync();
             return response.Success ? Ok(response.GetOkResult<IEnumerable<UserDTO>>()) : ProcessError(response);
         }
+
+        [HttpPatch("assign-role")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> AssignRoleToUser([FromBody] AssignRoleDTO assignRoleDto)
+        {
+            if (assignRoleDto == null)
+            {
+                return BadRequest("Role assignment data is missing.");
+            }
+
+            if (string.IsNullOrEmpty(assignRoleDto.Id))
+            {
+                return BadRequest("The Id field is required.");
+            }
+
+            if (string.IsNullOrEmpty(assignRoleDto.Role))
+            {
+                return BadRequest("The Role field is required.");
+            }
+
+            var response = await _serviceManager.EnrollmentService.AssignRoleToUserAsync(assignRoleDto);
+            return response.Success ? NoContent() : ProcessError(response);
+        }
     }
 }

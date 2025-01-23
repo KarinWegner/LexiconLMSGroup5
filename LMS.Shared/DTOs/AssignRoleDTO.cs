@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace LMS.Shared.DTOs
 {
-        public class UserDTO
-        {
+    public class AssignRoleDTO
+    {
         public string Id { get; set; }
-        public string UserName { get; set; }
-        public string Email { get; set; }
-        }
+        public string Role { get; set; }
+    }
 }

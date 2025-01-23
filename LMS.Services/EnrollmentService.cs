@@ -9,6 +9,7 @@ using LMS.Shared.DTOs.EnrollmentDTOs;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Services.Contracts;
+using System.IO;
 
 namespace LMS.Services
 {
@@ -227,5 +228,29 @@ namespace LMS.Services
             var userDTOs = _mapper.Map<IEnumerable<UserDTO>>(users);
             return new ApiOkResponse<IEnumerable<UserDTO>>(userDTOs);
         }
+
+        public async Task<ApiBaseResponse> AssignRoleToUserAsync(AssignRoleDTO assignRoleDto)
+        {
+            
+
+            try
+            {
+                await _uow.Enrollments.AssignRoleToUserAsync(assignRoleDto.Id, assignRoleDto.Role);
+                await _uow.CompleteASync();
+               
+                return new ApiNoContentResponse();
+            }
+            catch (UserNotFoundException ex)
+            {
+              
+                return new UserNotFoundResponse(ex.UserId);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException("Failed to assign role to user.", ex);
+            }
+        }
+           
+        
     }
 }
