@@ -1,0 +1,20 @@
+﻿<div class="input-group mb-5">
+    <input type="text"
+           class="form-control"
+           placeholder="Search..."
+           @bind="SearchString" />
+    <button class="btn btn-primary" @onclick="TriggerSearch">Search</button>
+</div>
+
+@code {
+    [Parameter] public string SearchString { get; set; } = string.Empty;
+    [Parameter] public EventCallback<string> OnSearch { get; set; }
+
+    private void TriggerSearch()
+    {
+        if (OnSearch.HasDelegate)
+        {
+            OnSearch.InvokeAsync(SearchString);
+        }
+    }
+}
