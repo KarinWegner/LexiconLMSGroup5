@@ -9,7 +9,7 @@
         //parameters getters
         public const string CourseId = "{CourseId:int}", ModuleId = "{ModuleId:int}", ActivityId = "{ActivityId:int}";
         //Adminstration route
-        public const string AdministrationDashboard = "AdministrationDashboard", CourseDashboard = "CourseDashboard", StudentDashboard = "StudentDashboard";
+        public const string AdministrationDashboard = "AdministrationDashboard", CourseDashboard = "CourseDashboard", StudentDashboard = "StudentDashboard", AddNewUser = "AddNewUser";
         //API Endpoints
         public const string APIModules = "api/modules", APICourses = "api/Courses", APIActivity = "api/activities";
         //API Course Queries

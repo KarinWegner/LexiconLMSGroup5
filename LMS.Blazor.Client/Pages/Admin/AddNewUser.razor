@@ -1,0 +1,75 @@
+﻿@using LMS.Shared.DTOs
+@using LMS.Blazor.Client.Services
+@using System.ComponentModel.DataAnnotations
+
+@attribute [Route(VBRoutes.Administration.LinkAddNewUser)]
+
+<PageTitle>User Registration</PageTitle>
+
+
+<div class="d-flex justify-content-center">
+    <h3>Register New User</h3>
+    <div class="card p-4 shadow" style="width:80%; max-width: 800px">
+        <EditForm Model="@registrationModel" OnValidSubmit="HandleValidSubmit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="mb-3">
+                <label for="Name" class="form-label">Name</label>
+                <InputText id="Name" class="form-control" @bind-Value="registrationModel.Name" />
+                <ValidationMessage For="@(() => registrationModel.Name)" />
+            </div>
+
+            <div class="mb-3">
+                <label for="Email" class="form-label">Email</label>
+                <InputText id="Email" type="email" class="form-control" @bind-Value="registrationModel.Email" />
+                <ValidationMessage For="@(() => registrationModel.Email)" />
+            </div>
+
+            <div class="mb-3">
+                <label for="Role" class="form-label">Role</label>
+                <InputText id="Role" class="form-control" @bind-Value="registrationModel.Role" />
+                <ValidationMessage For="@(() => registrationModel.Role)" />
+            </div>
+
+            <button type="submit" class="btn btn-primary">Add new user</button>
+        </EditForm>
+    </div>
+</div>
+@if (isSubmitting)
+{
+    <div class="d-flex justify-content-center my-3">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+}
+
+@if (submissionMessage != null)
+{
+    <div class="alert alert-info mt-3">@submissionMessage</div>
+}
+
+@code {
+    [Inject]
+    private IApiService _apiService { get; set; } = default!;
+
+    private RegistrationModel registrationModel = new();
+    private bool isSubmitting = false;
+    private string? submissionMessage = null;
+
+   
+
+    private class RegistrationModel
+    {
+        [Required(ErrorMessage = "Name is required.")]
+        public string Name { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Email is required.")]
+        [EmailAddress(ErrorMessage = "Invalid email address.")]
+        public string Email { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Role is required.")]
+        public string Role { get; set; } = string.Empty;
+    }
+}
