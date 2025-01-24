@@ -42,8 +42,9 @@ namespace LMS.Blazor.Client.Pages.CourseOverview
                     case 1:
                         NavigationManager.NavigateTo(VBRoutes.Student.LinkToCourse(res!.First().CourseId));
                         break;
-                    case 0:
-                        NavigationManager.NavigateTo(VBRoutes.AccessDenied);
+                  //  case 0:
+                      //Todo:Change this
+                      NavigationManager.NavigateTo(VBRoutes.AccessDenied);
                         break;
                     default:
                         courses = new CourseEntryModel(ECourseEntryType.Class, res!.Select(x => new CourseEntryDO(x)));

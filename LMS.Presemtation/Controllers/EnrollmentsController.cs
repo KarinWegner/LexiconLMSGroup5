@@ -169,7 +169,8 @@ namespace LMS.Presemtation.Controllers
         {
             var result = await _serviceManager.EnrollmentService.GetUserEnrollments(userId);
 
-         
+
+           
 
             return result.Success ? Ok(result.GetOkResult <IEnumerable<EnrollmentUserCourseListDTO>>()):
                 ProcessError(result);

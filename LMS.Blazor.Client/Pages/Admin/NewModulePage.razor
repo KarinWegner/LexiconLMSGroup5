@@ -1,5 +1,8 @@
-﻿@attribute [Route(VBRoutes.Administration.LinkToCreateNewModule)]
+﻿@attribute [Authorize(Roles = "Teacher")]
+@attribute [Route(VBRoutes.Administration.LinkToCreateNewModule)]
 @rendermode InteractiveWebAssembly
+
+
 
 <h4>Create new Module</h4>
 <EditForm Model="moduleCreateDTO" OnValidSubmit="OnModuleSubmit">
@@ -27,4 +30,5 @@
     </div>
 
     <button type="submit" class="btn btn-primary">Create Module</button>
-</EditForm>
+        </EditForm>
+ 

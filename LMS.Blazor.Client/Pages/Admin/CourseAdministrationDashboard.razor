@@ -1,4 +1,5 @@
 ﻿@attribute [Route(VBRoutes.Administration.LinkToCourseDashboard)]
+@attribute [Authorize(Roles = "Teacher")]
 
 <h3>Course Administration</h3>
 
