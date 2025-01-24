@@ -1,0 +1,30 @@
+﻿@attribute [Route(VBRoutes.Administration.LinkToCreateNewModule)]
+@rendermode InteractiveWebAssembly
+
+<h4>Create new Module</h4>
+<EditForm Model="moduleCreateDTO" OnValidSubmit="OnModuleSubmit">
+    <DataAnnotationsValidator/>
+    <ValidationSummary/>
+
+    <div>
+        <label for="name">Name</label>
+        <InputText id="name" @bind-Value="moduleCreateDTO.Name" class="form-control"/>
+    </div>
+
+    <div>
+        <label for="start-date">Start Date</label>
+        <InputDate id="start-date" @bind-Value="moduleCreateDTO.StartDate" class="form-control"/>
+    </div>
+
+    <div>
+        <label for="end-date">End Date</label>
+        <InputDate id="end-date" @bind-Value="moduleCreateDTO.EndDate" class="form-control"/>
+    </div>
+
+    <div>
+        <label for="description">Description</label>
+        <InputTextArea id="description" @bind-Value="moduleCreateDTO.Description" class="form-control"/>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create Module</button>
+</EditForm>

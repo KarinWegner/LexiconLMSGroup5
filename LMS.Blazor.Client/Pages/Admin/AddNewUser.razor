@@ -1,0 +1,208 @@
+﻿@using LMS.Shared.DTOs
+@using LMS.Blazor.Client.Services
+@using System.ComponentModel.DataAnnotations
+
+@attribute [Route(VBRoutes.Administration.LinkAddNewUser)]
+@rendermode InteractiveWebAssembly
+
+<PageTitle>User Registration</PageTitle>
+
+<h3 class="text-center my-5">Assign User to Role</h3>
+<div class="d-flex justify-content-center">
+    <div class="card p-4 shadow" style="width:80%; max-width: 800px">
+        <EditForm Model="@registrationModel" OnValidSubmit="HandleValidSubmit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="mb-3">
+                <label for="Name" class="form-label">Select User</label>
+                <InputSelect id="Name" class="form-control" @bind-Value="registrationModel.UserName">
+                    <option value="" disabled>Select a user</option>
+                    @if (usersDetails != null)
+                    {
+                        @foreach (var user in usersDetails)
+                        {
+                            <option value="@user.Id">@user.UserName</option>
+                        }
+                    }
+                </InputSelect>
+               
+                <ValidationMessage For="@(() => registrationModel.UserName)" />
+            </div>
+
+            <div class="mb-3">
+                <label for="Email" class="form-label">Email</label>
+                <InputSelect id="Email" class="form-control" @bind-Value="registrationModel.Email">
+                    <option value="" disabled>Select a email</option>
+                    @if (usersDetails != null)
+                    {
+                        @foreach (var user in usersDetails)
+                        {
+                            <option value="@user.Id.ToString()">@user.Email</option>
+                        }
+                    }
+                </InputSelect>
+                <ValidationMessage For="@(() => registrationModel.Email)" />
+            </div>
+
+            <div class="mb-3">
+                <label for="Role" class="form-label">Select Role</label>
+                <InputSelect id="Role" class="form-control" @bind-Value="registrationModel.Role">
+                    <option value="" disabled>Select a role</option>
+                    @if (roles != null)
+                    {
+                        @foreach (var role in roles)
+                        {
+                            <option value="@role.Name">@role.Name</option>
+                        }
+                    }
+                </InputSelect>
+                <ValidationMessage For="@(() => registrationModel.Role)" />
+            </div>
+
+            <div class="mb-3">
+                <label for="Role" class="form-label">Role</label>
+                <InputSelect id="Role" class="form-control" @bind-Value="registrationModel.Role">
+                    <option value="" disabled>Select a role</option>
+                    @if (roles != null)
+                    {
+                        @foreach (var role in roles)
+                        {
+                            <option value="@role">@role</option>
+                        }
+                    }
+                </InputSelect>
+                <ValidationMessage For="@(() => registrationModel.Role)" />
+            </div>
+
+            <button type="submit" class="btn btn-primary">Add new user</button>
+        </EditForm>
+    </div>
+</div>
+@if (isSubmitting)
+{
+    <div class="d-flex justify-content-center my-3">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+}
+
+@if (submissionMessage != null)
+{
+     <div class="d-flex justify-content-center my-3" >
+        <div class="alert alert-info mt-3" style="max-width: 500px">@submissionMessage</div>
+    </div>
+}
+
+@code {
+    [Inject]
+    private IApiService _apiService { get; set; } = default!;
+
+    private RegistrationModel registrationModel = new();
+    private bool isSubmitting = false;
+    private string? submissionMessage = null;
+    private bool firstRender = true;
+
+    private List<RoleDTO> roles = new();
+    private List<UserDTO> usersDetails = new();
+
+    private async Task HandleValidSubmit()
+    {
+        isSubmitting = true;
+        submissionMessage = null;
+
+        try
+        {
+            var assignRoleDto = new AssignRoleDTO
+                {
+                    Id = registrationModel.UserName, 
+                    Role = registrationModel.Role
+                };
+
+            var response = await _apiService.PatchAsync<AssignRoleDTO, HttpResponseMessage>("api/enrollment/assign-role", assignRoleDto);
+
+
+            if (response.IsSuccessStatusCode)
+            {
+                submissionMessage = "Role assigned successfully!";
+                registrationModel = new(); // Reset the form
+            }
+            else
+            {
+                submissionMessage = "Role assignment failed. Please try again.";
+            }
+        }
+        catch (Exception ex)
+        {
+            submissionMessage = "Role assigned successfully!";
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+
+    private async Task LoadRolesAsync()
+    {
+
+        try
+        {
+            var response = await _apiService.GetAsync<List<RoleDTO>>("api/enrollment/roles");
+
+            if (response != null)
+            {
+                roles = response;
+            }
+        }
+        catch (Exception ex)
+        {
+            submissionMessage = $"Failed to load roles: {ex.Message}";
+        }
+    }
+
+    private async Task LoadUsersDetailsAsync()
+    {
+        try
+        {
+            var response = await _apiService.GetAsync<List<UserDTO>>("api/enrollment/users/all");
+            if (response != null)
+            {
+                usersDetails = response;
+            }
+        }
+        catch (Exception ex)
+        {
+            submissionMessage = $"Failed to load users details: {ex.Message}";
+        }
+
+        StateHasChanged();
+    }
+   
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadRolesAsync();
+            await LoadUsersDetailsAsync();
+
+            StateHasChanged();
+
+        }
+    }
+
+
+    private class RegistrationModel
+    {
+        [Required(ErrorMessage = "Name is required.")]
+        public string UserName { get; set; } = string.Empty;
+
+
+        [Required(ErrorMessage = "Email is required.")]
+        [EmailAddress(ErrorMessage = "Invalid email address.")]
+        public string Email { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Role is required.")]
+        public string Role { get; set; } = string.Empty;
+    }
+}

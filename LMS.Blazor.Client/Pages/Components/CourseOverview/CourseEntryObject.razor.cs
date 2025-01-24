@@ -13,10 +13,19 @@ namespace LMS.Blazor.Client.Pages.Components.CourseOverview
         public CourseEntryDO Model { get; set; } = null!;
         [Parameter]
         public int CourseId { get; set; }
-        public string ThisNavLink => CourseEntryType == ECourseEntryType.Module ?
-            VBRoutes.Student.LinkToModule(CourseId, Model.Id) :
-            VBRoutes.Student.LinkToActivity(CourseId, Model.ParentId, Model.Id);
-
-
+        public string ThisNavLink()
+        {
+            switch (CourseEntryType)
+            {
+                case ECourseEntryType.Class:
+                    return VBRoutes.Student.LinkToCourse(Model.Id);
+                case ECourseEntryType.Module:
+                    return VBRoutes.Student.LinkToModule(CourseId, Model.Id);
+                case ECourseEntryType.Activity:
+                    return VBRoutes.Student.LinkToActivity(CourseId, Model.ParentId, Model.Id);
+                default:
+                    return VBRoutes.AccessDenied;
+            }
+        }
     }
 }

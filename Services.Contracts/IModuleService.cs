@@ -22,7 +22,7 @@ namespace Services.Contracts
                 string? filteringValue = null);
         Task<ApiBaseResponse> GetModuleByIdAsync(int id, bool includeActivities = false, bool includeDocuments = false);
         Task<ApiBaseResponse> UpdateModuleAsync(int id, int courseId, ModuleUpdateDTO moduleDto);
-        Task<ApiBaseResponse> CreateModuleAsync(ModuleCreateDTO moduleDto, int courseId);
+        Task<ApiBaseResponse> CreateModuleAsync(ModuleCreateDTO moduleDto);
         Task<ApiBaseResponse> DeleteModuleAsync(int id);
 
     }

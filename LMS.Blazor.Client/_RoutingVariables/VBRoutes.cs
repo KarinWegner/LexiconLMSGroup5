@@ -30,7 +30,14 @@ namespace LMS.Blazor.Client._RoutingVariables
             public const string LinkToDashboard = $"/{RoutingVariables.AdministrationDashboard}";
             public const string LinkToCourseDashboard = $"/{RoutingVariables.AdministrationDashboard}/{RoutingVariables.CourseDashboard}";
             public const string LinkToStudentDashboard = $"/{RoutingVariables.AdministrationDashboard}/{RoutingVariables.StudentDashboard}";
+
+             public const string LinkAddNewUser = $"/{RoutingVariables.AdministrationDashboard}/{RoutingVariables.AddNewUser}";
+            public const string LinkToCreateNewModule = $"{LinkToCourseDashboard}/{RoutingVariables.CourseId}/{RoutingVariables.DashboardModules}/{RoutingVariables.New}";
+            public static string DLinkToCreateNewModule(int CourseId) => $"{LinkToCourseDashboard}/{CourseId}/{RoutingVariables.DashboardModules}/{RoutingVariables.New}";
+
             public const string LinkToCreateActivity = $"/{RoutingVariables.Create}/{RoutingVariables.CreateActivity}";
+            public const string LinkToCreateCourse = $"{LinkToCourseDashboard}/{RoutingVariables.New}";
+
         }
 
         public record API
@@ -39,6 +46,9 @@ namespace LMS.Blazor.Client._RoutingVariables
             {
                 public const string Modules = RoutingVariables.APIModules;
                 public static string ModuleAtIdWithActivities(int id) => $"{RoutingVariables.APIModules}/{id}?{RoutingVariables.APIModulesIncludeActivities}";
+                public static string ModuleAtId(int id) => $"{RoutingVariables.APIModules}/{id}";
+                public static string PostModuleAtId(int CourseId) => $"{RoutingVariables.APIModules}/{RoutingVariables.ModuleCourse}/{CourseId}/{RoutingVariables.ModuleModule}";
+
 
             }
             public record Course

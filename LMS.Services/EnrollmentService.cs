@@ -4,12 +4,14 @@ using Domain.Contracts;
 using Domain.Models.Entities;
 using Domain.Models.Exceptions;
 using Domain.Models.Responses;
+using LMS.Shared.DTOs;
 using LMS.Shared.DTOs.ApplicationUserDTOs;
 using LMS.Shared.DTOs.EnrollmentDTOs;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Services.Contracts;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using System.IO;
 
 namespace LMS.Services
 {
@@ -202,11 +204,12 @@ namespace LMS.Services
             return new ApiOkResponse<IEnumerable<EnrollmentUserCourseListDTO>>(enrollmentListDTO);
         }
 
-        public async Task<ApiBaseResponse> GetUsers(string? roleFilter, int pageNr, int pageSize)
+
+        public async Task<ApiBaseResponse> GetUsers(string? roleFilter, int pageNr = 1, int pageSize=1)
         {
-            IQueryable<ApplicationUser> query = _uow.Courses.Query()                                                              
-                                                              .Include(c => c.Enrollments)
-                                                              .SelectMany(c => c.Enrollments);
+            IQueryable<ApplicationUser> query = _uow.Enrollments.UserQuery()
+                                                              .Where(u => u.Role == roleFilter);
+
             int totalCount = query.Count();
 
             var userList = await query
@@ -243,5 +246,43 @@ namespace LMS.Services
 
             return new ApiNoContentResponse();
         }
+
+        public async Task<ApiBaseResponse> GetAllRolesAsync()
+        {
+            var roles = await _uow.Enrollments.GetAllRolesAsync();
+            var roleDTOs = _mapper.Map<IEnumerable<RoleDTO>>(roles);
+            return new ApiOkResponse<IEnumerable<RoleDTO>>(roleDTOs);
+        }
+
+        public async Task<ApiBaseResponse> GetAllUsersAsync()
+        {
+            var users = await _uow.Enrollments.GetAllUsersAsync();
+            var userDTOs = _mapper.Map<IEnumerable<UserDTO>>(users);
+            return new ApiOkResponse<IEnumerable<UserDTO>>(userDTOs);
+        }
+
+        public async Task<ApiBaseResponse> AssignRoleToUserAsync(AssignRoleDTO assignRoleDto)
+        {
+            
+
+            try
+            {
+                await _uow.Enrollments.AssignRoleToUserAsync(assignRoleDto.Id, assignRoleDto.Role);
+                await _uow.CompleteASync();
+               
+                return new ApiNoContentResponse();
+            }
+            catch (UserNotFoundException ex)
+            {
+              
+                return new UserNotFoundResponse(ex.UserId);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException("Failed to assign role to user.", ex);
+            }
+        }
+           
+        
     }
 }

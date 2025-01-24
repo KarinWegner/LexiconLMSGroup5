@@ -10,6 +10,7 @@ namespace LMS.Blazor.Client.Pages.Components.Admin
     public partial class CourseDashboardContainer
     {
         private string IsMyCoursesActive = "active", IsAllCoursesActive = "";
+        private string linkToCreateCourse => VBRoutes.Administration.LinkToCreateCourse;
         List<CourseEntryDO> courseEntries;
         [Inject]
         private IApiService apiService { get; set; }

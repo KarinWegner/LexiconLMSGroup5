@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -70,7 +71,7 @@ namespace LMS.Infrastructure.Repositories
             return enrollments;
         }
 
-        public async Task<IEnumerable<ApplicationUser>> GetAllUsersAsync(string? roleFilter)
+        public async Task<IEnumerable<ApplicationUser>> GetUsersByRoleAsync(string? roleFilter)
         {
             IEnumerable<ApplicationUser> users = UserQuery().Where(u => u.Role == roleFilter);
                      
@@ -80,6 +81,49 @@ namespace LMS.Infrastructure.Repositories
         public IQueryable<ApplicationUser> UserQuery()
         {
             return _context.Users.AsQueryable();
+        }
+
+        public async Task<IEnumerable<IdentityRole>> GetAllRolesAsync()
+        {
+            return await _context.Roles.ToListAsync();
+        }
+
+        public async Task<IEnumerable<ApplicationUser>> GetAllUsersAsync()
+        {
+            return await _context.Users.ToListAsync();
+        }
+
+        public async Task AssignRoleToUserAsync(string userId, string roleName)
+        {
+            
+
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+            {
+                
+                throw new UserNotFoundException(userId);
+            }
+
+            var role = await _context.Roles.FirstOrDefaultAsync(r => r.Name == roleName);
+            if (role == null)
+            {
+                
+                throw new Exception(roleName);
+            }
+
+        
+            user.Role = roleName;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+                Console.WriteLine($"Role assigned successfully to user {userId}");
+            }
+            catch (DbUpdateException ex)
+            {
+                Console.WriteLine($"An error occurred while saving the entity changes: {ex.Message}");
+                throw new Exception("An error occurred while saving the entity changes. See the inner exception for details.", ex);
+            }
         }
     }
 }
