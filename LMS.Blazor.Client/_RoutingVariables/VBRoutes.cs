@@ -30,7 +30,7 @@
             public const string LinkToCreateNewModule = $"{LinkToCourseDashboard}/{RoutingVariables.CourseId}/{RoutingVariables.DashboardModules}/{RoutingVariables.New}";
             public static string DLinkToCreateNewModule(int CourseId) => $"{LinkToCourseDashboard}/{CourseId}/{RoutingVariables.DashboardModules}/{RoutingVariables.New}";
 
-            public const string LinkToCreateCourse = $"/{RoutingVariables.Create}/{RoutingVariables.CreateCourse}";
+            public const string LinkToCreateCourse = $"{LinkToCourseDashboard}/{RoutingVariables.New}";
         }
 
         public record API
