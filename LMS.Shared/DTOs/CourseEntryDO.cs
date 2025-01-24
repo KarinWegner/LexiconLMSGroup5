@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LMS.Shared.DTOs.EnrollmentDTOs;
 
 namespace LMS.Shared.DTOs
 {
@@ -111,6 +112,15 @@ namespace LMS.Shared.DTOs
             StartTime = from.StartDate;
             EndTime = from.EndDate;
             //ActivityType = from.ActivityType.Name;
+        }
+        public CourseEntryDO(EnrollmentUserCourseListDTO from)
+        {
+            Id = from.CourseId;
+            ParentId = -1;
+            Name = from.CourseName!;
+            Description = string.Empty;
+            StartTime = from.CourseStart;
+            EndTime = from.CourseEnd;
         }
     }
 }

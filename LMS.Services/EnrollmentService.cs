@@ -204,10 +204,12 @@ namespace LMS.Services
             return new ApiOkResponse<IEnumerable<EnrollmentUserCourseListDTO>>(enrollmentListDTO);
         }
 
+
         public async Task<ApiBaseResponse> GetUsers(string? roleFilter, int pageNr = 1, int pageSize=1)
         {
             IQueryable<ApplicationUser> query = _uow.Enrollments.UserQuery()
                                                               .Where(u => u.Role == roleFilter);
+
             int totalCount = query.Count();
 
             var userList = await query

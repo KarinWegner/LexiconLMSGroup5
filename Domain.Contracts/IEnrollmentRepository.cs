@@ -18,7 +18,8 @@ namespace Domain.Contracts
         Task<IEnumerable<ApplicationUser>> GetUsersByRoleAsync(string? roleFilter);
         IQueryable<ApplicationUser> UserQuery();
         Task<IEnumerable<IdentityRole>> GetAllRolesAsync();
-        Task<IEnumerable<ApplicationUser>> GetAllUsersAsync();
         Task AssignRoleToUserAsync(string userId, string roleName);
+        Task<IEnumerable<ApplicationUser>> GetAllUsersAsync(string? roleFilter);
+        IQueryable<ApplicationUser> UserQuery();
     }
 }

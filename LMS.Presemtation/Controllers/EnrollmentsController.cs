@@ -16,6 +16,7 @@ using LMS.Shared.DTOs.ApplicationUserDTOs;
 using System.Text.Json;
 using LMS.Shared.DTOs;
 
+
 namespace LMS.Presemtation.Controllers
 {
     [Route("api/enrollment")]
@@ -191,10 +192,7 @@ namespace LMS.Presemtation.Controllers
                 CurrentPage = pageNr,
                 TotalPages = (totalCount / pageSize)
             };
-
-            Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(metadata));
-
-
+            
             return response.Success ? Ok(response.GetOkResult<(IEnumerable<ApplicationUserListDTO> userList, int totalCount)>()) :
                 ProcessError(response);
         }

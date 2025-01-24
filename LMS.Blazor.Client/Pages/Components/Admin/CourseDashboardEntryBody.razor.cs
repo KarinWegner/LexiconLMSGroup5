@@ -1,4 +1,5 @@
-﻿using LMS.Blazor.Client.Models.Enums;
+﻿using LMS.Blazor.Client._RoutingVariables;
+using LMS.Blazor.Client.Models.Enums;
 using LMS.Blazor.Client.Services;
 using LMS.Shared.DTOs;
 using Microsoft.AspNetCore.Components;
@@ -14,6 +15,7 @@ namespace LMS.Blazor.Client.Pages.Components.Admin
         IEnumerable<CourseEntryDO> modules = [];
         private List<string> teachers = [];
         private int nrOfStudents = 0;
+        private string linkToCreateNewModule => VBRoutes.Administration.DLinkToCreateNewModule(CourseEntry.Id);
         protected async override Task OnInitializedAsync()
         {
             modules = CourseEntry.CourseEntryDOs;
