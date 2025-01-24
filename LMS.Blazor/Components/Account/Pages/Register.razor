@@ -54,10 +54,10 @@
                            
                             <!-- UserName input -->
                             <div class="form-floating mb-3">
-                                <InputText @bind-Value="Input.UserName" class="form-control" autocomplete="username" aria-required="true" placeholder="John" />
+                                <InputText @bind-Value="Input.Name" class="form-control" autocomplete="username" aria-required="true" placeholder="John" />
                                 <label for="username">User Name</label>
                                 <div class="text-start">
-                                    <ValidationMessage For="() => Input.UserName" class="text-danger" />
+                                    <ValidationMessage For="() => Input.Name" class="text-danger" />
                                 </div>
                             </div>
 
@@ -117,7 +117,7 @@
         [Required]
 
         [Display(Name = "User Name")]
-        public string UserName { get; set; } = "";
+        public string Name { get; set; } = "";
 
         [Required]
         [EmailAddress]
@@ -140,9 +140,11 @@
     {
         var registrationDto = new UserForRegistrationDto
             {
-                UserName = Input.UserName,
+                
+                UserName = Input.Email,
                 Email = Input.Email,
-                Password = Input.Password
+                Password = Input.Password,
+                Name = Input.Name
             };
         var redirectToConfirmation = false;
 

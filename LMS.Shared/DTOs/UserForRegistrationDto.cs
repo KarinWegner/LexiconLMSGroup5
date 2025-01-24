@@ -7,6 +7,8 @@ public record UserForRegistrationDto
 {
     [Required(ErrorMessage = "Username is required")]
     public string UserName { get; init; }
+    [Required(ErrorMessage = "Name is required")]
+    public string Name { get; init; }
 
     [Required(ErrorMessage = "Email is required")]
     [EmailAddress]
