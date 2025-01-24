@@ -27,10 +27,12 @@
             public const string LinkToDashboard = $"/{RoutingVariables.AdministrationDashboard}";
             public const string LinkToCourseDashboard = $"/{RoutingVariables.AdministrationDashboard}/{RoutingVariables.CourseDashboard}";
             public const string LinkToStudentDashboard = $"/{RoutingVariables.AdministrationDashboard}/{RoutingVariables.StudentDashboard}";
+             public const string LinkAddNewUser = $"/{RoutingVariables.AdministrationDashboard}/{RoutingVariables.AddNewUser}";
             public const string LinkToCreateNewModule = $"{LinkToCourseDashboard}/{RoutingVariables.CourseId}/{RoutingVariables.DashboardModules}/{RoutingVariables.New}";
             public static string DLinkToCreateNewModule(int CourseId) => $"{LinkToCourseDashboard}/{CourseId}/{RoutingVariables.DashboardModules}/{RoutingVariables.New}";
 
             public const string LinkToCreateCourse = $"/{RoutingVariables.Create}/{RoutingVariables.CreateCourse}";
+
         }
 
         public record API

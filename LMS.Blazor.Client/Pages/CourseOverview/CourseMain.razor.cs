@@ -12,6 +12,7 @@ using LMS.Blazor.Client.Models;
 using LMS.Blazor.Client.Models.Enums;
 using LMS.Shared.DTOs.CourseDTOs;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+
 namespace LMS.Blazor.Client.Pages.CourseOverview
 {
     public partial class CourseMain
@@ -21,6 +22,7 @@ namespace LMS.Blazor.Client.Pages.CourseOverview
         [Inject]
         IApiService ApiService { get; set; }
         [Inject]
+
         AuthenticationStateProvider PAuth { get; set; }
         private CourseEntryModel courses = new();
         protected async override Task OnAfterRenderAsync(bool firstRender)
