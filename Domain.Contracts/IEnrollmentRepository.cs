@@ -1,4 +1,5 @@
 ﻿using Domain.Models.Entities;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +15,10 @@ namespace Domain.Contracts
         Task EditEnrollment(int moveFromCourseId, string userId, int moveToCourseId);
         Task<ApplicationUser> FindUserByIdAsync(string userId);
         Task<IEnumerable<Course>> GetUserEnrollments(string userId);
-        Task<IEnumerable<ApplicationUser>> GetAllUsersAsync(string? roleFilter);
+        Task<IEnumerable<ApplicationUser>> GetUsersByRoleAsync(string? roleFilter);
         IQueryable<ApplicationUser> UserQuery();
+        Task<IEnumerable<IdentityRole>> GetAllRolesAsync();
+        Task AssignRoleToUserAsync(string userId, string roleName);
+        Task<IEnumerable<ApplicationUser>> GetAllUsersAsync();
     }
 }
