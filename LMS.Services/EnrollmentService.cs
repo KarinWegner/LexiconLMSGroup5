@@ -204,7 +204,7 @@ namespace LMS.Services
             return new ApiOkResponse<IEnumerable<EnrollmentUserCourseListDTO>>(enrollmentListDTO);
         }
 
-        public async Task<ApiBaseResponse> GetUsers(string? roleFilter, int pageNr, int pageSize)
+        public async Task<ApiBaseResponse> GetUsers(string? roleFilter, int pageNr = 1, int pageSize=1)
         {
             IQueryable<ApplicationUser> query = _uow.Courses.Query()                                                              
                                                               .Include(c => c.Enrollments)
