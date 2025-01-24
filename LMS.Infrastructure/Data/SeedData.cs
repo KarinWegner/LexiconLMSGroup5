@@ -33,7 +33,7 @@ public static class SeedData
             try
             {
                 await CreateRolesAsync([teacherRole, studentRole]);
-                await GenerateUsersAsync(10, 4);
+                await GenerateUsersAsync(15, 6);
                 await AssignRolesAsync(db.Users.ToList());
 
                 List<Course> courses = await GenerateCoursesAsync(3);
