@@ -7,7 +7,11 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
 using System.Security.Claims;
-
+using LMS.Shared.DTOs;
+using LMS.Blazor.Client.Models;
+using LMS.Blazor.Client.Models.Enums;
+using LMS.Shared.DTOs.CourseDTOs;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace LMS.Blazor.Client.Pages.CourseOverview
 {
     public partial class CourseMain
@@ -17,8 +21,8 @@ namespace LMS.Blazor.Client.Pages.CourseOverview
         [Inject]
         IApiService ApiService { get; set; }
         [Inject]
-        AuthenticationStateProvider PAuth {  get; set; }
-
+        AuthenticationStateProvider PAuth { get; set; }
+        private CourseEntryModel courses = new();
         protected async override Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
@@ -28,9 +32,24 @@ namespace LMS.Blazor.Client.Pages.CourseOverview
                 if (id == default)
                     NavigationManager.NavigateTo(VBRoutes.AccessDenied);
                 var res = await ApiService.GetAsync<IEnumerable<EnrollmentUserCourseListDTO>>(VBRoutes.API.Enrollment.GetUserEnrollment(id!.Value));
-                NavigationManager.NavigateTo(VBRoutes.Student.LinkToCourse(res!.First().CourseId));
+                //var result = ApiService.PostAsync<CourseCreateDTO, ApiResponse>(VBRoutes.API.Course.Courses, data);
+                //var result = ApiService.PostAsync<CourseUpdateDTO, ApiResponse>(VBRoutes.API.Course.CourseAtId(id), data);
+
+                switch (res!.Count())
+                {
+                    case 1:
+                        NavigationManager.NavigateTo(VBRoutes.Student.LinkToCourse(res!.First().CourseId));
+                        break;
+                    case 0:
+                        NavigationManager.NavigateTo(VBRoutes.AccessDenied);
+                        break;
+                    default:
+                        courses = new CourseEntryModel(ECourseEntryType.Class, res!.Select(x => new CourseEntryDO(x)));
+                        StateHasChanged();
+                        break;
+                }
+                await base.OnAfterRenderAsync(firstRender);
             }
-            await base.OnAfterRenderAsync(firstRender);
         }
     }
 }

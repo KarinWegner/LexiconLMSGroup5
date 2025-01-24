@@ -1,10 +1,10 @@
 ﻿@attribute [Route(VBRoutes.Student.LinkToOverview)]
 @rendermode InteractiveWebAssembly
-
-<h3>Course Information</h3>
-
-<CourseNavbar ActiveNav="ECourseNav.Overview" CourseId="@CourseId"></CourseNavbar>
 @if (Course != null)
 {
+    <h3>Course Information</h3>
+
+    <CourseNavbar ActiveNav="ECourseNav.Overview" CourseId="@CourseId"></CourseNavbar>
+
     <DetailsArticleObject CourseEntry="Course" DisplayDate="true"></DetailsArticleObject>
 }
