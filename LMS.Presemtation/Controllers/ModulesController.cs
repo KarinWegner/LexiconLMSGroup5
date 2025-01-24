@@ -96,7 +96,7 @@ namespace LMS.Presemtation.Controllers
 
 
         // PUT: api/modules/22
-        [HttpPut("{id}")]
+        [HttpPut("course/{courseId}/module/{id}")]
         public async Task<IActionResult> UpdateModule(int id, int courseId, [FromBody] ModuleUpdateDTO moduleDto)
         {
             if (id != moduleDto.ModuleId) return BadRequest("Mismatched module ID.");

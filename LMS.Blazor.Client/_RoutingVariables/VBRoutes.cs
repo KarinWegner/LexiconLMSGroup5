@@ -29,7 +29,9 @@
             public const string LinkToStudentDashboard = $"/{RoutingVariables.AdministrationDashboard}/{RoutingVariables.StudentDashboard}";
              public const string LinkAddNewUser = $"/{RoutingVariables.AdministrationDashboard}/{RoutingVariables.AddNewUser}";
             public const string LinkToCreateNewModule = $"{LinkToCourseDashboard}/{RoutingVariables.CourseId}/{RoutingVariables.DashboardModules}/{RoutingVariables.New}";
+            public const string LinkToEditModule = $"{LinkToCourseDashboard}/{RoutingVariables.CourseId}/{RoutingVariables.DashboardModules}/{RoutingVariables.ModuleId}/{RoutingVariables.Edit}";
             public static string DLinkToCreateNewModule(int CourseId) => $"{LinkToCourseDashboard}/{CourseId}/{RoutingVariables.DashboardModules}/{RoutingVariables.New}";
+            public static string DLinkToEditModule(int CourseId, int ModuleId) => $"{LinkToCourseDashboard}/{CourseId}/{RoutingVariables.DashboardModules}/{ModuleId}/{RoutingVariables.Edit}";
 
             public const string LinkToCreateCourse = $"{LinkToCourseDashboard}/{RoutingVariables.New}";
         }
@@ -42,6 +44,8 @@
                 public static string ModuleAtIdWithActivities(int id) => $"{RoutingVariables.APIModules}/{id}?{RoutingVariables.APIModulesIncludeActivities}";
                 public static string ModuleAtId(int id) => $"{RoutingVariables.APIModules}/{id}";
                 public static string PostModuleAtId(int CourseId) => $"{RoutingVariables.APIModules}/{RoutingVariables.ModuleCourse}/{CourseId}/{RoutingVariables.ModuleModule}";
+                public static string PutModuleAtId(int CourseId, int ModuleId) => $"{RoutingVariables.APIModules}/{RoutingVariables.ModuleCourse}/{CourseId}/{RoutingVariables.ModuleModule}/{ModuleId}";
+
 
 
             }

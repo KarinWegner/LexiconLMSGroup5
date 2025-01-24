@@ -1,0 +1,30 @@
+﻿@attribute [Route(VBRoutes.Administration.LinkToEditModule)]
+@rendermode InteractiveWebAssembly
+<h3>Edit Module</h3>
+
+<EditForm Model="moduleUpdateDTO" OnValidSubmit="OnModuleSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <label for="name">Name</label>
+        <InputText id="name" @bind-Value="moduleUpdateDTO.Name" class="form-control" />
+    </div>
+
+    <div>
+        <label for="start-date">Start Date</label>
+        <InputDate id="start-date" @bind-Value="moduleUpdateDTO.StartDate" class="form-control" />
+    </div>
+
+    <div>
+        <label for="end-date">End Date</label>
+        <InputDate id="end-date" @bind-Value="moduleUpdateDTO.EndDate" class="form-control" />
+    </div>
+
+    <div>
+        <label for="description">Description</label>
+        <InputTextArea id="description" @bind-Value="moduleUpdateDTO.Description" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Update Module</button>
+</EditForm>

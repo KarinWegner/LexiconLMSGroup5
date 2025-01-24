@@ -38,6 +38,16 @@ public class ClientApiService(IHttpClientFactory httpClientFactory, NavigationMa
             dto
         );
     }
+    public async Task<TResponse?> PutAsync<TRequest, TResponse>(
+    string endpoint,
+    TRequest dto)
+    {
+        return await CallApiAsync<TRequest, TResponse>(
+            endpoint,
+            HttpMethod.Put,
+            dto
+        );
+    }
 
     public async Task<TResponse?> PatchAsync<TRequest, TResponse>(
        string endpoint,
