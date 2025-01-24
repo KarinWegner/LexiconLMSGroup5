@@ -1,0 +1,40 @@
+﻿@using LMS.Shared.DTOs;
+@using LMS.Shared.DTOs.CourseDTOs;
+@using Services;
+@rendermode InteractiveWebAssembly
+@attribute [StreamRendering(true)]
+
+<EditForm Model="Model" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <label for="name">Name</label>
+        <InputText id="name" @bind-Value="Model.Name" class="form-control" />
+    </div>
+    <div>
+        <label for="start-date">Start Date</label>
+        <InputDate id="start-date" @bind-Value="Model.StartDate" class="form-control" />
+    </div>
+
+    <div>
+        <label for="end-date">End Date</label>
+        <InputDate id="end-date" @bind-Value="Model.EndDate" class="form-control" />
+    </div>
+
+    <div>
+        <label for="description">Description</label>
+        <InputTextArea id="description" @bind-Value="Model.Description" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create Course</button>
+</EditForm>
+
+
+@code {
+    [Parameter]
+    public CourseModel Model { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback<CourseModel> OnSubmit { get; set; }
+}
