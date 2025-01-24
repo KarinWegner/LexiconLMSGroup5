@@ -20,11 +20,10 @@ namespace Services.Contracts
         Task<ApiBaseResponse> AddEnrollment(int courseId, EnrollmentCreateDTO createDto);
         Task<ApiBaseResponse> RemoveEnrollment(int courseId, string userId);
         Task<ApiBaseResponse> GetUserEnrollments(string userId);
-        Task<ApiBaseResponse> GetUsers(string? roleFilter, int? pageNr, int? pageSize);
+        Task<ApiBaseResponse> GetUsers(string? roleFilter, int pageNr, int pageSize);
         Task<ApiBaseResponse> GetAllRolesAsync();
         Task<ApiBaseResponse> GetAllUsersAsync();
         Task<ApiBaseResponse> AssignRoleToUserAsync(AssignRoleDTO assignRoleDto);
-        Task<ApiBaseResponse> GetUsers(string? roleFilter, int pageNr, int pageSize);
        
        
     }
