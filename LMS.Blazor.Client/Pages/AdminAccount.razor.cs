@@ -21,6 +21,8 @@ namespace LMS.Blazor.Client.Pages
         private IEnumerable<ApplicationUserListDTO> data = [];
         private IEnumerable<ApplicationUserListDTO> searchResults = [];
         private bool isLoading = false;
+        private string linkToAddNewUser = VBRoutes.Administration.LinkAddNewUser;
+
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {

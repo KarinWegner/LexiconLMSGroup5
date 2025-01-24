@@ -17,16 +17,16 @@ namespace LMS.Blazor.Client.Pages.Components
 
         [Inject]
         private IApiService apiService { get; set; }
-       
+        [Parameter]
+        public int CourseId { get; set; }
+        [Parameter]
+        public int ModuleId { get; set; }
+        [Inject]
+        private NavigationManager navigationManager { get; set; }
+
         public class ActivityModel
         {
-            
-            [Required]
-            public int CourseId { get; set; }
-            [Required]
-            public int ModuleId { get; set; }
 
-            //Above will be removed when linking works
 
 
             [Required(ErrorMessage = "Activity name is required.")]
@@ -39,8 +39,8 @@ namespace LMS.Blazor.Client.Pages.Components
             [MaxLength(500, ErrorMessage = "Description can not exceed 500 characters")]
             [Required(ErrorMessage = "Activity requires a description")]
             public string Description { get; set; }
-                    [Required(ErrorMessage = "The Activity needs an end date")]
-            public  int ActivityTypeID { get; set; }
+            [Required(ErrorMessage = "The Activity needs an end date")]
+            public int ActivityTypeID { get; set; } = 1;
 
             //public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
             //{
@@ -79,6 +79,8 @@ namespace LMS.Blazor.Client.Pages.Components
 
             await OnSubmit.InvokeAsync(Model);
             await AddActivity(Model);
+            navigationManager.NavigateTo(VBRoutes.Administration.LinkToCourseDashboard);
+
         }
         async Task AddActivity(ActivityModel model)
         {
@@ -89,13 +91,13 @@ namespace LMS.Blazor.Client.Pages.Components
                 EndDate = model.EndDate,
                 Description = model.Description,
                 ActivityTypeId = model.ActivityTypeID,
-                ModuleId= model.ModuleId
+                ModuleId= ModuleId
             };
             try
             {
                 Logger.LogInformation("Attemting to create Activity!");
 
-                var response = await apiService.PostAsync<ActivityCreateDTO, ApiResponse>($"api/activities", ActivityCreateDto);
+                var response = await apiService.PostAsync<ActivityCreateDTO, ApiResponse>(VBRoutes.API.Activity.Activities, ActivityCreateDto);
 
                 if (response != null && response.Success)
                 {
@@ -114,7 +116,6 @@ namespace LMS.Blazor.Client.Pages.Components
         
            
             };
-            
             //   apiService.PostAsync<ApiResponse>(ActivityModel Model, VBRoutes.API.Cre.ActivityTypes);
 
 
