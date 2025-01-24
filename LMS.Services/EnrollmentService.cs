@@ -177,7 +177,7 @@ namespace LMS.Services
 
             var enrollmentList = await _uow.Enrollments.GetUserEnrollments(userId);
 
-            if (enrollmentList.Count() == 0) return new ApiNoContentResponse(); 
+           
 
             var enrollmentListDTO = new List<EnrollmentUserCourseListDTO>();
             foreach (var course in enrollmentList)
@@ -199,7 +199,7 @@ namespace LMS.Services
                     });
                 
             }
-
+            if (enrollmentList.Count() == 0) return new ApiOkResponse<IEnumerable<EnrollmentUserCourseListDTO>>(enrollmentListDTO);
 
             return new ApiOkResponse<IEnumerable<EnrollmentUserCourseListDTO>>(enrollmentListDTO);
         }

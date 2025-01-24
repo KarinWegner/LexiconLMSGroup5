@@ -1,4 +1,5 @@
 ﻿@attribute [Route(VBRoutes.Administration.LinkToDashboard)]
+@attribute [Authorize(Roles = "Teacher")]
 
 
 @* Just a redirect page, here to make sure the active nav system plays nice mostly.*@
