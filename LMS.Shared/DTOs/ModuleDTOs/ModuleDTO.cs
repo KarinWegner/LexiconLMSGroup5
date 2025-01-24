@@ -9,13 +9,13 @@ using System.Threading.Tasks;
 
 namespace LMS.Shared.DTOs.ModuleDTOs
 {
-    public record ModuleDTO
+    public record ModuleDTO : ITimeDTO
     {
         public int ModuleId { get; init; }
         public string? Name { get; init; }
         public string? Description { get; init; }
-        public DateTime StartDate { get; init; }
-        public DateTime EndDate { get; init; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
         public int CourseId { get; init; }
 
         public ICollection<ActivityDTO> Activities { get; init; }

@@ -17,7 +17,6 @@ namespace LMS.Blazor.Client.Pages.Admin
         public ModuleCreateDTO moduleCreateDTO { get; set; } = new();
         [Inject]
         private IApiService apiService { get; set; }
-        EventCallback<ModuleCreateDTO> eventCallback { get; set; }
         private ValidationMessageStore validationMessageStore { get; set; }
         private EditContext editContext { get; set; }
         [Inject]
