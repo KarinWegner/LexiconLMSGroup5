@@ -1,14 +1,43 @@
 ﻿@using LMS.Blazor.Client.Interfaces
-@typeparam TModel where TModel : IEntity
+@rendermode InteractiveWebAssembly
+
+@attribute [StreamRendering(true)]
+@inject ILogger<CreateActivity> Logger
+
+
+
 
 <EditForm Model="Model" OnValidSubmit="HandleValidSubmit">
     <DataAnnotationsValidator />
     <ValidationSummary />
+    <div>
+        <label for="courseid">Course Id</label>
+        <InputNumber id="courseid" @bind-Value="Model.CourseId" class="form-control" />
+    </div>
+    <div>
+        <label for="moduleid">Module Id</label>
+        <InputNumber id="moduleid" @bind-Value="Model.ModuleId" class="form-control" />
+    </div>
+
 
     <div>
         <label for="name">Name</label>
         <InputText id="name" @bind-Value="Model.Name" class="form-control" />
     </div>
+
+    <div>
+        <div>
+            <label for="ActivityTypeId">Activity Type</label>
+            <InputSelect id="ActivityTypeId" @bind-Value="Model.ActivityTypeID">
+                @foreach (var type in ActivityTypes)
+                {
+                    <option value="@type.ActivityTypeId">@type.Name</option>
+                }
+            </InputSelect>
+        </div>
+    </div>
+
+
 
     <div>
         <label for="start-date">Start Date</label>
@@ -37,13 +66,12 @@
 @code {
     [Parameter]
 
-    public TModel Model { get; set; } = default!;
-
+    public ActivityModel Model { get; set; } = default!;
 
 
     [Parameter]
 
-    public EventCallback<TModel> OnSubmit { get; set; }
+    public EventCallback<ActivityModel> OnSubmit { get; set; }
 
 
 
@@ -56,14 +84,6 @@
     [Parameter]
 
     public string? ErrorMessage { get; set; }
-
-
-
-    private async Task HandleValidSubmit()
-
-    {
-
-        await OnSubmit.InvokeAsync(Model);
-
-    }
+  
+    
 }

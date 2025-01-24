@@ -1,4 +1,6 @@
-﻿namespace LMS.Blazor.Client._RoutingVariables
+﻿using LMS.Shared.DTOs.ActivityDTOs;
+
+namespace LMS.Blazor.Client._RoutingVariables
 {
     //(Variable Based) Routes
     public static class VBRoutes
@@ -19,6 +21,7 @@
             public static string DLinkToCourseParticipants(int CourseId) => $"{LinkToCourse(CourseId)}/{RoutingVariables.CourseParticipants}";
             public static string LinkToModule(int CourseId, int ModuleId) => $"{LinkToCourse(CourseId)}/{RoutingVariables.Modules}/{ModuleId}";
             public static string LinkToActivity(int CourseId, int ModuleId, int ActivityId) => $"{LinkToModule(CourseId, ModuleId)}/{ActivityId}";
+
             public static string LinkToCourseParticipant(int CourseId, string id) => $"{DLinkToCourseParticipants(CourseId)}/{id}";
         }
 
@@ -27,11 +30,14 @@
             public const string LinkToDashboard = $"/{RoutingVariables.AdministrationDashboard}";
             public const string LinkToCourseDashboard = $"/{RoutingVariables.AdministrationDashboard}/{RoutingVariables.CourseDashboard}";
             public const string LinkToStudentDashboard = $"/{RoutingVariables.AdministrationDashboard}/{RoutingVariables.StudentDashboard}";
+
              public const string LinkAddNewUser = $"/{RoutingVariables.AdministrationDashboard}/{RoutingVariables.AddNewUser}";
             public const string LinkToCreateNewModule = $"{LinkToCourseDashboard}/{RoutingVariables.CourseId}/{RoutingVariables.DashboardModules}/{RoutingVariables.New}";
             public static string DLinkToCreateNewModule(int CourseId) => $"{LinkToCourseDashboard}/{CourseId}/{RoutingVariables.DashboardModules}/{RoutingVariables.New}";
 
+            public const string LinkToCreateActivity = $"/{RoutingVariables.Create}/{RoutingVariables.CreateActivity}";
             public const string LinkToCreateCourse = $"{LinkToCourseDashboard}/{RoutingVariables.New}";
+
         }
 
         public record API
@@ -58,6 +64,13 @@
             {
                 public const string Activities = RoutingVariables.APIActivity;
                 public static string ActivityAtId(int id) => $"{RoutingVariables.APIActivity}/{id}";
+                public static string ActivityPost(ActivityCreateDTO createDTO, int courseId, int moduleId) => $"{RoutingVariables.APICourses}/{courseId}/Modules/{moduleId}/activities";
+            }
+            public record ActivityType
+            {
+                public const string ActivityTypes = RoutingVariables.APIActivityType;
+                public static string ActivityTypeAtId(int Id) => $"{RoutingVariables.APIActivityType}/{Id}";
+                
             }
             public record Enrollment
             {
@@ -68,5 +81,6 @@
             }
         }
         public const string AccessDenied = RoutingVariables.AccessDenied;
+        public const string NotFound = RoutingVariables.NotFound;
     }
 }
