@@ -212,6 +212,7 @@ namespace LMS.Services
 
         public async Task<ApiBaseResponse> GetUsers(string? roleFilter, int pageNr = 1, int pageSize=1)
         {
+            if (roleFilter == null) roleFilter = "";
             IQueryable<ApplicationUser> query = _uow.Enrollments.UserQuery()
                                                               .Where(u => u.Role == roleFilter);
 

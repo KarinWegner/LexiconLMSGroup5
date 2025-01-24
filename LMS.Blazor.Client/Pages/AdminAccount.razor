@@ -20,6 +20,7 @@
         <div class="nav nav-tabs mb-3" id="nav-tab" role="tablist">
             <button @onclick="@(e => SwitchTab(Student))" class="nav-link @(activeTab == Student ? "active" : "")" id="students-tab" data-bs-toggle="tab" data-bs-target="#nav-student" type="button" role="tab" aria-controls="nav-student" aria-selected="true">Students</button>
             <button @onclick="@(e => SwitchTab(Teacher))" class="nav-link @(activeTab == Teacher ? "active" : "")" id="teachers-tab" data-bs-toggle="tab" data-bs-target="#nav-teacher" type="button" role="tab" aria-controls="nav-teacher" aria-selected="false">Teachers</button>
+            <button @onclick="@(e => SwitchTab(Unassigned))" class="nav-link @(activeTab == Unassigned ? "active" : "")" id="unassigned-tab" data-bs-toggle="tab" data-bs-target="#nav-unassigned" type="button" role="tab" aria-controls="nav-unassigned" aria-selected="false">Unassigned</button>
         </div>
     </nav>
 
@@ -32,6 +33,10 @@
             <div class="tab-pane @(activeTab == Teacher ? "active" : "")">
                 <UserTable Items="searchResults" IsLoading="isLoading" />
             </div>
+
+        <div class="tab-pane @(activeTab == Unassigned ? "active" : "")">
+            <UserTable Items="searchResults" IsLoading="isLoading" />
+        </div>
         </div>
     
 </div>

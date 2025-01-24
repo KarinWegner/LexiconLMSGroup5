@@ -15,6 +15,7 @@ namespace LMS.Blazor.Client.Pages
 
         private const string Student = "Student";
         private const string Teacher = "Teacher";
+        private const string Unassigned = "";
 
         private string searchTerm = string.Empty;
         private string activeTab = Student;
