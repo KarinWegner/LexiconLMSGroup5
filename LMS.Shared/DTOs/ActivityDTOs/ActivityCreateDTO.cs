@@ -25,5 +25,7 @@ namespace LMS.Shared.DTOs.ActivityDTOs
         public DateTime EndDate { get; set; }
         [Required(ErrorMessage ="An activity type needs to be selected.")]
         public int ActivityTypeId { get; set; }
+        [Required]
+        public int ModuleId { get; set; }
     }
 }
