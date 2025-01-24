@@ -9,7 +9,7 @@
         //parameters getters
         public const string CourseId = "{CourseId:int}", ModuleId = "{ModuleId:int}", ActivityId = "{ActivityId:int}";
         //Adminstration route
-        public const string AdministrationDashboard = "AdministrationDashboard", CourseDashboard = "CourseDashboard", StudentDashboard = "StudentDashboard", AddnewUser = "AddNewUser", DashboardModules = "Modules";
+        public const string AdministrationDashboard = "AdministrationDashboard", CourseDashboard = "CourseDashboard", StudentDashboard = "StudentDashboard", AddNewUser = "AddNewUser", DashboardModules = "Modules";
         //Administration directives
         public const string New = "new";
         //Create course/module/activity route
