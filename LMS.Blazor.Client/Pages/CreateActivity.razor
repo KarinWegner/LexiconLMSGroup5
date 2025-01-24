@@ -1,4 +1,12 @@
 ﻿@attribute [Route(VBRoutes.Administration.LinkToCreateActivity)]
 
 
-<AddActivityForm></AddActivityForm>
+<AddActivityForm CourseId="CourseId" ModuleId="ModuleId"></AddActivityForm>
+
+@code{
+    [Parameter]
+    public int CourseId { get; set; }
+    [Parameter]
+    public int ModuleId { get; set; }
+
+}

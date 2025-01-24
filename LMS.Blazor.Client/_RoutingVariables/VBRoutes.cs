@@ -31,11 +31,13 @@ namespace LMS.Blazor.Client._RoutingVariables
             public const string LinkToCourseDashboard = $"/{RoutingVariables.AdministrationDashboard}/{RoutingVariables.CourseDashboard}";
             public const string LinkToStudentDashboard = $"/{RoutingVariables.AdministrationDashboard}/{RoutingVariables.StudentDashboard}";
 
-             public const string LinkAddNewUser = $"/{RoutingVariables.AdministrationDashboard}/{RoutingVariables.AddNewUser}";
+             public const string LinkAddNewUser = $"{LinkToStudentDashboard}/{RoutingVariables.AddNewUser}";
             public const string LinkToCreateNewModule = $"{LinkToCourseDashboard}/{RoutingVariables.CourseId}/{RoutingVariables.DashboardModules}/{RoutingVariables.New}";
             public static string DLinkToCreateNewModule(int CourseId) => $"{LinkToCourseDashboard}/{CourseId}/{RoutingVariables.DashboardModules}/{RoutingVariables.New}";
 
-            public const string LinkToCreateActivity = $"/{RoutingVariables.Create}/{RoutingVariables.CreateActivity}";
+            public const string LinkToCreateActivity = $"{LinkToCourseDashboard}/{RoutingVariables.CourseId}/{RoutingVariables.DashboardModules}/{RoutingVariables.ModuleId}/{RoutingVariables.ModuleActivtity}/{RoutingVariables.New}";
+            public static string DLinkToCreateNewActivity(int CourseId, int ModuleId) => $"{LinkToCourseDashboard}/{CourseId}/{RoutingVariables.DashboardModules}/{ModuleId}/{RoutingVariables.ModuleActivtity}/{RoutingVariables.New}";
+
             public const string LinkToCreateCourse = $"{LinkToCourseDashboard}/{RoutingVariables.New}";
 
         }
@@ -64,12 +66,12 @@ namespace LMS.Blazor.Client._RoutingVariables
             {
                 public const string Activities = RoutingVariables.APIActivity;
                 public static string ActivityAtId(int id) => $"{RoutingVariables.APIActivity}/{id}";
-                public static string ActivityPost(ActivityCreateDTO createDTO, int courseId, int moduleId) => $"{RoutingVariables.APICourses}/{courseId}/Modules/{moduleId}/activities";
+                //public static string ActivityPost(ActivityCreateDTO createDTO, int courseId, int moduleId) => $"{RoutingVariables.APIActivity}/activities";
             }
             public record ActivityType
             {
-                public const string ActivityTypes = RoutingVariables.APIActivityType;
-                public static string ActivityTypeAtId(int Id) => $"{RoutingVariables.APIActivityType}/{Id}";
+                public const string ActivityTypes = RoutingVariables.APIActivityTypes;
+                public static string ActivityTypeAtId(int Id) => $"{RoutingVariables.APIActivityTypes}/{Id}";
                 
             }
             public record Enrollment

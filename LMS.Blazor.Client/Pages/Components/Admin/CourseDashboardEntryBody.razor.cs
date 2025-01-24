@@ -17,6 +17,7 @@ namespace LMS.Blazor.Client.Pages.Components.Admin
         private List<string> teachers = [];
         private int nrOfStudents = 0;
         private string linkToCreateNewModule => VBRoutes.Administration.DLinkToCreateNewModule(CourseEntry.Id);
+        private string linktToCreateNewActivity => VBRoutes.Administration.DLinkToCreateNewActivity(CourseEntry.ParentId, CourseEntry.Id);
         [Inject]
         private IApiService apiService {  get; set; }
         protected async override Task OnInitializedAsync()

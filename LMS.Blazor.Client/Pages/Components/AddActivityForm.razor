@@ -10,15 +10,6 @@
 <EditForm Model="Model" OnValidSubmit="HandleValidSubmit">
     <DataAnnotationsValidator />
     <ValidationSummary />
-    <div>
-        <label for="courseid">Course Id</label>
-        <InputNumber id="courseid" @bind-Value="Model.CourseId" class="form-control" />
-    </div>
-    <div>
-        <label for="moduleid">Module Id</label>
-        <InputNumber id="moduleid" @bind-Value="Model.ModuleId" class="form-control" />
-    </div>
-
 
     <div>
         <label for="name">Name</label>

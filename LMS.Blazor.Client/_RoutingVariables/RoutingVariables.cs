@@ -18,7 +18,7 @@
         //Create course/module/activity route
         public const string Create = "Create", CreateActivity = "CreateActivity", CreateModule = "CreateModule", CreateCourse = "CreateCourse";
         //API Endpoints
-        public const string APIModules = "api/modules", APICourses = "api/Courses", APIActivity = "api/activities", APIActivityTypes="api/activitytypes", Enrollments = "api/enrollment", EnrollmentsFromUser = "user", ModuleCourse = "course", ModuleModule = "module";
+        public const string APIModules = "api/modules", APICourses = "api/Courses", APIActivity = "api/activities", APIActivityTypes="api/activitytypes", Enrollments = "api/enrollment", EnrollmentsFromUser = "user", ModuleCourse = "course", ModuleModule = "module", ModuleActivtity ="Activity";
 
 
         //API Course Queries
