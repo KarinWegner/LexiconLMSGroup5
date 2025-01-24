@@ -14,7 +14,7 @@
 
         public const string AdministrationDashboard = "AdministrationDashboard", CourseDashboard = "CourseDashboard", StudentDashboard = "StudentDashboard", AddNewUser = "AddNewUser", DashboardModules = "Modules";
         //Administration directives
-        public const string New = "new";
+        public const string New = "new", Edit = "edit";
         //Create course/module/activity route
         public const string Create = "Create", CreateActivity = "CreateActivity", CreateModule = "CreateModule", CreateCourse = "CreateCourse";
         //API Endpoints

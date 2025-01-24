@@ -1,4 +1,5 @@
 ﻿using LMS.Blazor.Client.Models;
+using LMS.Shared.DTOs;
 using LMS.Shared.DTOs.ModuleDTOs;
 
 namespace LMS.Blazor.Client.Utilities
@@ -18,7 +19,7 @@ namespace LMS.Blazor.Client.Utilities
             if (model.CourseEntries.Count() == 0) return false;
             return true;
         }
-        public static bool AreTimesSeperate(this ModuleDTO MD, ModuleCreateDTO MCD)
+        public static bool AreTimesSeperate(this ITimeDTO MD, ITimeDTO MCD)
         {
             if (MD.EndDate > MCD.StartDate && MD.StartDate < MCD.StartDate)
                 return false;
@@ -32,25 +33,25 @@ namespace LMS.Blazor.Client.Utilities
             return true;
 
         }
-        public static bool IsStartTimeOverlapping(this ModuleDTO MD, ModuleCreateDTO MCD)
+        public static bool IsStartTimeOverlapping(this ITimeDTO MD, ITimeDTO MCD)
         {
             if (MD.EndDate > MCD.StartDate && MD.StartDate < MCD.StartDate)
                 return true;
             return false;
         }
-        public static bool IsEndTimeOverlapping(this ModuleDTO MD, ModuleCreateDTO MCD)
+        public static bool IsEndTimeOverlapping(this ITimeDTO MD, ITimeDTO MCD)
         {
             if (MD.StartDate < MCD.EndDate && MD.EndDate > MCD.EndDate)
                 return true;
             return false;
         }
-        public static bool IsThisFullyOverlapped(this ModuleDTO MD, ModuleCreateDTO MCD)
+        public static bool IsThisFullyOverlapped(this ITimeDTO MD, ITimeDTO MCD)
         {
             if (MD.EndDate < MCD.EndDate && MD.StartDate > MCD.StartDate)
                 return true;
             return false;
         }
-        public static bool IsThisFullyOverlapping(this ModuleDTO MD, ModuleCreateDTO MCD)
+        public static bool IsThisFullyOverlapping(this ITimeDTO MD, ITimeDTO MCD)
         {
             if (MD.EndDate > MCD.EndDate && MD.StartDate < MCD.StartDate)
                 return true;

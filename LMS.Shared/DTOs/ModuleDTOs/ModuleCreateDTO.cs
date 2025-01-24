@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace LMS.Shared.DTOs.ModuleDTOs
 {
-    public record ModuleCreateDTO
+    public record ModuleCreateDTO : ITimeDTO
     {
         [Required(ErrorMessage ="A module name is required.")]
         [MaxLength(50, ErrorMessage ="Module name cannot exceed 50 characters.")]
