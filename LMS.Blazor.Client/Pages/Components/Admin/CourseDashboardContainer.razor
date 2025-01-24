@@ -6,7 +6,7 @@
             <NavLink class="@($"col-sm-auto clickable {@IsMyCoursesActive} nav-link")" @onclick="setMyCoursesActive"><h4>My Courses</h4></NavLink>
             <NavLink class="@($"col-sm-auto clickable {@IsAllCoursesActive} nav-link ")" @onclick="setAllCoursesActive"><h4>All Courses</h4></NavLink>
             <div class="col"></div>
-            <NavLink class="col-sm-auto align-right clickable nav-link " ActiveClass="" href=""><h4>Add new course</h4></NavLink>
+            <NavLink class="col-sm-auto align-right clickable nav-link " ActiveClass="" href="@linkToCreateCourse"><h4>Add new course</h4></NavLink>
             <div class="col-1"></div>
         </div>
     </div>
