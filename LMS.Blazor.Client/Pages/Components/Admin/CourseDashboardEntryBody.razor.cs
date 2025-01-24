@@ -2,6 +2,7 @@
 using LMS.Blazor.Client.Models.Enums;
 using LMS.Blazor.Client.Services;
 using LMS.Shared.DTOs;
+using LMS.Shared.DTOs.ModuleDTOs;
 using Microsoft.AspNetCore.Components;
 
 namespace LMS.Blazor.Client.Pages.Components.Admin
@@ -16,6 +17,8 @@ namespace LMS.Blazor.Client.Pages.Components.Admin
         private List<string> teachers = [];
         private int nrOfStudents = 0;
         private string linkToCreateNewModule => VBRoutes.Administration.DLinkToCreateNewModule(CourseEntry.Id);
+        [Inject]
+        private IApiService apiService {  get; set; }
         protected async override Task OnInitializedAsync()
         {
             modules = CourseEntry.CourseEntryDOs;
@@ -30,6 +33,16 @@ namespace LMS.Blazor.Client.Pages.Components.Admin
                 }
             }
             await base.OnInitializedAsync();
+        }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender && CourseEntryType == ECourseEntryType.Module)
+            {
+                modules = (await apiService.GetAsync<ModuleDTO>(VBRoutes.API.Module.ModuleAtIdWithActivities(CourseEntry.Id))).Activities.Select(x => new CourseEntryDO(x));
+                StateHasChanged();
+            }
+            await base.OnAfterRenderAsync(firstRender);
         }
     }
 }

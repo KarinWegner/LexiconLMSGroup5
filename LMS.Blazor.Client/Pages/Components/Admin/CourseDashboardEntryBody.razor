@@ -1,4 +1,5 @@
-﻿<li class="notClick mx-3 my-1 bg-expanded list-group-item ">
+﻿@rendermode InteractiveWebAssembly
+<li class="notClick mx-3 my-1 bg-expanded list-group-item ">
     @if (CourseEntryType == ECourseEntryType.Class)
     {
         @* top bar *@
@@ -39,7 +40,7 @@
             </div>
         </div>
     }
-    else
+    else if(CourseEntryType == ECourseEntryType.Module)
     {
         <div class="row">
             <div class="col">
@@ -53,5 +54,13 @@
             </div>
             <span class=" align-right col"> <NavLink class="blue nav-link h5 my-2" href="">Delete</NavLink></span>
         </div>
+            <div class="row">
+            @* activities *@
+                <div class="row">
+                    <span class="h5 col-sm-auto ms-3">Modules</span>
+                    <span class="col"></span>
+                </div>
+                <CourseDashboardList courseEntries="modules" CourseEntryType="ECourseEntryType.Activity"></CourseDashboardList>
+            </div>
     }
 </li>
